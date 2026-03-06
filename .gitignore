@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.venv/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.vercel/
+
+# Data (generated from bank/)
+data/
+web/public/data/
+
+# Bank (your question docs — not committed)
+bank/
+
+# Generated output
+output/
+
+# OS
+.DS_Store
+Thumbable.db
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Lock files (keep uv.lock, bun.lockb)
