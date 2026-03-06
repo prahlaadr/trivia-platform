@@ -347,23 +347,14 @@ export function Presenter({ quiz }: PresenterProps) {
           onClick={() => setShowJumpNav(false)}
         >
           <div
-            className="max-h-[70vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-[#143B2E] p-5 shadow-2xl"
+            className="w-full max-w-[95vw] rounded-xl bg-[#143B2E] px-4 py-3 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm font-bold uppercase tracking-wider text-[#FFD700]">
-                Jump to Slide
+            {/* Header + Misc inline */}
+            <div className="mb-2 flex items-center gap-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#FFD700]">
+                Jump
               </p>
-              <button
-                onClick={() => setShowJumpNav(false)}
-                className="text-sm text-white/40 hover:text-white"
-              >
-                Close
-              </button>
-            </div>
-
-            {/* Misc: Title, Tie Breaker */}
-            <div className="mb-3 flex flex-wrap gap-1.5">
               {jumpNav.misc.map((item) => (
                 <button
                   key={item.slideIndex}
@@ -371,7 +362,7 @@ export function Presenter({ quiz }: PresenterProps) {
                     setCurrentSlide(item.slideIndex);
                     setShowJumpNav(false);
                   }}
-                  className={`rounded px-2.5 py-1 text-xs font-medium transition-all ${
+                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
                     currentSlide === item.slideIndex
                       ? "bg-[#FFD700] text-black"
                       : "bg-white/10 text-white/70 hover:bg-white/20"
@@ -380,69 +371,77 @@ export function Presenter({ quiz }: PresenterProps) {
                   {item.label}
                 </button>
               ))}
+              <div className="flex-1" />
+              <button
+                onClick={() => setShowJumpNav(false)}
+                className="text-xs text-white/40 hover:text-white"
+              >
+                Close
+              </button>
             </div>
 
-            {/* Rounds */}
-            <div className="space-y-3">
+            {/* Rounds — compact grid */}
+            <div className="space-y-1">
               {jumpNav.rounds.map((round) => (
                 <div
                   key={round.roundNum}
-                  className={`rounded-lg border px-3 py-2 ${
+                  className={`rounded px-2 py-1 ${
                     currentRoundNum === round.roundNum
-                      ? "border-[#FFD700]/30 bg-white/[0.03]"
-                      : "border-transparent"
+                      ? "bg-white/[0.04]"
+                      : ""
                   }`}
                 >
-                  {/* Round header */}
-                  <div className="mb-1.5 flex items-center gap-2">
-                    <span
-                      className={`text-xs font-black ${
-                        currentRoundNum === round.roundNum
-                          ? "text-[#FFD700]"
-                          : "text-white/40"
-                      }`}
-                    >
-                      R{round.roundNum}
-                    </span>
-                    {round.isLast && (
-                      <span className="text-[10px] font-bold text-[#E84D5A]">
-                        2x PTS
-                      </span>
-                    )}
-                  </div>
-                  {/* Rows */}
-                  <div className="space-y-1.5">
-                    {round.rows.map((row) => (
-                      <div key={row.label} className="flex items-center gap-2">
-                        <span className="w-16 shrink-0 text-right text-[10px] font-bold uppercase tracking-wider text-white/25">
-                          {row.label}
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {row.items.map((item) => {
-                            const isAnswer = item.type === "answer" || item.type === "progressive-answer" || item.type === "video-answers";
-                            return (
-                              <button
-                                key={item.slideIndex}
-                                onClick={() => {
-                                  setCurrentSlide(item.slideIndex);
-                                  setShowJumpNav(false);
-                                }}
-                                className={`rounded px-2.5 py-1 text-xs font-medium transition-all ${
-                                  currentSlide === item.slideIndex
-                                    ? "bg-[#FFD700] text-black"
-                                    : isAnswer
-                                      ? "bg-[#4EC9B0]/15 text-[#4EC9B0]/80 hover:bg-[#4EC9B0]/25"
-                                      : "bg-white/10 text-white/70 hover:bg-white/20"
-                                }`}
-                              >
-                                {item.label}
-                              </button>
-                            );
-                          })}
-                        </div>
+                  {round.rows.map((row, rowIdx) => (
+                    <div key={row.label} className="flex items-center gap-1.5 py-[2px]">
+                      {/* Round label only on first row */}
+                      <div className="flex w-20 shrink-0 items-center gap-1">
+                        {rowIdx === 0 ? (
+                          <>
+                            <span
+                              className={`text-[11px] font-black ${
+                                currentRoundNum === round.roundNum
+                                  ? "text-[#FFD700]"
+                                  : "text-white/40"
+                              }`}
+                            >
+                              R{round.roundNum}
+                            </span>
+                            {round.isLast && (
+                              <span className="text-[9px] font-bold text-[#E84D5A]">2x</span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="w-full" />
+                        )}
                       </div>
-                    ))}
-                  </div>
+                      <span className="w-14 shrink-0 text-right text-[9px] font-bold uppercase text-white/20">
+                        {row.label}
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {row.items.map((item) => {
+                          const isAnswer = item.type === "answer" || item.type === "progressive-answer" || item.type === "video-answers";
+                          return (
+                            <button
+                              key={item.slideIndex}
+                              onClick={() => {
+                                setCurrentSlide(item.slideIndex);
+                                setShowJumpNav(false);
+                              }}
+                              className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
+                                currentSlide === item.slideIndex
+                                  ? "bg-[#FFD700] text-black"
+                                  : isAnswer
+                                    ? "bg-[#4EC9B0]/15 text-[#4EC9B0]/70 hover:bg-[#4EC9B0]/25"
+                                    : "bg-white/10 text-white/60 hover:bg-white/20"
+                              }`}
+                            >
+                              {item.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
