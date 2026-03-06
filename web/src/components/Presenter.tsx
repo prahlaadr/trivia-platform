@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Quiz, Slide } from "@/lib/types";
 import { buildSlides } from "@/lib/slides";
 import { SlideRenderer } from "./SlideRenderer";
+import { getLatestSession, teamTotal, type GameSession } from "@/lib/scoring";
 
 interface PresenterProps {
   quiz: Quiz;
@@ -16,7 +17,18 @@ export function Presenter({ quiz }: PresenterProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [slideSeconds, setSlideSeconds] = useState(0);
+  const [showScores, setShowScores] = useState(false);
+  const [scoreSession, setScoreSession] = useState<GameSession | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Load latest scoring session for leaderboard
+  const refreshScores = useCallback(() => {
+    setScoreSession(getLatestSession());
+  }, []);
+
+  useEffect(() => {
+    refreshScores();
+  }, [refreshScores]);
 
   // Reset timer whenever slide changes
   useEffect(() => {
@@ -62,6 +74,11 @@ export function Presenter({ quiz }: PresenterProps) {
       } else if (e.key === "ArrowLeft" || e.key === "Backspace") {
         e.preventDefault();
         goPrev();
+      } else if (e.key === "s" || e.key === "S") {
+        setShowScores((v) => {
+          if (!v) refreshScores(); // refresh data when opening
+          return !v;
+        });
       } else if (e.key === "f" || e.key === "F") {
         toggleFullscreen();
       } else if (e.key === "Escape") {
@@ -83,7 +100,7 @@ export function Presenter({ quiz }: PresenterProps) {
       window.removeEventListener("keydown", handleKey);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
-  }, [goNext, goPrev, toggleFullscreen, exitPresenter, slides.length]);
+  }, [goNext, goPrev, toggleFullscreen, exitPresenter, refreshScores, slides.length]);
 
   const slide = slides[currentSlide];
   const progress = ((currentSlide + 1) / slides.length) * 100;
@@ -239,7 +256,94 @@ export function Presenter({ quiz }: PresenterProps) {
         >
           Jump
         </button>
+        <button
+          onClick={() => {
+            refreshScores();
+            setShowScores((v) => !v);
+          }}
+          className={`rounded px-3 py-1 text-sm font-bold ${
+            showScores
+              ? "bg-[#4EC9B0] text-black"
+              : "bg-[#4EC9B0]/20 text-[#4EC9B0]"
+          }`}
+        >
+          Scores
+        </button>
       </div>
+
+      {/* Scores leaderboard overlay */}
+      {showScores && (
+        <div
+          className="absolute inset-0 z-50 flex items-center justify-center bg-black/70"
+          onClick={() => setShowScores(false)}
+        >
+          <div
+            className="w-full max-w-2xl rounded-xl bg-[#0F1B2D] p-8 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-2 text-center text-3xl font-black uppercase tracking-wider text-[#FFD700]">
+              Score Check
+            </h2>
+            {scoreSession && (
+              <p className="mb-6 text-center text-sm text-white/40">
+                {scoreSession.name}
+              </p>
+            )}
+            {!scoreSession || scoreSession.teams.length === 0 ? (
+              <p className="text-center text-lg text-white/40">
+                {scoreSession
+                  ? "No teams yet — add them in the scorekeeper"
+                  : "No scoring session — create one at /score"}
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {[...scoreSession.teams]
+                  .sort((a, b) => teamTotal(b) - teamTotal(a))
+                  .map((team, rank) => {
+                    const total = teamTotal(team);
+                    return (
+                      <div
+                        key={rank}
+                        className={`flex items-center gap-4 rounded-lg px-6 py-3 ${
+                          rank === 0
+                            ? "bg-[#FFD700]/15"
+                            : rank === 1
+                              ? "bg-white/5"
+                              : rank === 2
+                                ? "bg-white/[0.03]"
+                                : "bg-transparent"
+                        }`}
+                      >
+                        <span
+                          className={`w-10 text-3xl font-black ${
+                            rank === 0
+                              ? "text-[#FFD700]"
+                              : rank === 1
+                                ? "text-gray-300"
+                                : rank === 2
+                                  ? "text-amber-700"
+                                  : "text-white/30"
+                          }`}
+                        >
+                          {rank + 1}
+                        </span>
+                        <span className="flex-1 text-2xl font-bold text-white">
+                          {team.name}
+                        </span>
+                        <span className="text-3xl font-black text-[#4EC9B0]">
+                          {total}
+                        </span>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+            <p className="mt-6 text-center text-xs text-white/30">
+              Press S to close
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Jump navigation overlay */}
       {showJumpNav && (

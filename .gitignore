@@ -39,3 +39,4 @@ Thumbable.db
 *.swo
 
 # Lock files (keep uv.lock, bun.lockb)
+.vercel
