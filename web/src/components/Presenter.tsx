@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import type { Quiz, Slide } from "@/lib/types";
 import { buildSlides } from "@/lib/slides";
 import { SlideRenderer } from "./SlideRenderer";
-import { getLatestSession, teamTotal, type GameSession } from "@/lib/scoring";
+import { getLatestSession, saveSession, teamTotal, type GameSession } from "@/lib/scoring";
+import { ScoreGrid } from "./ScoreGrid";
 
 interface PresenterProps {
   quiz: Quiz;
@@ -68,21 +69,40 @@ export function Presenter({ quiz }: PresenterProps) {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      const inInput =
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement;
+
+      // Always allow S to toggle scorekeeper, even from inputs
+      if (e.key === "Escape") {
+        // If scorekeeper is open, close it instead of exiting presenter
+        setShowScores((v) => {
+          if (v) return false;
+          exitPresenter();
+          return false;
+        });
+        return;
+      }
+
+      if ((e.key === "s" || e.key === "S") && !inInput) {
+        setShowScores((v) => {
+          if (!v) refreshScores(); // refresh data when opening
+          return !v;
+        });
+        return;
+      }
+
+      // Don't handle navigation keys when typing in score inputs
+      if (inInput) return;
+
       if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter") {
         e.preventDefault();
         goNext();
       } else if (e.key === "ArrowLeft" || e.key === "Backspace") {
         e.preventDefault();
         goPrev();
-      } else if (e.key === "s" || e.key === "S") {
-        setShowScores((v) => {
-          if (!v) refreshScores(); // refresh data when opening
-          return !v;
-        });
       } else if (e.key === "f" || e.key === "F") {
         toggleFullscreen();
-      } else if (e.key === "Escape") {
-        exitPresenter();
       } else if (e.key === "Home") {
         setCurrentSlide(0);
       } else if (e.key === "End") {
@@ -266,76 +286,47 @@ export function Presenter({ quiz }: PresenterProps) {
         </button>
       </div>
 
-      {/* Scores leaderboard overlay */}
+      {/* Scorekeeper overlay */}
       {showScores && (
         <div
           className="absolute inset-0 z-50 flex items-center justify-center bg-black/70"
           onClick={() => setShowScores(false)}
         >
           <div
-            className="w-full max-w-2xl rounded-xl bg-[#0F1B2D] p-8 shadow-2xl"
+            className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-xl bg-[#143B2E] p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="mb-2 text-center text-3xl font-black uppercase tracking-wider text-[#FFD700]">
-              Score Check
-            </h2>
-            {scoreSession && (
-              <p className="mb-6 text-center text-sm text-white/40">
-                {scoreSession.name}
-              </p>
-            )}
-            {!scoreSession || scoreSession.teams.length === 0 ? (
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-2xl font-black uppercase tracking-wider text-[#FFD700]">
+                Scorekeeper
+              </h2>
+              <button
+                onClick={() => setShowScores(false)}
+                className="rounded bg-white/10 px-3 py-1.5 text-sm font-bold text-white/60 hover:bg-white/20"
+              >
+                Back to game (S)
+              </button>
+            </div>
+            {!scoreSession ? (
               <p className="text-center text-lg text-white/40">
-                {scoreSession
-                  ? "No teams yet — add them in the scorekeeper"
-                  : "No scoring session — create one at /score"}
+                No scoring session — create one at /score
               </p>
             ) : (
-              <div className="space-y-2">
-                {[...scoreSession.teams]
-                  .sort((a, b) => teamTotal(b) - teamTotal(a))
-                  .map((team, rank) => {
-                    const total = teamTotal(team);
-                    return (
-                      <div
-                        key={rank}
-                        className={`flex items-center gap-4 rounded-lg px-6 py-3 ${
-                          rank === 0
-                            ? "bg-[#FFD700]/15"
-                            : rank === 1
-                              ? "bg-white/5"
-                              : rank === 2
-                                ? "bg-white/[0.03]"
-                                : "bg-transparent"
-                        }`}
-                      >
-                        <span
-                          className={`w-10 text-3xl font-black ${
-                            rank === 0
-                              ? "text-[#FFD700]"
-                              : rank === 1
-                                ? "text-gray-300"
-                                : rank === 2
-                                  ? "text-amber-700"
-                                  : "text-white/30"
-                          }`}
-                        >
-                          {rank + 1}
-                        </span>
-                        <span className="flex-1 text-2xl font-bold text-white">
-                          {team.name}
-                        </span>
-                        <span className="text-3xl font-black text-[#4EC9B0]">
-                          {total}
-                        </span>
-                      </div>
-                    );
-                  })}
-              </div>
+              <>
+                <p className="mb-4 text-sm text-white/40">
+                  {scoreSession.name} — {scoreSession.date}
+                </p>
+                <ScoreGrid
+                  session={scoreSession}
+                  onUpdate={(updated) => {
+                    setScoreSession({ ...updated });
+                  }}
+                />
+                <p className="mt-3 text-xs text-white/30">
+                  Arrow keys navigate between score cells. Last round is doubled.
+                </p>
+              </>
             )}
-            <p className="mt-6 text-center text-xs text-white/30">
-              Press S to close
-            </p>
           </div>
         </div>
       )}

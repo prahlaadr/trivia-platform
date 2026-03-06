@@ -78,9 +78,13 @@ export function getLatestSession(): GameSession | null {
   return getSession(sessions[0].id);
 }
 
-/** Calculate total score for a team. */
-export function teamTotal(team: Team): number {
-  return team.scores.reduce((sum: number, s) => sum + (s ?? 0), 0);
+/** Calculate total score for a team. Last round is doubled. */
+export function teamTotal(team: Team, roundCount?: number): number {
+  const lastIdx = (roundCount ?? team.scores.length) - 1;
+  return team.scores.reduce((sum: number, s, i) => {
+    const pts = s ?? 0;
+    return sum + (i === lastIdx ? pts * 2 : pts);
+  }, 0);
 }
 
 /** Export session as CSV string. */
