@@ -2,11 +2,17 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
-import type { Quiz } from "@/lib/types";
 import { brand } from "@/lib/branding";
 
+export interface QuizSummary {
+  quiz_number: number;
+  date: string;
+  round_count: number;
+  round_titles: string[];
+}
+
 interface QuizListProps {
-  initialQuizzes: Quiz[];
+  initialQuizzes: QuizSummary[];
 }
 
 export function QuizList({ initialQuizzes }: QuizListProps) {
@@ -57,11 +63,17 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
 
       // Add to list from response data (no filesystem dependency)
       if (data.quiz) {
+        const summary: QuizSummary = {
+          quiz_number: data.quiz.quiz_number,
+          date: data.quiz.date,
+          round_count: data.quiz.rounds.length,
+          round_titles: data.quiz.rounds.map((r: { title: string }) => r.title),
+        };
         setQuizzes((prev) => {
           const filtered = prev.filter(
-            (q) => q.quiz_number !== data.quiz.quiz_number
+            (q) => q.quiz_number !== summary.quiz_number
           );
-          return [data.quiz, ...filtered].sort(
+          return [summary, ...filtered].sort(
             (a, b) => b.quiz_number - a.quiz_number
           );
         });
@@ -177,10 +189,10 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
               </div>
               <div className="text-right">
                 <p className="text-sm text-[#FFD700]/60">
-                  {quiz.rounds.length} rounds
+                  {quiz.round_count} rounds
                 </p>
                 <p className="max-w-xs truncate text-xs text-white/30">
-                  {quiz.rounds.map((r) => r.title).join(" / ")}
+                  {quiz.round_titles.join(" / ")}
                 </p>
               </div>
             </Link>
