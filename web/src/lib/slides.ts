@@ -17,13 +17,20 @@ export function buildSlides(quiz: Quiz): Slide[] {
   // Title slide
   slides.push({ type: "title", quiz });
 
+  const lastRoundNum = quiz.rounds.length > 0
+    ? quiz.rounds[quiz.rounds.length - 1].number
+    : -1;
+
   for (const round of quiz.rounds) {
+    const isLastRound = round.number === lastRoundNum;
+
     // Round title
     slides.push({
       type: "round-title",
       round,
       roundNumber: round.number,
       roundTitle: round.title,
+      isLastRound,
     });
 
     if (round.round_type === "progressive") {

@@ -109,6 +109,13 @@ function RoundTitleSlide({ slide }: { slide: Slide }) {
           ? "Joker Is IN PLAY"
           : "Joker Is NOT In Play"}
       </p>
+      {slide.isLastRound && (
+        <div className="mt-6 rounded-lg border-2 border-[#FFD700]/60 bg-[#FFD700]/10 px-6 py-3">
+          <p className="text-xl font-black uppercase tracking-wider text-[#FFD700]">
+            Final Round — Points Are Doubled For Everyone
+          </p>
+        </div>
+      )}
       {round.theme_description && (
         <p className="mt-6 max-w-3xl text-center text-xl italic text-[#F5E6C8]/80">
           {round.theme_description}

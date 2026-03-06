@@ -55,4 +55,5 @@ export interface Slide {
   round?: Round;
   question?: Question;
   clueIndex?: number; // for progressive rounds
+  isLastRound?: boolean; // last round = doubled points
 }
