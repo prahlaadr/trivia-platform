@@ -218,7 +218,30 @@ export function Presenter({ quiz }: PresenterProps) {
         />
       </div>
 
-      {/* Controls overlay (bottom) */}
+      {/* Always-visible action buttons — bottom left */}
+      <div className="absolute bottom-4 left-4 z-40 flex gap-2">
+        <button
+          onClick={() => setShowJumpNav((v) => !v)}
+          className="rounded bg-[#FFD700]/20 px-3 py-1.5 text-sm font-bold text-[#FFD700] backdrop-blur-sm transition-all hover:bg-[#FFD700]/30"
+        >
+          Jump
+        </button>
+        <button
+          onClick={() => {
+            refreshScores();
+            setShowScores((v) => !v);
+          }}
+          className={`rounded px-3 py-1.5 text-sm font-bold backdrop-blur-sm transition-all ${
+            showScores
+              ? "bg-[#4EC9B0] text-black"
+              : "bg-[#4EC9B0]/20 text-[#4EC9B0] hover:bg-[#4EC9B0]/30"
+          }`}
+        >
+          Scores
+        </button>
+      </div>
+
+      {/* Nav controls (bottom center, show on hover) */}
       <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-4 opacity-0 transition-opacity hover:opacity-100">
         <button
           onClick={exitPresenter}
@@ -249,25 +272,6 @@ export function Presenter({ quiz }: PresenterProps) {
           className="rounded bg-black/60 px-3 py-1 text-sm text-white/80"
         >
           {isFullscreen ? "Exit FS" : "Fullscreen"}
-        </button>
-        <button
-          onClick={() => setShowJumpNav((v) => !v)}
-          className="rounded bg-[#FFD700]/20 px-3 py-1 text-sm font-bold text-[#FFD700]"
-        >
-          Jump
-        </button>
-        <button
-          onClick={() => {
-            refreshScores();
-            setShowScores((v) => !v);
-          }}
-          className={`rounded px-3 py-1 text-sm font-bold ${
-            showScores
-              ? "bg-[#4EC9B0] text-black"
-              : "bg-[#4EC9B0]/20 text-[#4EC9B0]"
-          }`}
-        >
-          Scores
         </button>
       </div>
 
