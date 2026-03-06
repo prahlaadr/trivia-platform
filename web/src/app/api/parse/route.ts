@@ -3,9 +3,12 @@ import { parseDocx } from "@/lib/parser";
 import fs from "fs";
 import path from "path";
 
+const isVercel = !!process.env.VERCEL;
 const PROJECT_ROOT = path.resolve(process.cwd(), "..");
-const BANK_DIR = path.join(PROJECT_ROOT, "bank");
-const DATA_DIR = path.join(process.cwd(), "public", "data");
+const BANK_DIR = isVercel ? "/tmp/bank" : path.join(PROJECT_ROOT, "bank");
+const DATA_DIR = isVercel
+  ? "/tmp/data"
+  : path.join(process.cwd(), "public", "data");
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -18,20 +21,28 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Ensure directories exist
-  fs.mkdirSync(BANK_DIR, { recursive: true });
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-
-  // Save to bank/
   const buffer = Buffer.from(await file.arrayBuffer());
-  const bankPath = path.join(BANK_DIR, file.name);
-  fs.writeFileSync(bankPath, buffer);
+
+  // Save to bank/ (best-effort, non-critical)
+  try {
+    fs.mkdirSync(BANK_DIR, { recursive: true });
+    fs.writeFileSync(path.join(BANK_DIR, file.name), buffer);
+  } catch {
+    // Filesystem may be read-only (Vercel) — that's fine
+  }
 
   // Parse with TypeScript
   try {
     const quiz = await parseDocx(buffer);
-    const jsonPath = path.join(DATA_DIR, `quiz_${quiz.quiz_number}.json`);
-    fs.writeFileSync(jsonPath, JSON.stringify(quiz, null, 2));
+
+    // Save parsed JSON (best-effort)
+    try {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+      const jsonPath = path.join(DATA_DIR, `quiz_${quiz.quiz_number}.json`);
+      fs.writeFileSync(jsonPath, JSON.stringify(quiz, null, 2));
+    } catch {
+      // Non-critical — quiz data is returned in the response
+    }
 
     return NextResponse.json({
       success: true,
@@ -39,6 +50,7 @@ export async function POST(request: NextRequest) {
       date: quiz.date,
       rounds: quiz.rounds.length,
       file: file.name,
+      quiz,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Parse failed";
