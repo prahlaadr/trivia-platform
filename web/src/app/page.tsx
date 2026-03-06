@@ -1,3 +1,5 @@
+import { QuizList } from "@/components/QuizList";
+
 export default function Home() {
-  return <div>Hello</div>;
+  return <QuizList />;
 }
