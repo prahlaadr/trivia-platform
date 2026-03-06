@@ -95,8 +95,8 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
         </div>
 
         {/* Upload zone */}
-        <label
-          htmlFor="quiz-upload"
+        <div
+          onClick={() => fileInputRef.current?.click()}
           onDragOver={(e) => {
             e.preventDefault();
             setDragOver(true);
@@ -110,12 +110,11 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
           }`}
         >
           <input
-            id="quiz-upload"
             ref={fileInputRef}
             type="file"
             accept=".docx"
             onChange={handleFileSelect}
-            className="sr-only"
+            className="absolute h-0 w-0 overflow-hidden opacity-0"
           />
           <p className="text-lg font-bold text-white/70">
             {uploading ? "Parsing..." : "Drop a .docx quiz file here"}
@@ -123,7 +122,7 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
           <p className="mt-1 text-sm text-white/30">
             or click to browse
           </p>
-        </label>
+        </div>
 
         {/* Status message */}
         {message && (
