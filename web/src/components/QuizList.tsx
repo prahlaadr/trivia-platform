@@ -87,14 +87,14 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
         </h1>
 
         {/* Upload zone */}
-        <div
+        <label
+          htmlFor="quiz-upload"
           onDragOver={(e) => {
             e.preventDefault();
             setDragOver(true);
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
           className={`mb-6 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-all ${
             dragOver
               ? "border-[#FFD700] bg-[#FFD700]/10"
@@ -102,6 +102,7 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
           }`}
         >
           <input
+            id="quiz-upload"
             ref={fileInputRef}
             type="file"
             accept=".docx"
@@ -114,7 +115,7 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
           <p className="mt-1 text-sm text-white/30">
             or click to browse
           </p>
-        </div>
+        </label>
 
         {/* Status message */}
         {message && (
