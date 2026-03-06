@@ -114,7 +114,7 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
             type="file"
             accept=".docx"
             onChange={handleFileSelect}
-            className="absolute h-0 w-0 overflow-hidden opacity-0"
+            className="hidden"
           />
           <p className="text-lg font-bold text-white/70">
             {uploading ? "Parsing..." : "Drop a .docx quiz file here"}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { execSync } from "child_process";
+import { parseDocx } from "@/lib/parser";
 import fs from "fs";
 import path from "path";
 
@@ -27,18 +27,9 @@ export async function POST(request: NextRequest) {
   const bankPath = path.join(BANK_DIR, file.name);
   fs.writeFileSync(bankPath, buffer);
 
-  // Parse with Python
+  // Parse with TypeScript
   try {
-    const output = execSync(
-      `uv run python parser.py "${bankPath}"`,
-      {
-        cwd: PROJECT_ROOT,
-        encoding: "utf-8",
-        timeout: 15000,
-      }
-    );
-
-    const quiz = JSON.parse(output);
+    const quiz = await parseDocx(buffer);
     const jsonPath = path.join(DATA_DIR, `quiz_${quiz.quiz_number}.json`);
     fs.writeFileSync(jsonPath, JSON.stringify(quiz, null, 2));
 
