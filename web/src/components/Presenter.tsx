@@ -19,6 +19,7 @@ export function Presenter({ quiz }: PresenterProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [slideSeconds, setSlideSeconds] = useState(0);
   const [showScores, setShowScores] = useState(false);
+  const [scoreTab, setScoreTab] = useState<"leaderboard" | "scorekeeper">("leaderboard");
   const [scoreSession, setScoreSession] = useState<GameSession | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -286,20 +287,42 @@ export function Presenter({ quiz }: PresenterProps) {
         </button>
       </div>
 
-      {/* Scorekeeper overlay */}
+      {/* Scores overlay — tabbed: Leaderboard / Scorekeeper */}
       {showScores && (
         <div
           className="absolute inset-0 z-50 flex items-center justify-center bg-black/70"
           onClick={() => setShowScores(false)}
         >
           <div
-            className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-xl bg-[#143B2E] p-6 shadow-2xl"
+            className={`max-h-[90vh] overflow-y-auto rounded-xl bg-[#0F1B2D] p-6 shadow-2xl ${
+              scoreTab === "scorekeeper" ? "w-full max-w-5xl" : "w-full max-w-2xl"
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-black uppercase tracking-wider text-[#FFD700]">
-                Scorekeeper
-              </h2>
+            {/* Tab bar + close */}
+            <div className="mb-5 flex items-center justify-between">
+              <div className="flex gap-1 rounded-lg bg-white/5 p-1">
+                <button
+                  onClick={() => setScoreTab("leaderboard")}
+                  className={`rounded-md px-4 py-1.5 text-sm font-bold transition-all ${
+                    scoreTab === "leaderboard"
+                      ? "bg-[#FFD700] text-black"
+                      : "text-white/50 hover:text-white/80"
+                  }`}
+                >
+                  Leaderboard
+                </button>
+                <button
+                  onClick={() => setScoreTab("scorekeeper")}
+                  className={`rounded-md px-4 py-1.5 text-sm font-bold transition-all ${
+                    scoreTab === "scorekeeper"
+                      ? "bg-[#4EC9B0] text-black"
+                      : "text-white/50 hover:text-white/80"
+                  }`}
+                >
+                  Scorekeeper
+                </button>
+              </div>
               <button
                 onClick={() => setShowScores(false)}
                 className="rounded bg-white/10 px-3 py-1.5 text-sm font-bold text-white/60 hover:bg-white/20"
@@ -307,11 +330,70 @@ export function Presenter({ quiz }: PresenterProps) {
                 Back to game (S)
               </button>
             </div>
+
             {!scoreSession ? (
               <p className="text-center text-lg text-white/40">
                 No scoring session — create one at /score
               </p>
+            ) : scoreTab === "leaderboard" ? (
+              /* Leaderboard view */
+              <>
+                <h2 className="mb-2 text-center text-3xl font-black uppercase tracking-wider text-[#FFD700]">
+                  Leaderboard
+                </h2>
+                <p className="mb-6 text-center text-sm text-white/40">
+                  {scoreSession.name}
+                </p>
+                {scoreSession.teams.length === 0 ? (
+                  <p className="text-center text-lg text-white/40">
+                    No teams yet — add them in the scorekeeper tab
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {[...scoreSession.teams]
+                      .sort((a, b) => teamTotal(b, scoreSession.roundCount) - teamTotal(a, scoreSession.roundCount))
+                      .map((team, rank) => {
+                        const total = teamTotal(team, scoreSession.roundCount);
+                        return (
+                          <div
+                            key={rank}
+                            className={`flex items-center gap-4 rounded-lg px-6 py-3 ${
+                              rank === 0
+                                ? "bg-[#FFD700]/15"
+                                : rank === 1
+                                  ? "bg-white/5"
+                                  : rank === 2
+                                    ? "bg-white/[0.03]"
+                                    : "bg-transparent"
+                            }`}
+                          >
+                            <span
+                              className={`w-10 text-3xl font-black ${
+                                rank === 0
+                                  ? "text-[#FFD700]"
+                                  : rank === 1
+                                    ? "text-gray-300"
+                                    : rank === 2
+                                      ? "text-amber-700"
+                                      : "text-white/30"
+                              }`}
+                            >
+                              {rank + 1}
+                            </span>
+                            <span className="flex-1 text-2xl font-bold text-white">
+                              {team.name || "—"}
+                            </span>
+                            <span className="text-3xl font-black text-[#4EC9B0]">
+                              {total}
+                            </span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </>
             ) : (
+              /* Scorekeeper view */
               <>
                 <p className="mb-4 text-sm text-white/40">
                   {scoreSession.name} — {scoreSession.date}
