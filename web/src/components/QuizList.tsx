@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import type { Quiz } from "@/lib/types";
 import { brand } from "@/lib/branding";
@@ -17,7 +17,6 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
     text: string;
     type: "success" | "error";
   } | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadFile = useCallback(async (file: File) => {
     if (!file.name.endsWith(".docx")) {
@@ -45,14 +44,20 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
         type: "success",
       });
 
-      // Refresh quiz list
-      const listRes = await fetch("/api/parse");
-      if (listRes.ok) {
-        // Reload the page to get fresh server-rendered data
-        window.location.reload();
+      // Add to list from response data (no filesystem dependency)
+      if (data.quiz) {
+        setQuizzes((prev) => {
+          const filtered = prev.filter(
+            (q) => q.quiz_number !== data.quiz.quiz_number
+          );
+          return [data.quiz, ...filtered].sort(
+            (a, b) => b.quiz_number - a.quiz_number
+          );
+        });
       }
-    } catch {
-      setMessage({ text: "Network error", type: "error" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      setMessage({ text: `Upload failed: ${msg}`, type: "error" });
     } finally {
       setUploading(false);
     }
@@ -95,8 +100,8 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
         </div>
 
         {/* Upload zone */}
-        <div
-          onClick={() => fileInputRef.current?.click()}
+        <label
+          htmlFor="docx-upload"
           onDragOver={(e) => {
             e.preventDefault();
             setDragOver(true);
@@ -110,7 +115,7 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
           }`}
         >
           <input
-            ref={fileInputRef}
+            id="docx-upload"
             type="file"
             accept=".docx"
             onChange={handleFileSelect}
@@ -122,7 +127,7 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
           <p className="mt-1 text-sm text-white/30">
             or click to browse
           </p>
-        </div>
+        </label>
 
         {/* Status message */}
         {message && (
