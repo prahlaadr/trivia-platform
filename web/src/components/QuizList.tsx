@@ -31,8 +31,19 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
     formData.append("file", file);
 
     try {
-      const res = await fetch("/api/parse", { method: "POST", body: formData });
-      const data = await res.json();
+      const res = await fetch("/api/parse", {
+        method: "POST",
+        body: formData,
+        headers: { Accept: "application/json" },
+      });
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        setMessage({ text: `Server returned non-JSON: ${text.slice(0, 100)}`, type: "error" });
+        return;
+      }
 
       if (!res.ok) {
         setMessage({ text: data.error || "Upload failed", type: "error" });
