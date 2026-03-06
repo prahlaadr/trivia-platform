@@ -114,85 +114,76 @@ export function Presenter({ quiz }: PresenterProps) {
       : `${secs}s`;
   };
 
-  // Build jump nav index: group slide indices by round
-  const jumpNav = useMemo(() => {
-    const nav: {
-      label: string;
-      roundNum: number;
-      isLast: boolean;
-      items: { label: string; slideIndex: number; type: string }[];
-    }[] = [];
+  // Build jump nav index: group slide indices by round, split into rows
+  type NavItem = { label: string; slideIndex: number; type: string };
+  type NavRow = { label: string; items: NavItem[] };
+  type NavRound = {
+    roundNum: number;
+    isLast: boolean;
+    rows: NavRow[];
+  };
 
-    // Title slide
-    const misc: { label: string; slideIndex: number; type: string }[] = [
+  const jumpNav = useMemo(() => {
+    const rounds: NavRound[] = [];
+    const misc: NavItem[] = [
       { label: "Title", slideIndex: 0, type: "title" },
     ];
 
-    let currentRound: (typeof nav)[number] | null = null;
+    let currentRound: NavRound | null = null;
+    let questionsRow: NavRow | null = null;
+    let revealRow: NavRow | null = null;
+    let seenReview = false;
 
     for (let i = 0; i < slides.length; i++) {
       const s = slides[i];
       if (s.type === "title") continue;
 
       if (s.type === "round-title") {
+        seenReview = false;
+        questionsRow = { label: "Questions", items: [{ label: "Title", slideIndex: i, type: "round-title" }] };
+        revealRow = { label: "Answers", items: [] };
         currentRound = {
-          label: `R${s.roundNumber}`,
           roundNum: s.roundNumber!,
           isLast: false,
-          items: [{ label: "Title", slideIndex: i, type: "round-title" }],
+          rows: [questionsRow],
         };
-        nav.push(currentRound);
+        rounds.push(currentRound);
       } else if (s.type === "tie-breaker-question") {
         misc.push({ label: "TB Q", slideIndex: i, type: "tie-breaker-question" });
       } else if (s.type === "tie-breaker-answer") {
         misc.push({ label: "TB A", slideIndex: i, type: "tie-breaker-answer" });
-      } else if (currentRound) {
-        if (s.type === "question" || s.type === "internet-question") {
-          currentRound.items.push({
-            label: `Q${s.question?.number}`,
-            slideIndex: i,
-            type: s.type,
-          });
+      } else if (currentRound && questionsRow && revealRow) {
+        if (s.type === "questions-overview") {
+          questionsRow.items.push({ label: "Review", slideIndex: i, type: "questions-overview" });
+          seenReview = true;
+          // Add the reveal row now that we know it's a standard round
+          currentRound.rows.push(revealRow);
+        } else if (s.type === "question" || s.type === "internet-question") {
+          if (seenReview) {
+            // This is the Q/A reveal section
+            revealRow.items.push({ label: `Q${s.question?.number}`, slideIndex: i, type: s.type });
+          } else {
+            // Questions-only section
+            questionsRow.items.push({ label: `Q${s.question?.number}`, slideIndex: i, type: s.type });
+          }
         } else if (s.type === "answer") {
-          currentRound.items.push({
-            label: `A${s.question?.number}`,
-            slideIndex: i,
-            type: "answer",
-          });
-        } else if (s.type === "questions-overview") {
-          currentRound.items.push({
-            label: "Review",
-            slideIndex: i,
-            type: "questions-overview",
-          });
+          revealRow.items.push({ label: `A${s.question?.number}`, slideIndex: i, type: "answer" });
         } else if (s.type === "progressive-clue") {
-          currentRound.items.push({
-            label: `Clue ${(s.clueIndex ?? 0) + 1}`,
-            slideIndex: i,
-            type: "progressive-clue",
-          });
+          questionsRow.items.push({ label: `Clue ${(s.clueIndex ?? 0) + 1}`, slideIndex: i, type: "progressive-clue" });
         } else if (s.type === "progressive-answer") {
-          currentRound.items.push({
-            label: "Answer",
-            slideIndex: i,
-            type: "progressive-answer",
-          });
+          questionsRow.items.push({ label: "Answer", slideIndex: i, type: "progressive-answer" });
         } else if (s.type === "video-answers") {
-          currentRound.items.push({
-            label: "Answers",
-            slideIndex: i,
-            type: "video-answers",
-          });
+          questionsRow.items.push({ label: "Answers", slideIndex: i, type: "video-answers" });
         }
       }
     }
 
     // Mark last round
-    if (nav.length > 0) {
-      nav[nav.length - 1].isLast = true;
+    if (rounds.length > 0) {
+      rounds[rounds.length - 1].isLast = true;
     }
 
-    return { rounds: nav, misc };
+    return { rounds, misc };
   }, [slides]);
 
   // Find which round the current slide belongs to
@@ -392,10 +383,18 @@ export function Presenter({ quiz }: PresenterProps) {
             </div>
 
             {/* Rounds */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               {jumpNav.rounds.map((round) => (
-                <div key={round.roundNum} className="flex items-start gap-2">
-                  <div className="flex w-14 shrink-0 flex-col items-center pt-1">
+                <div
+                  key={round.roundNum}
+                  className={`rounded-lg border px-3 py-2 ${
+                    currentRoundNum === round.roundNum
+                      ? "border-[#FFD700]/30 bg-white/[0.03]"
+                      : "border-transparent"
+                  }`}
+                >
+                  {/* Round header */}
+                  <div className="mb-1.5 flex items-center gap-2">
                     <span
                       className={`text-xs font-black ${
                         currentRoundNum === round.roundNum
@@ -403,36 +402,46 @@ export function Presenter({ quiz }: PresenterProps) {
                           : "text-white/40"
                       }`}
                     >
-                      {round.label}
+                      R{round.roundNum}
                     </span>
                     {round.isLast && (
-                      <span className="mt-0.5 text-[10px] font-bold text-[#E84D5A]">
+                      <span className="text-[10px] font-bold text-[#E84D5A]">
                         2x PTS
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {round.items.map((item) => {
-                      const isAnswer = item.type === "answer" || item.type === "progressive-answer" || item.type === "video-answers";
-                      return (
-                        <button
-                          key={item.slideIndex}
-                          onClick={() => {
-                            setCurrentSlide(item.slideIndex);
-                            setShowJumpNav(false);
-                          }}
-                          className={`rounded px-2.5 py-1 text-xs font-medium transition-all ${
-                            currentSlide === item.slideIndex
-                              ? "bg-[#FFD700] text-black"
-                              : isAnswer
-                                ? "bg-[#4EC9B0]/15 text-[#4EC9B0]/80 hover:bg-[#4EC9B0]/25"
-                                : "bg-white/10 text-white/70 hover:bg-white/20"
-                          }`}
-                        >
-                          {item.label}
-                        </button>
-                      );
-                    })}
+                  {/* Rows */}
+                  <div className="space-y-1.5">
+                    {round.rows.map((row) => (
+                      <div key={row.label} className="flex items-center gap-2">
+                        <span className="w-16 shrink-0 text-right text-[10px] font-bold uppercase tracking-wider text-white/25">
+                          {row.label}
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {row.items.map((item) => {
+                            const isAnswer = item.type === "answer" || item.type === "progressive-answer" || item.type === "video-answers";
+                            return (
+                              <button
+                                key={item.slideIndex}
+                                onClick={() => {
+                                  setCurrentSlide(item.slideIndex);
+                                  setShowJumpNav(false);
+                                }}
+                                className={`rounded px-2.5 py-1 text-xs font-medium transition-all ${
+                                  currentSlide === item.slideIndex
+                                    ? "bg-[#FFD700] text-black"
+                                    : isAnswer
+                                      ? "bg-[#4EC9B0]/15 text-[#4EC9B0]/80 hover:bg-[#4EC9B0]/25"
+                                      : "bg-white/10 text-white/70 hover:bg-white/20"
+                                }`}
+                              >
+                                {item.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
