@@ -1,28 +1,35 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { brand } from "@/lib/branding";
 
-export interface QuizSummary {
+interface QuizSummary {
   quiz_number: number;
   date: string;
-  round_count: number;
-  round_titles: string[];
+  rounds: number;
 }
 
-interface QuizListProps {
-  initialQuizzes: QuizSummary[];
-}
-
-export function QuizList({ initialQuizzes }: QuizListProps) {
-  const [quizzes, setQuizzes] = useState(initialQuizzes);
+export function QuizList() {
+  const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
+  const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
     type: "success" | "error";
   } | null>(null);
+
+  // Fetch quiz list on mount
+  useEffect(() => {
+    fetch("/api/parse")
+      .then((res) => res.json())
+      .then((data) => {
+        setQuizzes(data.quizzes || []);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const uploadFile = useCallback(async (file: File) => {
     if (!file.name.endsWith(".docx")) {
@@ -47,7 +54,10 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
       try {
         data = JSON.parse(text);
       } catch {
-        setMessage({ text: `Server returned non-JSON: ${text.slice(0, 100)}`, type: "error" });
+        setMessage({
+          text: "Server returned non-JSON: " + text.slice(0, 100),
+          type: "error",
+        });
         return;
       }
 
@@ -57,30 +67,19 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
       }
 
       setMessage({
-        text: `Parsed Quiz #${data.quiz_number} (${data.date}) — ${data.rounds} rounds`,
+        text: "Parsed Quiz #" + data.quiz_number + " (" + data.date + ") — " + data.rounds + " rounds",
         type: "success",
       });
 
-      // Add to list from response data (no filesystem dependency)
-      if (data.quiz) {
-        const summary: QuizSummary = {
-          quiz_number: data.quiz.quiz_number,
-          date: data.quiz.date,
-          round_count: data.quiz.rounds.length,
-          round_titles: data.quiz.rounds.map((r: { title: string }) => r.title),
-        };
-        setQuizzes((prev) => {
-          const filtered = prev.filter(
-            (q) => q.quiz_number !== summary.quiz_number
-          );
-          return [summary, ...filtered].sort(
-            (a, b) => b.quiz_number - a.quiz_number
-          );
-        });
+      // Refresh quiz list
+      const listRes = await fetch("/api/parse");
+      if (listRes.ok) {
+        const listData = await listRes.json();
+        setQuizzes(listData.quizzes || []);
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error";
-      setMessage({ text: `Upload failed: ${msg}`, type: "error" });
+      setMessage({ text: "Upload failed: " + msg, type: "error" });
     } finally {
       setUploading(false);
     }
@@ -147,9 +146,7 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
           <p className="text-lg font-bold text-white/70">
             {uploading ? "Parsing..." : "Drop a .docx quiz file here"}
           </p>
-          <p className="mt-1 text-sm text-white/30">
-            or click to browse
-          </p>
+          <p className="mt-1 text-sm text-white/30">or click to browse</p>
         </label>
 
         {/* Status message */}
@@ -169,7 +166,7 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
         <div className="mb-4 flex items-center gap-3">
           <div className="h-px flex-1 bg-[#FFD700]/20" />
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#FFD700]/40">
-            {quizzes.length} quizzes in bank
+            {loading ? "Loading..." : quizzes.length + " quizzes in bank"}
           </p>
           <div className="h-px flex-1 bg-[#FFD700]/20" />
         </div>
@@ -178,7 +175,7 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
           {quizzes.map((quiz) => (
             <Link
               key={quiz.quiz_number}
-              href={`/present/${quiz.quiz_number}`}
+              href={"/present/" + quiz.quiz_number}
               className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1B4D3E] p-5 transition-all hover:border-[#FFD700]/40 hover:bg-[#1B4D3E]/80"
             >
               <div>
@@ -189,17 +186,14 @@ export function QuizList({ initialQuizzes }: QuizListProps) {
               </div>
               <div className="text-right">
                 <p className="text-sm text-[#FFD700]/60">
-                  {quiz.round_count} rounds
-                </p>
-                <p className="max-w-xs truncate text-xs text-white/30">
-                  {quiz.round_titles.join(" / ")}
+                  {quiz.rounds} rounds
                 </p>
               </div>
             </Link>
           ))}
         </div>
 
-        {quizzes.length === 0 && (
+        {!loading && quizzes.length === 0 && (
           <p className="mt-8 text-center text-white/40">
             No quizzes yet. Drop a .docx file above to get started.
           </p>
