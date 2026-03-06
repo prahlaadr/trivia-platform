@@ -423,12 +423,51 @@ export function Presenter({ quiz }: PresenterProps) {
             className="w-full max-w-[95vw] rounded-xl bg-[#143B2E] px-4 py-3 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header + Misc inline */}
-            <div className="mb-2 flex items-center gap-3">
+            {/* Header: Title + Round shortcuts + TB + Close */}
+            <div className="mb-2 flex items-center gap-2">
               <p className="text-xs font-bold uppercase tracking-wider text-[#FFD700]">
                 Jump
               </p>
-              {jumpNav.misc.map((item) => (
+              {/* Title slide */}
+              <button
+                onClick={() => {
+                  setCurrentSlide(0);
+                  setShowJumpNav(false);
+                }}
+                className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
+                  currentSlide === 0
+                    ? "bg-[#FFD700] text-black"
+                    : "bg-white/10 text-white/70 hover:bg-white/20"
+                }`}
+              >
+                Title
+              </button>
+              {/* Round title shortcuts */}
+              {jumpNav.rounds.map((round) => {
+                const titleItem = round.rows[0]?.items[0];
+                if (!titleItem) return null;
+                return (
+                  <button
+                    key={round.roundNum}
+                    onClick={() => {
+                      setCurrentSlide(titleItem.slideIndex);
+                      setShowJumpNav(false);
+                    }}
+                    className={`rounded px-2 py-0.5 text-[11px] font-bold transition-all ${
+                      currentRoundNum === round.roundNum
+                        ? "bg-[#FFD700] text-black"
+                        : "bg-white/10 text-white/60 hover:bg-white/20"
+                    }`}
+                  >
+                    R{round.roundNum}
+                    {round.isLast && (
+                      <span className="ml-0.5 text-[9px] text-[#E84D5A]">2x</span>
+                    )}
+                  </button>
+                );
+              })}
+              {/* Tiebreaker items */}
+              {jumpNav.misc.filter((m) => m.type !== "title").map((item) => (
                 <button
                   key={item.slideIndex}
                   onClick={() => {
