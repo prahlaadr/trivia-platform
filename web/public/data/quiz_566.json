@@ -1,0 +1,392 @@
+{
+  "quiz_number": 566,
+  "date": "1/13/26",
+  "rounds": [
+    {
+      "number": 1,
+      "title": "Random",
+      "round_type": "standard",
+      "points_per_question": 1,
+      "joker_eligible": true,
+      "theme_description": "",
+      "questions": [
+        {
+          "number": 1,
+          "text": "Internet-Only Question:  The Internet question and answer can be found at DirtySouthTrivia.com (Don\u2019t read the actual question. Let them look it up)",
+          "answer": "",
+          "choices": [],
+          "is_internet_only": true
+        },
+        {
+          "number": 2,
+          "text": "What silvery metal is the only one that\u2019s liquid at room temperature?",
+          "answer": "Mercury",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 3,
+          "text": "What color pill does Neo take in The Matrix\u2026Red or Blue?",
+          "answer": "Red",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 4,
+          "text": "What street did the Beatles walk across in one of the most famous album covers of all time?",
+          "answer": "Abbey Road",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 5,
+          "text": "Which author wrote Fahrenheit 451, a book about censorship that schools keep trying to ban?",
+          "answer": "Ray Bradbury",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 6,
+          "text": "This sounds like an antidepressant, but it's actually a sweet confection made from ground almonds, sugar, and sometimes honey.",
+          "answer": "Marzipan",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 7,
+          "text": "According to the dating app Feeld, what is the fastest-growing sexuality? Urban Dictionary calls it \u201cin between bisexual and straight.\u201d",
+          "answer": "Heteroflexible",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 8,
+          "text": "What Texas-based burger chain has its own minor-league baseball stadium painted with orange and white stripes to match its logo?",
+          "answer": "Whataburger",
+          "choices": [],
+          "is_internet_only": false
+        }
+      ],
+      "clues": [],
+      "progressive_answer": ""
+    },
+    {
+      "number": 2,
+      "title": "Zero Proof",
+      "round_type": "standard",
+      "points_per_question": 1,
+      "joker_eligible": true,
+      "theme_description": "These drinks sound like they belong behind the bar, but they\u2019re all participating in Dry January.",
+      "questions": [
+        {
+          "number": 1,
+          "text": "What non-alcoholic drink named after an old-timey child star is often served to kids, designated drivers, and people who say \u201cI\u2019m just pacing myself\u201d?",
+          "answer": "Shirley Temple",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 2,
+          "text": "If you\u2019re drinking cocktails containing cordyceps, shitake or reishi, what are you drinking?",
+          "answer": "Mushrooms/Adaptogens",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 3,
+          "text": "What half-tea, half-lemonade drink named after a famous golfer contains zero alcohol but a lot of country club energy?",
+          "answer": "Arnold Palmer",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 4,
+          "text": "St. Agrestis sells a non-alchoholic version of an Italian cocktail traditionally made with gin, Campari, and sweet vermouth called Phony _________ ?",
+          "answer": "Phony Negroni",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 5,
+          "text": "What cola-based drink with grenadine shares its name with a famous singing cowboy and a fast-food chain?",
+          "answer": "Roy Rogers",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 6,
+          "text": "What citrusy Italian soda sold by San Pellegrino sounds like a cocktail but has been called \u201cgrown-up Diet Coke?\u201d",
+          "answer": "Chinotto (pronounced \"kee-notto\")",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 7,
+          "text": "What do you call a Bloody Mary that\u2019s found sobriety?",
+          "answer": "Virgin Mary",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 8,
+          "text": "What fermented tea drink technically contains trace alcohol but is legally considered non-alcoholic?",
+          "answer": "Kombucha",
+          "choices": [],
+          "is_internet_only": false
+        }
+      ],
+      "clues": [],
+      "progressive_answer": ""
+    },
+    {
+      "number": 3,
+      "title": "Yearbook Movie Quotables",
+      "round_type": "standard",
+      "points_per_question": 1,
+      "joker_eligible": true,
+      "theme_description": "All of these are movie quotes that would make dramatic senior yearbook quotes. Name the movie.",
+      "questions": [
+        {
+          "number": 1,
+          "text": "1986: \u201cLife moves pretty fast. If you don\u2019t stop and look around once in a while, you could miss it.\u201d",
+          "answer": "Ferris Bueller\u2019s Day Off",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 2,
+          "text": "1995: \u201cEvery man dies. Not every man really lives.\u201d",
+          "answer": "Braveheart",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 3,
+          "text": "2006: \u201cIf you\u2019re not first, you\u2019re last.\u201d",
+          "answer": "Talladega Nights: The Ballad of Ricky Bobby",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 4,
+          "text": "2008: \u201cYou either die a hero, or you live long enough to see yourself become the villain.\u201d",
+          "answer": "The Dark Knight",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 5,
+          "text": "2023: \u201cEveryone keeps telling me how my story is supposed to go. Nah. I\u2019m a do my own thing.\"",
+          "answer": "Spider Man: Across the Spiderverse",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 6,
+          "text": "1997: \u201cI\u2019m the king of the world!\u201d",
+          "answer": "Titanic",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 7,
+          "text": "2023: \u201cIt is literally impossible to be a woman.\"",
+          "answer": "Barbie",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 8,
+          "text": "2010: \u201cA million dollars isn\u2019t cool. You know what\u2019s cool? A billion dollars.\u201d",
+          "answer": "The Social Network",
+          "choices": [],
+          "is_internet_only": false
+        }
+      ],
+      "clues": [],
+      "progressive_answer": ""
+    },
+    {
+      "number": 4,
+      "title": "Video Round \u2013 Manga Is Lit",
+      "round_type": "video",
+      "points_per_question": 1,
+      "joker_eligible": true,
+      "theme_description": "There is no sound on the video, and you can watch, pause, rewind, fast forward, and re-watch to your heart\u2019s content.\u00a0Identify the name of the classic novel based on the art from these manga adaptations.",
+      "questions": [
+        {
+          "number": 1,
+          "text": "Hamlet",
+          "answer": "",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 2,
+          "text": "Frankenstein",
+          "answer": "",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 3,
+          "text": "Sherlock Holmes",
+          "answer": "",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 4,
+          "text": "Les Mis\u00e9rables",
+          "answer": "",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 5,
+          "text": "Anne of Green Gables",
+          "answer": "",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 6,
+          "text": "Dracula",
+          "answer": "",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 7,
+          "text": "Tom Sawyer/Huck Finn",
+          "answer": "",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 8,
+          "text": "The Jungle Book",
+          "answer": "",
+          "choices": [],
+          "is_internet_only": false
+        }
+      ],
+      "clues": [],
+      "progressive_answer": ""
+    },
+    {
+      "number": 5,
+      "title": "Guess Where",
+      "round_type": "progressive",
+      "points_per_question": 0,
+      "joker_eligible": false,
+      "theme_description": "Allow one minute between each clue ** Only one guess per team for the entire round.",
+      "questions": [],
+      "clues": [
+        {
+          "points": 10,
+          "text": "It\u2019s a moon located 26 trillion miles from Earth that orbits a gas giant planet called Polyphemus."
+        },
+        {
+          "points": 8,
+          "text": "It\u2019s a fictional place with floating mountain ranges and its atmosphere is toxic to humans."
+        },
+        {
+          "points": 6,
+          "text": "You can buy a colorful pongu-pongu drunk from this fictional place at Disney World."
+        },
+        {
+          "points": 4,
+          "text": "The people here have a connection to their world through a planet-wide neural network called Eywa\u2014also, everyone is blue."
+        },
+        {
+          "points": 2,
+          "text": "It\u2019s the setting of the movie Avatar and shares its name with a mythological box or a music streaming service."
+        }
+      ],
+      "progressive_answer": "Pandora"
+    },
+    {
+      "number": 6,
+      "title": "Add It Up",
+      "round_type": "standard",
+      "points_per_question": 2,
+      "joker_eligible": true,
+      "theme_description": "The answer to each clue is a number. For #8, add up all the numbers and write the sum.",
+      "questions": [
+        {
+          "number": 1,
+          "text": "How many rings does Sonic the Hedgehog need to survive one hit?",
+          "answer": "1",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 2,
+          "text": "How many ounces of coffee is a Starbucks Tall size?",
+          "answer": "12",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 3,
+          "text": "How many Teenage Mutant Ninja Turtles share a sewer, a sensei, and an extremely loose definition of stealth?",
+          "answer": "4",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 4,
+          "text": "How many Hunger Games movies have been released so far?",
+          "answer": "5 (a sixth movie, Sunrise on the Reaping, is slated for later this year)",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 5,
+          "text": "How many members were in OutKast?",
+          "answer": "2 (Big Boi and Andre 3000)",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 6,
+          "text": "What number is the solid maroon colored ball in pool? Maroon NOT Red.",
+          "answer": "7",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 7,
+          "text": "How many miles are in a half-marathon\u2014rounded to the nearest mile?",
+          "answer": "13",
+          "choices": [],
+          "is_internet_only": false
+        },
+        {
+          "number": 8,
+          "text": "Add it up. (Between 1-50)",
+          "answer": "44",
+          "choices": [],
+          "is_internet_only": false
+        }
+      ],
+      "clues": [],
+      "progressive_answer": ""
+    }
+  ],
+  "mini_games": [
+    {
+      "number": 1,
+      "title": "Invent a new cocktail after a celebrity, and give it a one-sentence description.",
+      "description": "- \tIntro the game and give them a song to think about it.\nHave the teams hand their answers in as they normally would.\nPick some winners, or better yet task a staff member to pick them for you.\nIf any answers are too vulgar based on your location, then don\u2019t read them.\nSample Intro:  I want you guys to invent a new cocktail after a celebrity, and give it a one-sentence description.  (Up to 3 answers) We are looking for funny and weird answers. I\u2019m going to give you a song to think about it, and you can hand your answers into me. Please hand them in on one sheet just like a normal round."
+    },
+    {
+      "number": 2,
+      "title": "Music",
+      "description": "Bring 6 people up to the front. Split them into 2 teams and assign a captain for each team. Only the captain can raise their hand to answer or it will be total anarchy.  The first team with 3 correct answers wins a round of shots and then the game is over.\nHave them name the artist of each song. Pause the song when a team raises their hand. If they get it wrong then play a little bit more of the song for the other team. Once a team answers they are out.\nSample Intro:  Who wants to win some free drinks!  The first six people to come up here can play.  You can send multiple people per team.  This is just for alcohol NOT for points, so it\u2019s much more important.  I\u2019m going to play some songs all you have to do is tell me the name of the artist.\nCategory: 2010s Hits\nOnce you get enough volunteers:  Who wants to be a captain?  Only the captain can answer by raising their hand. The first team to 3 correct answers wins and then the game is over! You can only guess once per song.\n1. Katy Perry \u2013 Teenage Dream\n2. Lady Gaga \u2013 Bad Romance\n3. Drake - Headlines\n4. Travis Scott \u2013 Sicko Mode\n5. Bruno Mars \u2013 Just The Way You Are\n6. Jason Derulo \u2013 Ridin Solo\n7. Childish Gambino \u2013 This Is America\n8. Mike Posner \u2013 Cooler Than Me\n9. Ke$ha \u2013 Your Love is My Drug\n10. Usher \u2013 DJ Got Us Fallin\u2019 In Love"
+    }
+  ],
+  "tie_breaker_question": "How much money did the 2025 Lilo & Stitch movie make at the US box office?",
+  "tie_breaker_answer": "$424 Million"
+}
