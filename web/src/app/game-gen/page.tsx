@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getBrand } from "@/lib/branding";
-import type { GameGenSession, GameGenTeam } from "@/lib/types";
+import type { GameGenSession, GameGenTeam, SavedGameGen } from "@/lib/types";
 import {
   getGameGenSession,
   createGameGenSession,
@@ -13,6 +13,9 @@ import {
   removeTeam,
   aggregateTopics,
   buildRoundTopics,
+  getSavedGames,
+  saveGame,
+  deleteSavedGame,
 } from "@/lib/game-gen";
 
 const SUGGESTED_TOPICS = [
@@ -45,9 +48,35 @@ export default function GameGenPage() {
   const [customTopic, setCustomTopic] = useState("");
   const [generatedQuiz, setGeneratedQuiz] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [savedGames, setSavedGames] = useState<SavedGameGen[]>([]);
 
   useEffect(() => {
     setSession(getGameGenSession());
+
+    // Seed the two example generated games if not already saved
+    const SEED_GAMES: SavedGameGen[] = [
+      {
+        sessionId: "c32a7a01",
+        name: "Mixed Topics",
+        date: "March 8, 2026",
+        roundTopics: ["Random", "Around the World", "Bites & Sips", "Name That Tune", "Back in My Day", "Record Breakers"],
+        savedAt: "2026-03-08T00:00:00.000Z",
+      },
+      {
+        sessionId: "b4fb274c",
+        name: "Carnatic Music",
+        date: "March 8, 2026",
+        roundTopics: ["Swagatham", "The Legends", "Raga Raga Raga", "Stage & Sabhas", "Kritis & Compositions", "Carnatic Connections"],
+        savedAt: "2026-03-08T00:01:00.000Z",
+      },
+    ];
+    const existing = getSavedGames();
+    for (const seed of SEED_GAMES) {
+      if (!existing.some((g) => g.sessionId === seed.sessionId)) {
+        saveGame(seed);
+      }
+    }
+    setSavedGames(getSavedGames());
   }, []);
 
   const startNew = useCallback(() => {
@@ -110,6 +139,32 @@ export default function GameGenPage() {
     }
   }, [session]);
 
+  const handleSaveGame = useCallback(async () => {
+    if (!session || !generatedQuiz) return;
+    try {
+      const res = await fetch(`/api/quiz?id=gen_${session.id}`);
+      if (!res.ok) return;
+      const quiz = await res.json();
+      const roundTopics = (quiz.rounds || []).map((r: { title: string }) => r.title);
+      const game: SavedGameGen = {
+        sessionId: session.id,
+        name: roundTopics.join(", "),
+        date: quiz.date || new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+        roundTopics,
+        savedAt: new Date().toISOString(),
+      };
+      saveGame(game);
+      setSavedGames(getSavedGames());
+    } catch {
+      // ignore
+    }
+  }, [session, generatedQuiz]);
+
+  const handleDeleteSaved = useCallback((sessionId: string) => {
+    deleteSavedGame(sessionId);
+    setSavedGames(getSavedGames());
+  }, []);
+
   // Build the prompt for Claude Code
   const buildPrompt = useCallback(() => {
     if (!session || session.teams.length < 3) return "";
@@ -153,6 +208,48 @@ export default function GameGenPage() {
           >
             Start New Game
           </button>
+
+          {/* Saved Games */}
+          {savedGames.length > 0 && (
+            <div className="mt-8">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="h-px flex-1 bg-[#4EC9B0]/20" />
+                <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#4EC9B0]/40">
+                  {savedGames.length} saved game{savedGames.length !== 1 ? "s" : ""}
+                </p>
+                <div className="h-px flex-1 bg-[#4EC9B0]/20" />
+              </div>
+              <div className="space-y-3">
+                {savedGames.map((game) => (
+                  <div
+                    key={game.sessionId}
+                    className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1B4D3E] p-4 sm:p-5 transition-all hover:border-[#4EC9B0]/40"
+                  >
+                    <Link href={`/present/gen_${game.sessionId}`} className="flex-1">
+                      <h3 className="font-bold text-white">{game.date}</h3>
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        {game.roundTopics.map((t) => (
+                          <span
+                            key={t}
+                            className="rounded-full bg-[#4EC9B0]/10 px-2.5 py-0.5 text-xs text-[#4EC9B0]/70"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </Link>
+                    <button
+                      onClick={() => handleDeleteSaved(game.sessionId)}
+                      className="ml-3 rounded px-2 py-1 text-xs text-[#E84D5A]/40 transition-colors hover:bg-[#E84D5A]/10 hover:text-[#E84D5A]"
+                      title="Remove from saved"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -391,12 +488,21 @@ export default function GameGenPage() {
                   Check for Results
                 </button>
                 {generatedQuiz && (
-                  <Link
-                    href={`/present/${generatedQuiz}`}
-                    className="rounded bg-[#4EC9B0] px-4 py-2 text-sm sm:px-5 sm:text-base font-bold text-black transition-all hover:bg-[#4EC9B0]/90"
-                  >
-                    Present Game →
-                  </Link>
+                  <>
+                    <button
+                      onClick={handleSaveGame}
+                      disabled={savedGames.some((g) => g.sessionId === session.id)}
+                      className="rounded bg-[#4EC9B0]/20 px-4 py-2 text-sm sm:px-5 sm:text-base font-bold text-[#4EC9B0] transition-all hover:bg-[#4EC9B0]/30 disabled:opacity-30"
+                    >
+                      {savedGames.some((g) => g.sessionId === session.id) ? "Saved" : "Save Game"}
+                    </button>
+                    <Link
+                      href={`/present/${generatedQuiz}`}
+                      className="rounded bg-[#4EC9B0] px-4 py-2 text-sm sm:px-5 sm:text-base font-bold text-black transition-all hover:bg-[#4EC9B0]/90"
+                    >
+                      Present Game →
+                    </Link>
+                  </>
                 )}
               </div>
             </div>
@@ -407,6 +513,48 @@ export default function GameGenPage() {
           <p className="text-center text-sm text-white/40">
             Register at least 3 teams to generate rounds
           </p>
+        )}
+
+        {/* Saved Games */}
+        {savedGames.length > 0 && (
+          <div className="mt-8">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-[#4EC9B0]/20" />
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#4EC9B0]/40">
+                {savedGames.length} saved game{savedGames.length !== 1 ? "s" : ""}
+              </p>
+              <div className="h-px flex-1 bg-[#4EC9B0]/20" />
+            </div>
+            <div className="space-y-3">
+              {savedGames.map((game) => (
+                <div
+                  key={game.sessionId}
+                  className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1B4D3E] p-4 sm:p-5 transition-all hover:border-[#4EC9B0]/40"
+                >
+                  <Link href={`/present/gen_${game.sessionId}`} className="flex-1">
+                    <h3 className="font-bold text-white">{game.date}</h3>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      {game.roundTopics.map((t) => (
+                        <span
+                          key={t}
+                          className="rounded-full bg-[#4EC9B0]/10 px-2.5 py-0.5 text-xs text-[#4EC9B0]/70"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </Link>
+                  <button
+                    onClick={() => handleDeleteSaved(game.sessionId)}
+                    className="ml-3 rounded px-2 py-1 text-xs text-[#E84D5A]/40 transition-colors hover:bg-[#E84D5A]/10 hover:text-[#E84D5A]"
+                    title="Remove from saved"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>

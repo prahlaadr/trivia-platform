@@ -3,9 +3,10 @@
  * Persisted in localStorage like the scorekeeper.
  */
 
-import type { GameGenSession, GameGenTeam, GeneratedRound, Quiz } from "./types";
+import type { GameGenSession, GameGenTeam, GeneratedRound, Quiz, SavedGameGen } from "./types";
 
 const SESSION_KEY = "trivia-gamegen-session";
+const SAVED_GAMES_KEY = "trivia-gamegen-saved";
 
 export function getGameGenSession(): GameGenSession | null {
   if (typeof window === "undefined") return null;
@@ -77,6 +78,27 @@ export function buildRoundTopics(teams: GameGenTeam[]): string[] {
   const topics = ranked.slice(0, 6).map((r) => r.topic);
   while (topics.length < 6) topics.push("random");
   return topics;
+}
+
+// ── Saved Games ──
+
+export function getSavedGames(): SavedGameGen[] {
+  if (typeof window === "undefined") return [];
+  const raw = localStorage.getItem(SAVED_GAMES_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+
+export function saveGame(game: SavedGameGen) {
+  const games = getSavedGames();
+  // Don't duplicate
+  if (games.some((g) => g.sessionId === game.sessionId)) return;
+  games.unshift(game);
+  localStorage.setItem(SAVED_GAMES_KEY, JSON.stringify(games));
+}
+
+export function deleteSavedGame(sessionId: string) {
+  const games = getSavedGames().filter((g) => g.sessionId !== sessionId);
+  localStorage.setItem(SAVED_GAMES_KEY, JSON.stringify(games));
 }
 
 /**

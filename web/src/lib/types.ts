@@ -89,3 +89,11 @@ export interface GameGenSession {
   rounds: GeneratedRound[];
   tieBreaker?: { question: string; answer: string };
 }
+
+export interface SavedGameGen {
+  sessionId: string;
+  name: string;
+  date: string;
+  roundTopics: string[];
+  savedAt: string;
+}
