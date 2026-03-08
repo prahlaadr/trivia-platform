@@ -1,65 +1,83 @@
-# Trivia Platform
+# Pyaar Trivia Platform
 
-A web-based pub quiz presenter that parses `.docx` question documents into interactive browser slides with keyboard navigation, fullscreen mode, and per-slide timers.
+A trivia hosting platform with two deployment modes: **Vercel** (live presenter + scorekeeper for host employees) and **Local** (full game generation toolkit).
 
-Built for [Dirty South Trivia](https://dirtysouthtrivia.com) — easily rebrandable for any trivia host.
+**Live:** [pyaar-trivia.vercel.app](https://pyaar-trivia.vercel.app)
+
+## Architecture
+
+| Mode | What it does | Who uses it |
+|------|-------------|-------------|
+| **Vercel** | Presenter, scorekeeper, test bank (Blob storage) | You + host employees |
+| **Local** | Everything above + Game Gen mode + AI question generation | You only |
+
+**Workflow:** Generate games locally → curate rounds → upload the best to Vercel Blob → host employees present them.
 
 ## Features
 
-- **Slide Presenter** — Full-screen quiz presentation with keyboard controls
-- **Docx Parser** — Parses structured `.docx` quiz files into JSON
-- **Drag & Drop Upload** — Upload new quiz docs directly from the browser
-- **Multiple Round Types** — Standard Q&A, video rounds, progressive reveal (Guess Who/Where)
-- **Answer Reveal Flow** — Questions one-by-one → review all → question/answer pairs
-- **Per-slide Timer** — Tracks time spent on each slide
-- **Keyboard Navigation** — Arrow keys, Space, Enter, Backspace, Home/End, F (fullscreen), Esc (exit)
+### Presenter
+- Full-screen quiz slides with keyboard navigation
+- Parses `.docx` (mammoth) and `.pdf` (unpdf) quiz files
+- Round types: standard Q&A, video rounds, progressive reveal (Guess Who/Where)
+- Answer reveal flow: questions one-by-one → review all → question/answer pairs
+- Per-slide timer, progress bar, jump navigation
+
+### Scorekeeper
+- Create game sessions, register teams
+- Score input per round with Joker tracking (doubles one round per team)
+- Live leaderboard (sortable, projected on screen)
+- Last round auto-doubled, CSV export
+
+### Brand Toggle
+- Switch between **Pyaar Trivia** and **Dirty South Trivia** branding
+- Persisted in localStorage, affects all pages and slides
+- Toggle button on homepage (top-right corner)
+
+### Vercel Blob Storage
+- Uploaded quizzes persist across deploys via Vercel Blob
+- Local mode uses filesystem (`public/data/`)
+- Vercel mode reads/writes from Blob store automatically
+
+### Game Gen Mode (Local — not yet built)
+- Teams walk in, each picks 3 topics
+- Generate rounds (6 questions each) from combined topic pool
+- AI question generation via Claude API + web search
+- Pull from test bank first, AI-generate to fill gaps
+- Save good rounds to local bank, upload to Vercel when ready
 
 ## Quick Start
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) (or Node.js 18+)
+- [Bun](https://bun.sh)
 - [Python 3.13+](https://www.python.org/) with [uv](https://docs.astral.sh/uv/)
 
-### Setup
+### Local Development
 
 ```bash
-# Clone
 git clone https://github.com/prahlaadr/trivia-platform.git
 cd trivia-platform
 
-# Install Python dependencies
+# Python deps (for batch parsing)
 uv sync
 
-# Install web dependencies
+# Web app
 cd web
 bun install
-
-# Create your bank folder and add .docx quiz files
-mkdir -p ../bank
-# Copy your quiz .docx files into bank/
-
-# Parse all docs in bank/
-cd ..
-uv run python parser.py bank/
-
-# Or parse a single doc (outputs JSON to stdout)
-uv run python parser.py bank/your-quiz.docx > web/public/data/quiz_123.json
-
-# Start the dev server
-cd web
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — you'll see your quizzes listed. Click one to present.
+Open [http://localhost:3000](http://localhost:3000) — drag & drop `.docx` or `.pdf` quiz files to upload.
 
-### Uploading via Browser
+### Vercel Deployment
 
-You can also drag & drop `.docx` files onto the home page. The app will parse them automatically (requires the Python parser and `uv` to be available).
+The app auto-deploys from `main` via GitHub integration. Requires:
+- `BLOB_READ_WRITE_TOKEN` env var (from Vercel Blob store)
+- Blob store connected to the project in all environments
 
 ## Quiz Document Format
 
-The parser expects `.docx` files structured like:
+The parser handles `.docx` and `.pdf` files structured like:
 
 ```
 Pub Quiz 566 – January 13, 2026
@@ -77,8 +95,6 @@ B. Choice B
 C. Choice C ✅ (Correct)
 D. Choice D
 
-...
-
 Round 2 – Theme Name
 ...
 
@@ -91,47 +107,50 @@ Supported round types:
 - **Video** — Video montage rounds (answers only)
 - **Progressive** — Guess Who/Where with clues at 10/8/6/4/2 points
 
-## Rebranding
-
-All brand-specific text is centralized in [`web/src/lib/branding.ts`](web/src/lib/branding.ts):
-
-```typescript
-export const brand = {
-  name: "Dirty South Trivia",
-  website: "DirtySouthTrivia.com",
-  socialHandle: "dstrivia",
-  // ... change these to rebrand
-};
-```
-
-Colors are documented at the top of [`web/src/components/SlideRenderer.tsx`](web/src/components/SlideRenderer.tsx) — search for hex values like `#1B4D3E`, `#FFD700`, etc. to change the palette.
-
-The body background is set in [`web/src/app/globals.css`](web/src/app/globals.css).
-
 ## Project Structure
 
 ```
 trivia-platform/
-├── parser.py              # Python .docx parser
+├── parser.py              # Python .docx batch parser (CLI)
 ├── pyproject.toml         # Python dependencies
-├── bank/                  # Your .docx quiz files (gitignored)
+├── bank/                  # Raw quiz files (gitignored)
+├── PLAN.md                # Full architecture and roadmap
 ├── web/                   # Next.js app
 │   ├── src/
-│   │   ├── app/           # Pages and API routes
-│   │   ├── components/    # SlideRenderer, Presenter, QuizList
-│   │   └── lib/           # Types, slide builder, branding config
+│   │   ├── app/
+│   │   │   ├── api/
+│   │   │   │   ├── parse/     # Upload + list quizzes (Blob or filesystem)
+│   │   │   │   ├── parse-all/ # Batch parse via Python
+│   │   │   │   └── quiz/      # Fetch single quiz by ID
+│   │   │   ├── present/[quizId]/ # Presenter page
+│   │   │   └── score/         # Scorekeeper pages
+│   │   ├── components/
+│   │   │   ├── Presenter.tsx  # Slide navigation + overlays
+│   │   │   ├── QuizList.tsx   # Homepage: upload + quiz list
+│   │   │   ├── ScoreGrid.tsx  # Scoring spreadsheet
+│   │   │   └── SlideRenderer.tsx # All slide type renderers
+│   │   └── lib/
+│   │       ├── branding.ts    # Brand toggle (Pyaar / Dirty South)
+│   │       ├── parser.ts      # DOCX + PDF → Quiz parser
+│   │       ├── scoring.ts     # Session management (localStorage)
+│   │       ├── slides.ts      # Quiz → Slide[] builder
+│   │       └── types.ts       # Quiz, Round, Question, Slide types
 │   └── public/
-│       ├── data/          # Parsed quiz JSON (gitignored)
-│       └── fonts/         # Poppins font files
+│       ├── data/              # Parsed quiz JSON (local, gitignored)
+│       └── fonts/             # Poppins font files
 └── README.md
 ```
 
 ## Tech Stack
 
-- **Frontend** — Next.js 16, React 19, TypeScript, Tailwind CSS v4
-- **Parser** — Python 3.13, python-docx
-- **Runtime** — Bun (or Node.js)
-- **Font** — Poppins
+| Layer | Tech |
+|-------|------|
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS v4 |
+| Parsing | mammoth (DOCX), unpdf (PDF) |
+| Storage | Vercel Blob (deployed), filesystem (local) |
+| Scoring | localStorage |
+| Runtime | Bun |
+| Deployment | Vercel (auto-deploy from GitHub) |
 
 ## Keyboard Shortcuts
 
@@ -142,8 +161,18 @@ trivia-platform/
 | `Home` | First slide |
 | `End` | Last slide |
 | `F` | Toggle fullscreen |
-| `Esc` | Exit to quiz list |
+| `S` | Toggle scores overlay |
+| `Esc` | Close overlay / exit to quiz list |
 
-## License
+## Roadmap
 
-MIT
+See [PLAN.md](PLAN.md) for full architecture and build order.
+
+| Module | Status |
+|--------|--------|
+| Presenter | ✅ Done |
+| Scorekeeper | ✅ Done |
+| Brand Toggle | ✅ Done |
+| PDF + DOCX Upload | ✅ Done |
+| Vercel Blob Storage | ✅ Done |
+| Game Gen Mode (Local) | 🔲 Not started |
