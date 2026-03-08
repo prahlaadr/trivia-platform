@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { brand } from "@/lib/branding";
+import { getBrand, getBrandKey, setBrandKey, brands, type BrandKey } from "@/lib/branding";
 
 interface QuizSummary {
   quiz_number: number;
@@ -17,6 +17,19 @@ export function QuizList() {
   const [dragOver, setDragOver] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"success" | "error">("success");
+  const [brandKey, setBrandKeyState] = useState<BrandKey>("pyaar");
+
+  useEffect(() => {
+    setBrandKeyState(getBrandKey());
+  }, []);
+
+  const currentBrand = brands[brandKey];
+
+  const toggleBrand = () => {
+    const next: BrandKey = brandKey === "pyaar" ? "dirty-south" : "pyaar";
+    setBrandKey(next);
+    setBrandKeyState(next);
+  };
 
   useEffect(() => {
     fetch("/api/parse")
@@ -27,8 +40,9 @@ export function QuizList() {
   }, []);
 
   const uploadFile = useCallback(async (file: File) => {
-    if (!file.name.endsWith(".docx")) {
-      setMessage("Only .docx files are supported");
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (ext !== "docx" && ext !== "pdf") {
+      setMessage("Only .docx and .pdf files are supported");
       setMessageType("error");
       return;
     }
@@ -101,12 +115,21 @@ export function QuizList() {
   return (
     <div className="min-h-screen bg-[#143B2E] p-8">
       <div className="mx-auto max-w-3xl">
-        <p className="mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
-          {brand.name}
-        </p>
+        <div className="mb-1 flex items-center justify-between">
+          <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
+            {currentBrand.name}
+          </p>
+          <button
+            onClick={toggleBrand}
+            className="rounded px-2 py-1 text-xs font-medium text-white/30 transition-colors hover:bg-white/5 hover:text-white/50"
+            title={`Switch to ${brandKey === "pyaar" ? "Dirty South" : "Pyaar"} branding`}
+          >
+            {brandKey === "pyaar" ? "DST" : "PT"}
+          </button>
+        </div>
         <div className="mb-6 flex items-end justify-between">
           <h1 className="text-4xl font-black uppercase text-[#FFD700]">
-            {brand.tagline}
+            {currentBrand.tagline}
           </h1>
           <Link
             href="/score"
@@ -134,12 +157,12 @@ export function QuizList() {
           <input
             id="docx-upload"
             type="file"
-            accept=".docx"
+            accept=".docx,.pdf"
             onChange={handleFileSelect}
             className="sr-only"
           />
           <p className="text-lg font-bold text-white/70">
-            {uploading ? "Parsing..." : "Drop a .docx quiz file here"}
+            {uploading ? "Parsing..." : "Drop a .docx or .pdf quiz file here"}
           </p>
           <p className="mt-1 text-sm text-white/30">or click to browse</p>
         </label>
@@ -175,7 +198,7 @@ export function QuizList() {
             >
               <div>
                 <h2 className="text-xl font-bold text-white">
-                  {brand.quizLabel} #{quiz.quiz_number}
+                  {currentBrand.quizLabel} #{quiz.quiz_number}
                 </h2>
                 <p className="text-sm text-[#F5E6C8]/50">{quiz.date}</p>
               </div>
@@ -190,7 +213,7 @@ export function QuizList() {
 
         {!loading && quizzes.length === 0 && (
           <p className="mt-8 text-center text-white/40">
-            No quizzes yet. Drop a .docx file above to get started.
+            No quizzes yet. Drop a .docx or .pdf file above to get started.
           </p>
         )}
       </div>

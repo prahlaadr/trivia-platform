@@ -1,32 +1,62 @@
 /**
- * Branding configuration — change these values to rebrand the app.
+ * Branding configuration — supports toggling between brands.
  *
  * Colors are defined as CSS custom properties in globals.css.
  * Text, social handles, and metadata are defined here.
  */
 
-export const brand = {
-  /** Display name shown on title slides and headers */
-  name: "Dirty South Trivia",
+export type BrandKey = "dirty-south" | "pyaar";
 
-  /** Tagline / subtitle */
-  tagline: "Pub Quiz Presenter",
+interface BrandConfig {
+  name: string;
+  tagline: string;
+  website: string;
+  socialHandle: string;
+  socialPlatform: string;
+  pageTitle: string;
+  pageDescription: string;
+  quizLabel: string;
+}
 
-  /** Website URL shown on internet-only question slides */
-  website: "DirtySouthTrivia.com",
+const brands: Record<BrandKey, BrandConfig> = {
+  "dirty-south": {
+    name: "Dirty South Trivia",
+    tagline: "Pub Quiz Presenter",
+    website: "DirtySouthTrivia.com",
+    socialHandle: "dstrivia",
+    socialPlatform: "Instagram",
+    pageTitle: "Trivia Platform — Dirty South Trivia",
+    pageDescription: "Pub quiz presenter and question bank",
+    quizLabel: "Pub Quiz",
+  },
+  pyaar: {
+    name: "Pyaar Trivia",
+    tagline: "Trivia Platform",
+    website: "pyaar-trivia.vercel.app",
+    socialHandle: "pyaartrivia",
+    socialPlatform: "Instagram",
+    pageTitle: "Pyaar Trivia",
+    pageDescription: "Trivia platform — presenter, scorekeeper, and test bank",
+    quizLabel: "Quiz",
+  },
+};
 
-  /** Social media handle (without @) */
-  socialHandle: "dstrivia",
+const DEFAULT_BRAND: BrandKey = "pyaar";
 
-  /** Social platform name */
-  socialPlatform: "Instagram",
+export function getBrandKey(): BrandKey {
+  if (typeof window === "undefined") return DEFAULT_BRAND;
+  return (localStorage.getItem("trivia-brand") as BrandKey) || DEFAULT_BRAND;
+}
 
-  /** HTML page title */
-  pageTitle: "Trivia Platform — Dirty South Trivia",
+export function setBrandKey(key: BrandKey) {
+  localStorage.setItem("trivia-brand", key);
+}
 
-  /** Meta description */
-  pageDescription: "Pub quiz presenter and question bank",
+export function getBrand(): BrandConfig {
+  return brands[getBrandKey()];
+}
 
-  /** Label for the quiz format (e.g., "Pub Quiz") */
-  quizLabel: "Pub Quiz",
-} as const;
+/** Static brand for server-side rendering (layout metadata) */
+export const brand = brands[DEFAULT_BRAND];
+
+export { brands };

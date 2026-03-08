@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { brand } from "@/lib/branding";
+import { getBrand } from "@/lib/branding";
 import {
   listSessions,
   createSession,
@@ -43,7 +43,7 @@ export default function ScorePage() {
         </Link>
 
         <p className="mt-4 mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
-          {brand.name}
+          {getBrand().name}
         </p>
         <h1 className="mb-6 text-4xl font-black uppercase text-[#FFD700]">
           Scorekeeper

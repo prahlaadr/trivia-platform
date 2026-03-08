@@ -40,3 +40,4 @@ Thumbable.db
 
 # Lock files (keep uv.lock, bun.lockb)
 .vercel
+.env*.local

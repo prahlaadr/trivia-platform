@@ -1,15 +1,49 @@
 import mammoth from "mammoth";
+import { extractText } from "unpdf";
 import type { Quiz, Round, Question, MiniGame } from "./types";
 
+/**
+ * Parse a .docx buffer into a Quiz object.
+ */
 export async function parseDocx(buffer: Buffer): Promise<Quiz> {
   const result = await mammoth.extractRawText({ buffer });
-  const paragraphs = result.value.split("\n").map((l) => l.trim());
+  return parseQuizText(result.value);
+}
+
+/**
+ * Parse a .pdf buffer into a Quiz object.
+ */
+export async function parsePdf(buffer: Buffer): Promise<Quiz> {
+  const { text } = await extractText(new Uint8Array(buffer));
+  // text is an array of strings (one per page), join them
+  const fullText = Array.isArray(text) ? text.join("\n") : String(text);
+  return parseQuizText(fullText);
+}
+
+/**
+ * Parse a buffer of either format based on file extension.
+ */
+export async function parseFile(
+  buffer: Buffer,
+  filename: string
+): Promise<Quiz> {
+  const ext = filename.split(".").pop()?.toLowerCase();
+  if (ext === "pdf") return parsePdf(buffer);
+  return parseDocx(buffer);
+}
+
+/**
+ * Core parser: takes raw text content and extracts quiz structure.
+ */
+export function parseQuizText(rawText: string): Quiz {
+  const paragraphs = rawText.split("\n").map((l) => l.trim());
 
   // Extract quiz number and date from first non-empty line
   let quizNumber = 0;
   let date = "";
   for (const p of paragraphs) {
-    const m = p.match(/^Pub Quiz (\d+)\s*[–-]\s*(.+)/);
+    // Match "Pub Quiz N – Date" or just "Quiz N – Date"
+    const m = p.match(/^(?:Pub\s+)?Quiz\s+(\d+)\s*[–\-]\s*(.+)/i);
     if (m) {
       quizNumber = parseInt(m[1]);
       date = m[2].trim();
@@ -27,12 +61,17 @@ export async function parseDocx(buffer: Buffer): Promise<Quiz> {
   };
 
   // Find all section starts
-  type Section = ["round" | "minigame" | "tiebreaker", number, number, string];
+  type Section = [
+    "round" | "minigame" | "tiebreaker",
+    number,
+    number,
+    string,
+  ];
   const sections: Section[] = [];
 
   for (let i = 0; i < paragraphs.length; i++) {
     const p = paragraphs[i];
-    const rm = p.match(/^Round\s+(\d+)\s*[–-]\s*(.+)/);
+    const rm = p.match(/^Round\s+(\d+)\s*[–\-]\s*(.+)/);
     if (rm) {
       sections.push(["round", i, parseInt(rm[1]), rm[2].trim()]);
     } else if (/^Mini Game \d+/i.test(p)) {
@@ -42,16 +81,40 @@ export async function parseDocx(buffer: Buffer): Promise<Quiz> {
     }
   }
 
-  // Deduplicate rounds — keep only the LAST occurrence of each round number
-  const lastRoundIdx: Record<number, number> = {};
+  // Deduplicate rounds — keep the occurrence with the most content
+  const roundOccurrences: Record<number, number[]> = {};
   for (let i = 0; i < sections.length; i++) {
     if (sections[i][0] === "round") {
-      lastRoundIdx[sections[i][2]] = i;
+      const roundNum = sections[i][2];
+      if (!roundOccurrences[roundNum]) roundOccurrences[roundNum] = [];
+      roundOccurrences[roundNum].push(i);
     }
   }
-  const deduped = sections.filter(
-    (s, i) => s[0] !== "round" || lastRoundIdx[s[2]] === i
-  );
+
+  const skipIndices = new Set<number>();
+  for (const indices of Object.values(roundOccurrences)) {
+    if (indices.length <= 1) continue;
+    // For each duplicate round, keep the one with the most lines of content
+    let bestIdx = indices[0];
+    let bestLines = 0;
+    for (const idx of indices) {
+      const startLine = sections[idx][1];
+      const nextSectionLine =
+        idx + 1 < sections.length
+          ? sections[idx + 1][1]
+          : paragraphs.length;
+      const lineCount = nextSectionLine - startLine;
+      if (lineCount > bestLines) {
+        bestLines = lineCount;
+        bestIdx = idx;
+      }
+    }
+    for (const idx of indices) {
+      if (idx !== bestIdx) skipIndices.add(idx);
+    }
+  }
+
+  const deduped = sections.filter((_, i) => !skipIndices.has(i));
 
   // Process each section
   for (let idx = 0; idx < deduped.length; idx++) {
@@ -89,7 +152,7 @@ function parseRound(
           l.toLowerCase().includes("video") &&
           l.toLowerCase().includes("montage")
       );
-  const isProgressive = lines.some((l) => /^\d+\s+POINTS?:/.test(l));
+  const isProgressive = lines.some((l) => /^\d+\s+POINTS?:/i.test(l));
 
   let points = 1;
   let joker = true;
@@ -105,7 +168,7 @@ function parseRound(
       joker = false;
     if (
       l &&
-      !/^Round\s+\d+/.test(l) &&
+      !/^Round\s+\d+/i.test(l) &&
       !l.toLowerCase().includes("point") &&
       !l.toLowerCase().includes("joker") &&
       !/^\d+\./.test(l) &&
@@ -178,6 +241,7 @@ function parseRound(
           break;
         } else if (
           nextLine.startsWith("Please turn") ||
+          nextLine.startsWith("Please ") ||
           nextLine.startsWith("Round ")
         ) {
           break;
@@ -235,26 +299,31 @@ function parseProgressiveRound(
   };
 
   for (const line of lines) {
-    const m = line.match(/^(\d+)\s+POINTS?:\s*(.+)/);
+    const m = line.match(/^(\d+)\s+POINTS?:\s*(.+)/i);
     if (m) {
       rnd.clues.push({ points: parseInt(m[1]), text: m[2].trim() });
-    } else if (line.startsWith("ANSWER:")) {
-      rnd.progressive_answer = line.replace("ANSWER:", "").trim();
+    } else if (/^ANSWER:\s*/i.test(line)) {
+      rnd.progressive_answer = line.replace(/^ANSWER:\s*/i, "").trim();
     }
   }
 
+  // Fallback: grab first non-boilerplate line after last clue
   if (!rnd.progressive_answer && rnd.clues.length) {
     let lastClueIdx = 0;
     for (let i = 0; i < lines.length; i++) {
-      if (/^\d+\s+POINTS?:/.test(lines[i])) lastClueIdx = i;
+      if (/^\d+\s+POINTS?:/i.test(lines[i])) lastClueIdx = i;
     }
     for (let j = lastClueIdx + 1; j < lines.length; j++) {
+      const line = lines[j];
       if (
-        lines[j] &&
-        !lines[j].startsWith("Please") &&
-        !lines[j].toLowerCase().includes("pens")
+        line &&
+        !line.startsWith("Please") &&
+        !/^Round\s+\d+/i.test(line) &&
+        !/^\d+\s+Points?\s+Per/i.test(line) &&
+        !/^Mini Game/i.test(line) &&
+        !/^Tie\s*Breaker/i.test(line)
       ) {
-        rnd.progressive_answer = lines[j];
+        rnd.progressive_answer = line;
         break;
       }
     }
@@ -267,7 +336,7 @@ function parseMiniGame(lines: string[]): MiniGame {
   const header = lines[0] || "";
   const numMatch = header.match(/^Mini Game (\d+)/i);
   const num = numMatch ? parseInt(numMatch[1]) : 0;
-  const title = header.replace(/^Mini Game \d+\s*[–-]\s*/, "").trim();
+  const title = header.replace(/^Mini Game \d+\s*[–\-]\s*/, "").trim();
   const desc = lines
     .slice(1)
     .filter((l) => l)
@@ -279,7 +348,7 @@ function parseTieBreaker(lines: string[]): [string, string] {
   let question = "";
   let answer = "";
   for (const line of lines) {
-    if (/^Tie\s*Breaker:/i.test(line)) {
+    if (/^Tie\s*Breaker:\s*/i.test(line)) {
       question = line.replace(/^Tie\s*Breaker:\s*/i, "").trim();
     } else if (line.toLowerCase().includes("price is right")) {
       continue;

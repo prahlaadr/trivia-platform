@@ -1,7 +1,7 @@
 "use client";
 
 import type { Slide } from "@/lib/types";
-import { brand } from "@/lib/branding";
+import { getBrand } from "@/lib/branding";
 
 /**
  * Color Palette — edit these hex values to rebrand.
@@ -57,10 +57,10 @@ function TitleSlide({ slide }: { slide: Slide }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-5 bg-[#1B4D3E]">
       <p className="text-2xl font-bold uppercase tracking-[0.3em] text-[#F5E6C8]">
-        {brand.name}
+        {getBrand().name}
       </p>
       <h1 className="text-8xl font-black uppercase text-[#FFD700] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
-        {brand.quizLabel} #{quiz.quiz_number}
+        {getBrand().quizLabel} #{quiz.quiz_number}
       </h1>
       <p className="text-3xl font-medium text-white/80">{quiz.date}</p>
       <div className="mt-4 w-16 border-t-2 border-[#FFD700]" />
@@ -145,13 +145,13 @@ function InternetQuestionSlide({ slide }: { slide: Slide }) {
         Find this week&apos;s question and answer at
       </p>
       <p className="mb-8 text-4xl font-black text-white">
-        {brand.website}
+        {getBrand().website}
       </p>
       <div className="flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-6 py-3">
-        <svg viewBox="0 0 24 24" className="h-8 w-8 fill-[#E1306C]" aria-label={brand.socialPlatform}>
+        <svg viewBox="0 0 24 24" className="h-8 w-8 fill-[#E1306C]" aria-label={getBrand().socialPlatform}>
           <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
         </svg>
-        <span className="text-2xl font-bold text-white">@{brand.socialHandle}</span>
+        <span className="text-2xl font-bold text-white">@{getBrand().socialHandle}</span>
       </div>
     </div>
   );
@@ -179,7 +179,7 @@ function QuestionsOverviewSlide({ slide }: { slide: Slide }) {
                 <span className="mr-2 inline-block w-9 text-right font-bold text-[#FFD700]/40">
                   {q.number}.
                 </span>
-                Internet-Only Question &mdash; {brand.website}
+                Internet-Only Question &mdash; {getBrand().website}
               </p>
             ) : (
             <>
