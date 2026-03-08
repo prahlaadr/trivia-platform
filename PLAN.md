@@ -56,20 +56,9 @@ Live game scoring — create sessions, register teams, input scores per round, J
 
 Switch between Dirty South Trivia and Pyaar Trivia branding. Stored in localStorage, affects all pages and slides.
 
-### Module 4: Google Drive Integration 🔲
+### Module 4: Vercel Blob Storage ✅
 
-**Goal:** Connect the test bank to Google Drive so you can share quiz files with host employees.
-
-**Flow:**
-- You upload quiz files (PDF/DOCX) to a shared Google Drive folder
-- Vercel app reads from that folder via Google Drive API
-- Host employees see available games when they open the app
-- You control access by managing the Drive folder sharing
-
-**Alternative approaches to consider:**
-- **Vercel Blob Storage** — simpler, upload directly in-app, no Google setup needed
-- **Supabase Storage** — if you want user auth + file storage in one place
-- Google Drive is fine if you're already organizing files there
+Persistent quiz storage via Vercel Blob. Upload PDF/DOCX → parse → store JSON in Blob. Admin PIN gate on upload/delete. Sort controls on quiz list.
 
 ### Module 5: Game Gen Mode (Local) 🔲
 
@@ -107,10 +96,10 @@ Switch between Dirty South Trivia and Pyaar Trivia branding. Stored in localStor
 3. ~~Brand toggle~~
 4. ~~PDF support~~
 
-### Phase 2 — Google Drive Integration
-5. Google Drive API setup (service account or OAuth)
-6. Browse shared folder in-app
-7. Import quiz files from Drive → parse → present
+### Phase 2 — Vercel Blob + Admin ✅
+5. ~~Vercel Blob persistence~~
+6. ~~Admin PIN gate on upload/delete~~
+7. ~~Delete quiz, sort controls~~
 
 ### Phase 3 — Game Gen Mode (Local)
 8. Team registration UI
@@ -128,6 +117,6 @@ Switch between Dirty South Trivia and Pyaar Trivia branding. Stored in localStor
 |--------|--------|-------|
 | Presenter | ✅ Done | PDF + DOCX, slides, keyboard nav, fullscreen |
 | Scorekeeper | ✅ Done | Teams, rounds, joker, leaderboard, CSV |
-| Brand Toggle | ✅ Done | Dirty South ↔ Pyaar Trivia |
-| Google Drive | 🔲 Not started | Shared test bank for host employees |
+| Brand Toggle | ✅ Done | Dirty South (default) ↔ Pyaar Trivia |
+| Vercel Blob | ✅ Done | Persistent storage, admin PIN (481516), delete, sort |
 | Game Gen | 🔲 Not started | Local-only, includes AI generator |
