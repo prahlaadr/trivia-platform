@@ -14,7 +14,7 @@ interface PresenterProps {
 
 export function Presenter({ quiz }: PresenterProps) {
   const router = useRouter();
-  const slides = buildSlides(quiz);
+  const slides = useMemo(() => buildSlides(quiz), [quiz]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [slideSeconds, setSlideSeconds] = useState(0);
@@ -79,7 +79,8 @@ export function Presenter({ quiz }: PresenterProps) {
         // If scorekeeper is open, close it instead of exiting presenter
         setShowScores((v) => {
           if (v) return false;
-          exitPresenter();
+          // Defer navigation to avoid setState during render
+          setTimeout(exitPresenter, 0);
           return false;
         });
         return;
