@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseFile } from "@/lib/parser";
-import { put, list } from "@vercel/blob";
+import { put, list, del } from "@vercel/blob";
 import fs from "fs";
 import path from "path";
 
@@ -11,8 +11,19 @@ const DATA_DIR = path.join(process.cwd(), "public", "data");
 const ALLOWED_EXTENSIONS = [".docx", ".pdf"];
 
 const isVercel = !!process.env.VERCEL;
+const ADMIN_PIN = process.env.ADMIN_PIN || "";
+
+function checkAdmin(request: NextRequest): boolean {
+  if (!ADMIN_PIN) return true; // no pin set = open access
+  const pin = request.headers.get("x-admin-pin") || "";
+  return pin === ADMIN_PIN;
+}
 
 export async function POST(request: NextRequest) {
+  if (!checkAdmin(request)) {
+    return NextResponse.json({ error: "Invalid admin PIN" }, { status: 403 });
+  }
+
   const formData = await request.formData();
   const file = formData.get("file") as File | null;
 
@@ -58,14 +69,12 @@ export async function POST(request: NextRequest) {
     const jsonContent = JSON.stringify(quiz, null, 2);
 
     if (isVercel) {
-      // Store parsed JSON in Vercel Blob
       await put(`quiz_${quiz.quiz_number}.json`, jsonContent, {
         access: "public",
         contentType: "application/json",
         addRandomSuffix: false,
       });
     } else {
-      // Store locally
       try {
         fs.mkdirSync(DATA_DIR, { recursive: true });
         const jsonPath = path.join(
@@ -104,6 +113,50 @@ export async function GET() {
   return listFromFilesystem();
 }
 
+// DELETE: remove a quiz by quiz_number
+export async function DELETE(request: NextRequest) {
+  if (!checkAdmin(request)) {
+    return NextResponse.json({ error: "Invalid admin PIN" }, { status: 403 });
+  }
+
+  const quizNumber = request.nextUrl.searchParams.get("quiz_number");
+  if (!quizNumber) {
+    return NextResponse.json(
+      { error: "Missing quiz_number param" },
+      { status: 400 }
+    );
+  }
+
+  if (isVercel) {
+    try {
+      const { blobs } = await list({ prefix: `quiz_${quizNumber}.json` });
+      const blob = blobs.find(
+        (b) => b.pathname === `quiz_${quizNumber}.json`
+      );
+      if (!blob) {
+        return NextResponse.json(
+          { error: "Quiz not found" },
+          { status: 404 }
+        );
+      }
+      await del(blob.url);
+      return NextResponse.json({ success: true, deleted: quizNumber });
+    } catch {
+      return NextResponse.json(
+        { error: "Failed to delete" },
+        { status: 500 }
+      );
+    }
+  } else {
+    const filePath = path.join(DATA_DIR, `quiz_${quizNumber}.json`);
+    if (!fs.existsSync(filePath)) {
+      return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
+    }
+    fs.unlinkSync(filePath);
+    return NextResponse.json({ success: true, deleted: quizNumber });
+  }
+}
+
 async function listFromBlob() {
   try {
     const { blobs } = await list({ prefix: "quiz_" });
@@ -127,7 +180,6 @@ async function listFromBlob() {
       quizzes: quizzes.sort((a, b) => b.quiz_number - a.quiz_number),
     });
   } catch {
-    // Blob not configured — return empty
     return NextResponse.json({ quizzes: [] });
   }
 }

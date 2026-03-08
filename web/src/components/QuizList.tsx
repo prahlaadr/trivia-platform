@@ -10,6 +10,17 @@ interface QuizSummary {
   rounds: number;
 }
 
+type SortKey = "number" | "date";
+
+function getAdminPin(): string {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem("trivia-admin-pin") || "";
+}
+
+function setAdminPin(pin: string) {
+  localStorage.setItem("trivia-admin-pin", pin);
+}
+
 export function QuizList() {
   const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +29,9 @@ export function QuizList() {
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"success" | "error">("success");
   const [brandKey, setBrandKeyState] = useState<BrandKey>("pyaar");
+  const [sortKey, setSortKey] = useState<SortKey>("number");
+  const [sortAsc, setSortAsc] = useState(false);
+  const [deleting, setDeleting] = useState<number | null>(null);
 
   useEffect(() => {
     setBrandKeyState(getBrandKey());
@@ -31,12 +45,30 @@ export function QuizList() {
     setBrandKeyState(next);
   };
 
+  const refreshQuizzes = useCallback(async () => {
+    try {
+      const res = await fetch("/api/parse");
+      if (res.ok) {
+        const data = await res.json();
+        setQuizzes(data.quizzes || []);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   useEffect(() => {
-    fetch("/api/parse")
-      .then((res) => res.json())
-      .then((data) => setQuizzes(data.quizzes || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    refreshQuizzes().finally(() => setLoading(false));
+  }, [refreshQuizzes]);
+
+  const ensurePin = useCallback((): string | null => {
+    let pin = getAdminPin();
+    if (!pin) {
+      pin = prompt("Enter admin PIN to continue:") || "";
+      if (!pin) return null;
+      setAdminPin(pin);
+    }
+    return pin;
   }, []);
 
   const uploadFile = useCallback(async (file: File) => {
@@ -46,6 +78,9 @@ export function QuizList() {
       setMessageType("error");
       return;
     }
+
+    const pin = ensurePin();
+    if (pin === null) return;
 
     setUploading(true);
     setMessage(null);
@@ -57,7 +92,10 @@ export function QuizList() {
       const res = await fetch("/api/parse", {
         method: "POST",
         body: formData,
-        headers: { Accept: "application/json" },
+        headers: {
+          Accept: "application/json",
+          "x-admin-pin": pin,
+        },
       });
       const text = await res.text();
       let data;
@@ -65,6 +103,14 @@ export function QuizList() {
         data = JSON.parse(text);
       } catch {
         setMessage("Server returned non-JSON: " + text.slice(0, 100));
+        setMessageType("error");
+        return;
+      }
+
+      if (res.status === 403) {
+        // Wrong PIN — clear it so they get prompted again
+        setAdminPin("");
+        setMessage("Invalid admin PIN");
         setMessageType("error");
         return;
       }
@@ -79,20 +125,49 @@ export function QuizList() {
         "Parsed Quiz #" + data.quiz_number + " (" + data.date + ")"
       );
       setMessageType("success");
-
-      // Refresh quiz list
-      const listRes = await fetch("/api/parse");
-      if (listRes.ok) {
-        const listData = await listRes.json();
-        setQuizzes(listData.quizzes || []);
-      }
+      await refreshQuizzes();
     } catch (err) {
       setMessage("Upload failed: " + (err instanceof Error ? err.message : "Unknown error"));
       setMessageType("error");
     } finally {
       setUploading(false);
     }
-  }, []);
+  }, [ensurePin, refreshQuizzes]);
+
+  const deleteQuiz = useCallback(async (quizNumber: number) => {
+    if (!confirm(`Delete Quiz #${quizNumber}?`)) return;
+
+    const pin = ensurePin();
+    if (pin === null) return;
+
+    setDeleting(quizNumber);
+    try {
+      const res = await fetch(`/api/parse?quiz_number=${quizNumber}`, {
+        method: "DELETE",
+        headers: { "x-admin-pin": pin },
+      });
+      if (res.status === 403) {
+        setAdminPin("");
+        setMessage("Invalid admin PIN");
+        setMessageType("error");
+        return;
+      }
+      if (!res.ok) {
+        const data = await res.json();
+        setMessage(data.error || "Delete failed");
+        setMessageType("error");
+        return;
+      }
+      setMessage(`Deleted Quiz #${quizNumber}`);
+      setMessageType("success");
+      await refreshQuizzes();
+    } catch {
+      setMessage("Delete failed");
+      setMessageType("error");
+    } finally {
+      setDeleting(null);
+    }
+  }, [ensurePin, refreshQuizzes]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -111,6 +186,28 @@ export function QuizList() {
     },
     [uploadFile]
   );
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortKey(key);
+      setSortAsc(false);
+    }
+  };
+
+  const sortedQuizzes = [...quizzes].sort((a, b) => {
+    let cmp: number;
+    if (sortKey === "date") {
+      // Parse dates like "07/12/25" or "1/13/26"
+      const da = new Date(a.date).getTime() || 0;
+      const db = new Date(b.date).getTime() || 0;
+      cmp = db - da;
+    } else {
+      cmp = b.quiz_number - a.quiz_number;
+    }
+    return sortAsc ? -cmp : cmp;
+  });
 
   return (
     <div className="min-h-screen bg-[#143B2E] p-8">
@@ -180,7 +277,7 @@ export function QuizList() {
           </div>
         )}
 
-        {/* Quiz list */}
+        {/* Quiz list header with sort */}
         <div className="mb-4 flex items-center gap-3">
           <div className="h-px flex-1 bg-[#FFD700]/20" />
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#FFD700]/40">
@@ -189,25 +286,60 @@ export function QuizList() {
           <div className="h-px flex-1 bg-[#FFD700]/20" />
         </div>
 
+        {!loading && quizzes.length > 1 && (
+          <div className="mb-3 flex gap-2">
+            <button
+              onClick={() => toggleSort("number")}
+              className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
+                sortKey === "number"
+                  ? "bg-[#FFD700]/20 text-[#FFD700]"
+                  : "text-white/30 hover:text-white/50"
+              }`}
+            >
+              # {sortKey === "number" ? (sortAsc ? "↑" : "↓") : ""}
+            </button>
+            <button
+              onClick={() => toggleSort("date")}
+              className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
+                sortKey === "date"
+                  ? "bg-[#FFD700]/20 text-[#FFD700]"
+                  : "text-white/30 hover:text-white/50"
+              }`}
+            >
+              Date {sortKey === "date" ? (sortAsc ? "↑" : "↓") : ""}
+            </button>
+          </div>
+        )}
+
         <div className="space-y-3">
-          {quizzes.map((quiz) => (
-            <Link
+          {sortedQuizzes.map((quiz) => (
+            <div
               key={quiz.quiz_number}
-              href={"/present/" + quiz.quiz_number}
               className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1B4D3E] p-5 transition-all hover:border-[#FFD700]/40 hover:bg-[#1B4D3E]/80"
             >
-              <div>
+              <Link
+                href={"/present/" + quiz.quiz_number}
+                className="flex-1"
+              >
                 <h2 className="text-xl font-bold text-white">
                   {currentBrand.quizLabel} #{quiz.quiz_number}
                 </h2>
                 <p className="text-sm text-[#F5E6C8]/50">{quiz.date}</p>
-              </div>
-              <div className="text-right">
+              </Link>
+              <div className="flex items-center gap-3">
                 <p className="text-sm text-[#FFD700]/60">
                   {quiz.rounds} rounds
                 </p>
+                <button
+                  onClick={() => deleteQuiz(quiz.quiz_number)}
+                  disabled={deleting === quiz.quiz_number}
+                  className="rounded px-2 py-1 text-xs text-[#E84D5A]/40 transition-colors hover:bg-[#E84D5A]/10 hover:text-[#E84D5A] disabled:opacity-30"
+                  title="Delete quiz"
+                >
+                  {deleting === quiz.quiz_number ? "..." : "×"}
+                </button>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
 
