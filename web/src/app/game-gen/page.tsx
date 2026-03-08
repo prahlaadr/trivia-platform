@@ -136,7 +136,7 @@ export default function GameGenPage() {
   // No session — show start button
   if (!session) {
     return (
-      <div className="min-h-screen bg-[#143B2E] p-8">
+      <div className="min-h-screen bg-[#143B2E] p-4 sm:p-8">
         <div className="mx-auto max-w-3xl">
           <Link href="/" className="text-sm text-white/40 hover:text-white/60">
             &larr; Back to quizzes
@@ -144,12 +144,12 @@ export default function GameGenPage() {
           <p className="mt-4 mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
             {brand.name}
           </p>
-          <h1 className="mb-6 text-4xl font-black uppercase text-[#FFD700]">
+          <h1 className="mb-6 text-3xl sm:text-4xl font-black uppercase text-[#FFD700]">
             Game Gen
           </h1>
           <button
             onClick={startNew}
-            className="w-full rounded-lg border-2 border-dashed border-white/20 bg-[#1B4D3E]/50 p-12 text-xl font-bold text-white/70 transition-all hover:border-[#FFD700]/40 hover:text-white"
+            className="w-full rounded-lg border-2 border-dashed border-white/20 bg-[#1B4D3E]/50 p-8 sm:p-12 text-lg sm:text-xl font-bold text-white/70 transition-all hover:border-[#FFD700]/40 hover:text-white"
           >
             Start New Game
           </button>
@@ -159,7 +159,7 @@ export default function GameGenPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#143B2E] p-8">
+    <div className="min-h-screen bg-[#143B2E] p-4 sm:p-8">
       <div className="mx-auto max-w-4xl">
         <div className="flex items-center justify-between">
           <Link
@@ -179,12 +179,12 @@ export default function GameGenPage() {
         <p className="mt-4 mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
           {brand.name}
         </p>
-        <h1 className="mb-6 text-4xl font-black uppercase text-[#FFD700]">
+        <h1 className="mb-6 text-3xl sm:text-4xl font-black uppercase text-[#FFD700]">
           Game Gen
         </h1>
 
         {/* Team Registration */}
-        <div className="mb-8 rounded-lg border border-[#FFD700]/20 bg-[#1B4D3E] p-6">
+        <div className="mb-8 rounded-lg border border-[#FFD700]/20 bg-[#1B4D3E] p-4 sm:p-6">
           <h2 className="mb-4 text-lg font-bold text-[#FFD700]">
             Register Team
           </h2>
@@ -327,7 +327,7 @@ export default function GameGenPage() {
 
         {/* Topic Aggregation & Round Preview */}
         {session.teams.length >= 3 && (
-          <div className="mb-8 rounded-lg border border-[#4EC9B0]/30 bg-[#1B4D3E] p-6">
+          <div className="mb-8 rounded-lg border border-[#4EC9B0]/30 bg-[#1B4D3E] p-4 sm:p-6">
             <h2 className="mb-4 text-lg font-bold text-[#4EC9B0]">
               Round Plan
             </h2>
@@ -377,23 +377,23 @@ export default function GameGenPage() {
               <pre className="mb-3 overflow-x-auto rounded bg-black/30 p-3 text-xs text-white/70">
                 {buildPrompt()}
               </pre>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <button
                   onClick={copyPrompt}
-                  className="rounded bg-[#FFD700] px-5 py-2 font-bold text-black transition-all hover:bg-[#FFD700]/90"
+                  className="rounded bg-[#FFD700] px-4 py-2 text-sm sm:px-5 sm:text-base font-bold text-black transition-all hover:bg-[#FFD700]/90"
                 >
                   {copied ? "Copied!" : "Copy Prompt"}
                 </button>
                 <button
                   onClick={checkForGeneratedQuiz}
-                  className="rounded bg-white/10 px-5 py-2 font-medium text-white/60 transition-all hover:bg-white/20 hover:text-white"
+                  className="rounded bg-white/10 px-4 py-2 text-sm sm:px-5 sm:text-base font-medium text-white/60 transition-all hover:bg-white/20 hover:text-white"
                 >
                   Check for Results
                 </button>
                 {generatedQuiz && (
                   <Link
                     href={`/present/${generatedQuiz}`}
-                    className="rounded bg-[#4EC9B0] px-5 py-2 font-bold text-black transition-all hover:bg-[#4EC9B0]/90"
+                    className="rounded bg-[#4EC9B0] px-4 py-2 text-sm sm:px-5 sm:text-base font-bold text-black transition-all hover:bg-[#4EC9B0]/90"
                   >
                     Present Game →
                   </Link>

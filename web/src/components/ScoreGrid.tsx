@@ -110,13 +110,13 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
       <table ref={gridRef} className="w-full border-collapse">
         <thead>
           <tr className="bg-[#1B4D3E]">
-            <th className="sticky left-0 z-10 min-w-[200px] bg-[#1B4D3E] px-4 py-3 text-left text-sm font-bold uppercase tracking-wider text-[#FFD700]">
+            <th className="sticky left-0 z-10 min-w-[120px] sm:min-w-[200px] bg-[#1B4D3E] px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider text-[#FFD700]">
               Team Name
             </th>
             {Array.from({ length: session.roundCount }, (_, i) => (
               <th
                 key={i}
-                className="min-w-[80px] px-4 py-3 text-center text-sm font-bold uppercase tracking-wider text-[#FFD700]"
+                className="min-w-[50px] sm:min-w-[80px] px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold uppercase tracking-wider text-[#FFD700]"
               >
                 {i + 1}
                 {i === session.roundCount - 1 && (
@@ -126,7 +126,7 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
                 )}
               </th>
             ))}
-            <th className="min-w-[90px] px-4 py-3 text-center text-sm font-black uppercase tracking-wider text-[#FFD700]">
+            <th className="min-w-[60px] sm:min-w-[90px] px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFD700]">
               Total
             </th>
             <th className="w-10 px-2 py-3" />
@@ -143,7 +143,7 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
                   type="text"
                   value={team.name}
                   onChange={(e) => updateTeamName(teamIdx, e.target.value)}
-                  className="w-full rounded bg-transparent px-2 py-2 text-lg font-bold text-white outline-none focus:bg-white/5 focus:ring-1 focus:ring-[#FFD700]/30"
+                  className="w-full rounded bg-transparent px-1 sm:px-2 py-1.5 sm:py-2 text-sm sm:text-lg font-bold text-white outline-none focus:bg-white/5 focus:ring-1 focus:ring-[#FFD700]/30"
                   placeholder="Team name"
                   tabIndex={-1}
                 />
@@ -162,12 +162,12 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
                       handleScoreCellKeyDown(e, teamIdx, roundIdx)
                     }
                     onFocus={(e) => e.target.select()}
-                    className="w-full rounded bg-transparent px-2 py-2 text-center text-lg tabular-nums text-white outline-none focus:bg-[#FFD700]/10 focus:ring-1 focus:ring-[#FFD700]/40"
+                    className="w-full rounded bg-transparent px-1 sm:px-2 py-1.5 sm:py-2 text-center text-sm sm:text-lg tabular-nums text-white outline-none focus:bg-[#FFD700]/10 focus:ring-1 focus:ring-[#FFD700]/40"
                     placeholder="—"
                   />
                 </td>
               ))}
-              <td className="px-4 py-2 text-center text-xl font-black tabular-nums text-[#4EC9B0]">
+              <td className="px-2 sm:px-4 py-2 text-center text-base sm:text-xl font-black tabular-nums text-[#4EC9B0]">
                 {teamTotal(team, session.roundCount)}
               </td>
               <td className="px-2 py-2">
@@ -189,7 +189,7 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
               <input
                 type="text"
                 placeholder="+ Add team name..."
-                className="w-full rounded bg-transparent px-2 py-2 text-lg text-white/40 outline-none placeholder-white/20 focus:bg-white/5 focus:text-white focus:ring-1 focus:ring-[#FFD700]/30"
+                className="w-full rounded bg-transparent px-1 sm:px-2 py-1.5 sm:py-2 text-sm sm:text-lg text-white/40 outline-none placeholder-white/20 focus:bg-white/5 focus:text-white focus:ring-1 focus:ring-[#FFD700]/30"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     const input = e.currentTarget;

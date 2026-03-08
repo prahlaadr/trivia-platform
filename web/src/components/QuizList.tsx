@@ -210,7 +210,7 @@ export function QuizList() {
   });
 
   return (
-    <div className="min-h-screen bg-[#143B2E] p-8">
+    <div className="min-h-screen bg-[#143B2E] p-4 sm:p-8">
       <div className="mx-auto max-w-3xl">
         <div className="mb-1 flex items-center justify-between">
           <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
@@ -224,8 +224,8 @@ export function QuizList() {
             {brandKey === "pyaar" ? "DST" : "PT"}
           </button>
         </div>
-        <div className="mb-6 flex items-end justify-between">
-          <h1 className="text-4xl font-black uppercase text-[#FFD700]">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <h1 className="text-3xl sm:text-4xl font-black uppercase text-[#FFD700]">
             {currentBrand.tagline}
           </h1>
           <div className="flex gap-2">

@@ -61,10 +61,10 @@ export default function ScoreSheetPage() {
     .sort((a, b) => teamTotal(b, session.roundCount) - teamTotal(a, session.roundCount));
 
   return (
-    <div className="min-h-screen bg-[#143B2E] p-6">
+    <div className="min-h-screen bg-[#143B2E] p-3 sm:p-6">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Link
               href="/score"
@@ -72,15 +72,15 @@ export default function ScoreSheetPage() {
             >
               &larr; All games
             </Link>
-            <h1 className="text-3xl font-black text-[#FFD700]">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#FFD700]">
               {session.name}
             </h1>
             <p className="text-sm text-white/40">{session.date}</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             <button
               onClick={() => setShowLeaderboard((v) => !v)}
-              className={`rounded px-4 py-2 text-sm font-bold transition-all ${
+              className={`rounded px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-bold transition-all ${
                 showLeaderboard
                   ? "bg-[#FFD700] text-black"
                   : "bg-[#FFD700]/20 text-[#FFD700] hover:bg-[#FFD700]/30"
@@ -90,7 +90,7 @@ export default function ScoreSheetPage() {
             </button>
             <button
               onClick={downloadCSV}
-              className="rounded bg-white/10 px-4 py-2 text-sm font-bold text-white/70 hover:bg-white/20"
+              className="rounded bg-white/10 px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-bold text-white/70 hover:bg-white/20"
             >
               Download CSV
             </button>
@@ -99,7 +99,7 @@ export default function ScoreSheetPage() {
 
         {/* Leaderboard */}
         {showLeaderboard && (
-          <div className="mb-6 rounded-xl border-2 border-[#FFD700]/30 bg-[#0F1B2D] p-6">
+          <div className="mb-6 rounded-xl border-2 border-[#FFD700]/30 bg-[#0F1B2D] p-4 sm:p-6">
             <h2 className="mb-4 text-center text-2xl font-black uppercase tracking-wider text-[#FFD700]">
               Leaderboard
             </h2>

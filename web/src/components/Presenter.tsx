@@ -257,12 +257,12 @@ export function Presenter({ quiz }: PresenterProps) {
       </div>
 
       {/* Bottom toolbar — in flex flow, always visible */}
-      <div className="flex shrink-0 items-center justify-between bg-[#0F1B2D] px-4 py-2">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-1 bg-[#0F1B2D] px-2 py-1.5 sm:px-4 sm:py-2">
         {/* Left: Jump + Scores */}
-        <div className="flex gap-2">
+        <div className="flex gap-1 sm:gap-2">
           <button
             onClick={() => setShowJumpNav((v) => !v)}
-            className="rounded bg-[#FFD700]/20 px-3 py-1.5 text-sm font-bold text-[#FFD700] transition-all hover:bg-[#FFD700]/30"
+            className="rounded bg-[#FFD700]/20 px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-bold text-[#FFD700] transition-all hover:bg-[#FFD700]/30"
           >
             Jump
           </button>
@@ -271,7 +271,7 @@ export function Presenter({ quiz }: PresenterProps) {
               refreshScores();
               setShowScores((v) => !v);
             }}
-            className={`rounded px-3 py-1.5 text-sm font-bold transition-all ${
+            className={`rounded px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-bold transition-all ${
               showScores
                 ? "bg-[#4EC9B0] text-black"
                 : "bg-[#4EC9B0]/20 text-[#4EC9B0] hover:bg-[#4EC9B0]/30"
@@ -282,10 +282,10 @@ export function Presenter({ quiz }: PresenterProps) {
         </div>
 
         {/* Center: nav controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           <button
             onClick={exitPresenter}
-            className="rounded bg-[#E84D5A]/80 px-3 py-1 text-sm font-bold text-white"
+            className="rounded bg-[#E84D5A]/80 px-2 py-1 text-xs sm:px-3 sm:text-sm font-bold text-white"
             title="Esc"
           >
             Exit
@@ -293,30 +293,30 @@ export function Presenter({ quiz }: PresenterProps) {
           <button
             onClick={goPrev}
             disabled={currentSlide === 0}
-            className="rounded bg-black/60 px-3 py-1 text-sm text-white/80 disabled:opacity-30"
+            className="rounded bg-black/60 px-2 py-1 text-xs sm:px-3 sm:text-sm text-white/80 disabled:opacity-30"
           >
             Prev
           </button>
-          <span className="text-sm text-white/50">
+          <span className="text-xs sm:text-sm text-white/50">
             {currentSlide + 1} / {slides.length}
           </span>
           <button
             onClick={goNext}
             disabled={currentSlide === slides.length - 1}
-            className="rounded bg-black/60 px-3 py-1 text-sm text-white/80 disabled:opacity-30"
+            className="rounded bg-black/60 px-2 py-1 text-xs sm:px-3 sm:text-sm text-white/80 disabled:opacity-30"
           >
             Next
           </button>
           <button
             onClick={toggleFullscreen}
-            className="rounded bg-black/60 px-3 py-1 text-sm text-white/80"
+            className="hidden sm:block rounded bg-black/60 px-3 py-1 text-sm text-white/80"
           >
             {isFullscreen ? "Exit FS" : "Fullscreen"}
           </button>
         </div>
 
-        {/* Right: spacer to balance layout */}
-        <div className="w-[140px]" />
+        {/* Right: spacer to balance layout — hidden on mobile */}
+        <div className="hidden sm:block w-[140px]" />
       </div>
 
       {/* Scores overlay — tabbed: Leaderboard / Scorekeeper */}

@@ -36,7 +36,7 @@ export default function ScorePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#143B2E] p-8">
+    <div className="min-h-screen bg-[#143B2E] p-4 sm:p-8">
       <div className="mx-auto max-w-3xl">
         <Link href="/" className="text-sm text-white/40 hover:text-white/60">
           &larr; Back to quizzes
@@ -45,7 +45,7 @@ export default function ScorePage() {
         <p className="mt-4 mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
           {getBrand().name}
         </p>
-        <h1 className="mb-6 text-4xl font-black uppercase text-[#FFD700]">
+        <h1 className="mb-6 text-3xl sm:text-4xl font-black uppercase text-[#FFD700]">
           Scorekeeper
         </h1>
 
@@ -58,11 +58,11 @@ export default function ScorePage() {
             + New Game Session
           </button>
         ) : (
-          <div className="mb-6 rounded-lg border border-[#FFD700]/30 bg-[#1B4D3E] p-6">
+          <div className="mb-6 rounded-lg border border-[#FFD700]/30 bg-[#1B4D3E] p-4 sm:p-6">
             <h2 className="mb-4 text-lg font-bold text-[#FFD700]">
               New Game Session
             </h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="mb-1 block text-sm text-white/50">
                   Session Name
