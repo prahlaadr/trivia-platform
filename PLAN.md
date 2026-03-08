@@ -28,9 +28,9 @@ The full platform running locally for dynamic game creation. Built as a separate
 
 | Feature | Status |
 |---------|--------|
-| Team registration (name + 3 topic picks) | 🔲 Not started |
-| Topic aggregation → round generation | 🔲 Not started |
-| AI question generation (Claude API + web search) | 🔲 Not started |
+| Team registration (name + 3-5 topic picks) | ✅ Built |
+| Topic aggregation → round generation | ✅ Built |
+| AI question generation (Claude Code skill + web search) | ✅ Built |
 | Question swapping | 🔲 Not started |
 | Test bank pull (reuse existing questions by topic) | 🔲 Not started |
 
@@ -60,17 +60,13 @@ Switch between Dirty South Trivia and Pyaar Trivia branding. Stored in localStor
 
 Persistent quiz storage via Vercel Blob. Upload PDF/DOCX → parse → store JSON in Blob. Admin PIN gate on upload/delete. Sort controls on quiz list.
 
-### Module 5: Game Gen Mode (Local) 🔲
+### Module 5: Game Gen Mode (Local) ✅
 
-**Goal:** Dynamic game creation for live trivia nights with AI-powered question generation.
+Dynamic game creation for live trivia nights. Teams pick 3-5 topics, topics are aggregated and ranked, a 6-round plan is generated, and a Claude Code skill (`/game-gen`) generates 36 questions + tie-breaker via web search. Output is a standard Quiz JSON that loads directly into the Presenter.
 
-**Sub-features:**
-- Team registration UI
-- Topic selection (3 per team)
-- Round generation from topic pool
-- AI question generation (Claude API + web search)
-- Question bank integration (reuse existing questions)
-- Question swapping (replace individual questions)
+**Remaining sub-features:**
+- Question swapping (replace individual questions without regenerating)
+- Test bank pull (search existing quizzes by topic before generating new)
 
 ---
 

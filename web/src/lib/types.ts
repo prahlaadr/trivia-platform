@@ -57,3 +57,35 @@ export interface Slide {
   clueIndex?: number; // for progressive rounds
   isLastRound?: boolean; // last round = doubled points
 }
+
+// ── Game Gen types ──
+
+export interface GameGenTeam {
+  id: string;
+  name: string;
+  topics: string[]; // 3 topic picks
+}
+
+export interface GeneratedQuestion {
+  number: number;
+  text: string;
+  answer: string;
+  topic: string;
+  source: "ai" | "bank";
+}
+
+export interface GeneratedRound {
+  number: number;
+  title: string;
+  topic: string;
+  questions: GeneratedQuestion[];
+}
+
+export interface GameGenSession {
+  id: string;
+  createdAt: string;
+  status: "registering" | "generating" | "reviewing" | "ready";
+  teams: GameGenTeam[];
+  rounds: GeneratedRound[];
+  tieBreaker?: { question: string; answer: string };
+}

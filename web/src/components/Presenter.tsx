@@ -127,6 +127,28 @@ export function Presenter({ quiz }: PresenterProps) {
   const slide = slides[currentSlide];
   const progress = ((currentSlide + 1) / slides.length) * 100;
   const [showJumpNav, setShowJumpNav] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
+
+  // Measure actual visible viewport and lock body scroll
+  useEffect(() => {
+    const measure = () => setViewportHeight(window.innerHeight);
+    measure();
+    window.addEventListener("resize", measure);
+
+    // Lock body to prevent scroll and match presenter background
+    const prevBg = document.body.style.background;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.background = "#0F1B2D";
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.background = "#0F1B2D";
+
+    return () => {
+      window.removeEventListener("resize", measure);
+      document.body.style.background = prevBg;
+      document.body.style.overflow = prevOverflow;
+      document.documentElement.style.background = "";
+    };
+  }, []);
 
   const formatTime = (s: number) => {
     const mins = Math.floor(s / 60);
@@ -212,80 +234,89 @@ export function Presenter({ quiz }: PresenterProps) {
   const currentRoundNum = slide.roundNumber ?? null;
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-[#0F1B2D]">
+    <div className="fixed inset-0 bg-[#0F1B2D]">
+    <div
+      className="flex flex-col overflow-hidden"
+      style={{ height: viewportHeight ? `${viewportHeight}px` : '100vh' }}
+    >
       {/* Slide content */}
-      <div className="h-full w-full">
+      <div className="relative flex-1 overflow-hidden">
         <SlideRenderer slide={slide} />
-      </div>
-
-      {/* Timer — always visible, top-right corner */}
-      <div className="absolute right-4 top-4 rounded bg-black/40 px-3 py-1.5 font-mono text-sm tabular-nums text-white/50">
-        {formatTime(slideSeconds)}
+        {/* Timer — top-right corner */}
+        <div className="absolute right-4 top-4 rounded bg-black/40 px-3 py-1.5 font-mono text-sm tabular-nums text-white/50">
+          {formatTime(slideSeconds)}
+        </div>
       </div>
 
       {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 h-1 w-full bg-black/30">
+      <div className="h-1 w-full shrink-0 bg-black/30">
         <div
           className="h-full bg-[#FFD700] transition-all duration-300"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      {/* Always-visible action buttons — bottom left */}
-      <div className="absolute bottom-4 left-4 z-40 flex gap-2">
-        <button
-          onClick={() => setShowJumpNav((v) => !v)}
-          className="rounded bg-[#FFD700]/20 px-3 py-1.5 text-sm font-bold text-[#FFD700] backdrop-blur-sm transition-all hover:bg-[#FFD700]/30"
-        >
-          Jump
-        </button>
-        <button
-          onClick={() => {
-            refreshScores();
-            setShowScores((v) => !v);
-          }}
-          className={`rounded px-3 py-1.5 text-sm font-bold backdrop-blur-sm transition-all ${
-            showScores
-              ? "bg-[#4EC9B0] text-black"
-              : "bg-[#4EC9B0]/20 text-[#4EC9B0] hover:bg-[#4EC9B0]/30"
-          }`}
-        >
-          Scores
-        </button>
-      </div>
+      {/* Bottom toolbar — in flex flow, always visible */}
+      <div className="flex shrink-0 items-center justify-between bg-[#0F1B2D] px-4 py-2">
+        {/* Left: Jump + Scores */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowJumpNav((v) => !v)}
+            className="rounded bg-[#FFD700]/20 px-3 py-1.5 text-sm font-bold text-[#FFD700] transition-all hover:bg-[#FFD700]/30"
+          >
+            Jump
+          </button>
+          <button
+            onClick={() => {
+              refreshScores();
+              setShowScores((v) => !v);
+            }}
+            className={`rounded px-3 py-1.5 text-sm font-bold transition-all ${
+              showScores
+                ? "bg-[#4EC9B0] text-black"
+                : "bg-[#4EC9B0]/20 text-[#4EC9B0] hover:bg-[#4EC9B0]/30"
+            }`}
+          >
+            Scores
+          </button>
+        </div>
 
-      {/* Nav controls (bottom center, show on hover) */}
-      <div className="absolute bottom-2 left-0 right-0 flex items-center justify-center gap-4 opacity-0 transition-opacity hover:opacity-100">
-        <button
-          onClick={exitPresenter}
-          className="rounded bg-[#E84D5A]/80 px-3 py-1 text-sm font-bold text-white"
-          title="Esc"
-        >
-          Exit
-        </button>
-        <button
-          onClick={goPrev}
-          disabled={currentSlide === 0}
-          className="rounded bg-black/60 px-3 py-1 text-sm text-white/80 disabled:opacity-30"
-        >
-          Prev
-        </button>
-        <span className="text-sm text-white/50">
-          {currentSlide + 1} / {slides.length}
-        </span>
-        <button
-          onClick={goNext}
-          disabled={currentSlide === slides.length - 1}
-          className="rounded bg-black/60 px-3 py-1 text-sm text-white/80 disabled:opacity-30"
-        >
-          Next
-        </button>
-        <button
-          onClick={toggleFullscreen}
-          className="rounded bg-black/60 px-3 py-1 text-sm text-white/80"
-        >
-          {isFullscreen ? "Exit FS" : "Fullscreen"}
-        </button>
+        {/* Center: nav controls */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={exitPresenter}
+            className="rounded bg-[#E84D5A]/80 px-3 py-1 text-sm font-bold text-white"
+            title="Esc"
+          >
+            Exit
+          </button>
+          <button
+            onClick={goPrev}
+            disabled={currentSlide === 0}
+            className="rounded bg-black/60 px-3 py-1 text-sm text-white/80 disabled:opacity-30"
+          >
+            Prev
+          </button>
+          <span className="text-sm text-white/50">
+            {currentSlide + 1} / {slides.length}
+          </span>
+          <button
+            onClick={goNext}
+            disabled={currentSlide === slides.length - 1}
+            className="rounded bg-black/60 px-3 py-1 text-sm text-white/80 disabled:opacity-30"
+          >
+            Next
+          </button>
+          <button
+            onClick={toggleFullscreen}
+            className="rounded bg-black/60 px-3 py-1 text-sm text-white/80"
+          >
+            {isFullscreen ? "Exit FS" : "Fullscreen"}
+          </button>
+        </div>
+
+        {/* Right: spacer to balance layout */}
+        <div className="w-[140px]" />
       </div>
 
       {/* Scores overlay — tabbed: Leaderboard / Scorekeeper */}
@@ -561,6 +592,7 @@ export function Presenter({ quiz }: PresenterProps) {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

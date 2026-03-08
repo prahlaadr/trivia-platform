@@ -41,7 +41,7 @@ const brands: Record<BrandKey, BrandConfig> = {
   },
 };
 
-const DEFAULT_BRAND: BrandKey = "pyaar";
+const DEFAULT_BRAND: BrandKey = "dirty-south";
 
 export function getBrandKey(): BrandKey {
   if (typeof window === "undefined") return DEFAULT_BRAND;

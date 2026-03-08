@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# quiz data (local only)
+/public/data/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.env*.local

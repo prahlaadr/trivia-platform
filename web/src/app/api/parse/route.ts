@@ -189,7 +189,7 @@ function listFromFilesystem() {
     return NextResponse.json({ quizzes: [] });
   }
 
-  const files = fs.readdirSync(DATA_DIR).filter((f) => f.endsWith(".json"));
+  const files = fs.readdirSync(DATA_DIR).filter((f) => f.endsWith(".json") && !f.startsWith("quiz_gen_"));
   const quizzes = files.map((f) => {
     const content = JSON.parse(
       fs.readFileSync(path.join(DATA_DIR, f), "utf-8")
