@@ -20,9 +20,9 @@ export async function GET(request: NextRequest) {
 
 async function getFromBlob(quizId: string) {
   try {
-    const { blobs } = await list({ prefix: `quizzes/quiz_${quizId}.json` });
+    const { blobs } = await list({ prefix: `quiz_${quizId}.json` });
     const blob = blobs.find((b) =>
-      b.pathname === `quizzes/quiz_${quizId}.json`
+      b.pathname === `quiz_${quizId}.json`
     );
     if (!blob) {
       return NextResponse.json({ error: "Quiz not found" }, { status: 404 });

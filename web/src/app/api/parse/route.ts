@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     if (isVercel) {
       // Store parsed JSON in Vercel Blob
-      await put(`quizzes/quiz_${quiz.quiz_number}.json`, jsonContent, {
+      await put(`quiz_${quiz.quiz_number}.json`, jsonContent, {
         access: "public",
         contentType: "application/json",
         addRandomSuffix: false,
@@ -106,7 +106,7 @@ export async function GET() {
 
 async function listFromBlob() {
   try {
-    const { blobs } = await list({ prefix: "quizzes/" });
+    const { blobs } = await list({ prefix: "quiz_" });
 
     const quizzes = await Promise.all(
       blobs
