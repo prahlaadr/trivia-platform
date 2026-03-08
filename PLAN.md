@@ -97,13 +97,13 @@ Dynamic game creation for live trivia nights. Teams pick 3-5 topics, topics are 
 6. ~~Admin PIN gate on upload/delete~~
 7. ~~Delete quiz, sort controls~~
 
-### Phase 3 — Game Gen Mode (Local)
-8. Team registration UI
-9. Topic aggregation → round generation logic
-10. Claude API integration for question generation
+### Phase 3 — Game Gen Mode (Local) ✅
+8. ~~Team registration UI~~
+9. ~~Topic aggregation → round generation logic~~
+10. ~~Claude Code skill for question generation~~
 11. Test bank search (by topic/tag)
 12. Question swapping UI
-13. End-to-end game flow
+13. ~~End-to-end game flow~~
 
 ---
 
@@ -115,4 +115,4 @@ Dynamic game creation for live trivia nights. Teams pick 3-5 topics, topics are 
 | Scorekeeper | ✅ Done | Teams, rounds, joker, leaderboard, CSV |
 | Brand Toggle | ✅ Done | Dirty South (default) ↔ Pyaar Trivia |
 | Vercel Blob | ✅ Done | Persistent storage, admin PIN (481516), delete, sort |
-| Game Gen | 🔲 Not started | Local-only, includes AI generator |
+| Game Gen | ✅ Done | Local-only, AI generator, saved games. Remaining: question swapping, test bank pull |

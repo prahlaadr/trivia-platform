@@ -38,6 +38,7 @@ Full-screen quiz presentation with keyboard navigation.
 - Per-slide timer, progress bar, jump navigation panel
 - Scores overlay with live leaderboard and inline scorekeeper
 - Floating toolbar that adapts to any viewport size
+- Fully responsive — works on mobile, tablet, and desktop
 
 ### Scorekeeper
 
@@ -61,6 +62,7 @@ Dynamic game creation for live trivia nights at `/game-gen`.
   - Matches the witty, conversational tone of existing quizzes
   - Mix of difficulty per round (2 easy, 2 medium, 2 hard)
   - No API costs — runs through Claude Code / Claude Max plan
+- **Saved games:** Save generated quizzes to a persistent list for quick access later
 - **Presenter-ready:** Generated quiz uses the exact same JSON format, loads directly into the Presenter
 
 **Game Gen flow:**
@@ -76,6 +78,13 @@ Switch between **Pyaar Trivia** and **Dirty South Trivia** branding with a singl
 ### Vercel Blob Storage
 
 Uploaded quizzes persist across deploys via Vercel Blob. Local mode uses filesystem (`public/data/`), Vercel mode reads/writes from Blob store automatically. Admin PIN gate on upload/delete.
+
+### Mobile & PWA
+
+- All pages responsive — optimized layouts for phone, tablet, and desktop
+- Installable as a home screen app on iOS and Android (Add to Home Screen)
+- Standalone mode with dark green theme, status bar integration, and safe area insets for notched phones
+- Web app manifest with app icons
 
 ---
 
@@ -192,7 +201,9 @@ trivia-platform/
 │   │       └── types.ts           # Quiz, Round, Question, Slide, GameGen types
 │   └── public/
 │       ├── data/                  # Parsed + generated quiz JSON (local)
-│       └── fonts/                 # Poppins font files
+│       ├── fonts/                 # Poppins font files
+│       ├── manifest.json          # PWA web app manifest
+│       └── icon-*.png             # App icons (192, 512, apple-touch)
 └── README.md
 ```
 
@@ -220,3 +231,4 @@ trivia-platform/
 | PDF + DOCX Upload | Done |
 | Vercel Blob Storage | Done |
 | Game Gen Mode | Done |
+| Mobile & PWA | Done |
