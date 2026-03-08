@@ -50,14 +50,14 @@ trivia-platform/           # Repo root
 - **Slides:** `slides.ts` converts a `Quiz` into a flat `Slide[]` array. The Presenter navigates this array linearly.
 - **Presenter toolbar:** Uses `window.innerHeight` measurement (not CSS `100vh`) because Mac Dock/browser chrome can cover the bottom. Two-layer layout: outer `fixed inset-0` for background + inner flex column sized to measured height.
 - **Brand toggle:** `localStorage("trivia-brand")` → `"dirty-south"` or `"pyaar"`. Default is `"dirty-south"`. Server-side rendering uses the default.
-- **Admin PIN:** Set via `ADMIN_PIN` env var. Gates upload and delete operations. Client stores it in `localStorage("trivia-admin-pin")` after first prompt.
+- **Admin PIN:** Set via `ADMIN_PIN` env var. Gates upload and delete operations. Client stores it in localStorage after first prompt.
 - **Game Gen:** Teams pick topics → topics ranked → round plan generated → prompt copied to Claude Code → `/game-gen` skill generates quiz JSON → saved to `public/data/`.
 - **Responsive:** All pages use `sm:` breakpoint pattern. Presenter hides fullscreen button on mobile.
 
 ## Environment Variables
 
 - `BLOB_READ_WRITE_TOKEN` — Vercel Blob store token (required for deployed version)
-- `ADMIN_PIN` — Gates upload/delete (optional, defaults to no gate)
+- `ADMIN_PIN` — Gates upload/delete (set in Vercel env vars)
 - `VERCEL` — Auto-set by Vercel, used to switch between Blob and filesystem storage
 
 ## Commands

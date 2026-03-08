@@ -58,7 +58,7 @@ Switch between Dirty South Trivia and Pyaar Trivia branding. Stored in localStor
 
 ### Module 4: Vercel Blob Storage ✅
 
-Persistent quiz storage via Vercel Blob. Upload PDF/DOCX → parse → store JSON in Blob. Admin PIN gate on upload/delete. Sort controls on quiz list.
+Persistent quiz storage via Vercel Blob. Upload PDF/DOCX → parse → store JSON in Blob. Sort controls on quiz list.
 
 ### Module 5: Game Gen Mode (Local) ✅
 
@@ -114,5 +114,5 @@ Dynamic game creation for live trivia nights. Teams pick 3-5 topics, topics are 
 | Presenter | ✅ Done | PDF + DOCX, slides, keyboard nav, fullscreen |
 | Scorekeeper | ✅ Done | Teams, rounds, joker, leaderboard, CSV |
 | Brand Toggle | ✅ Done | Dirty South (default) ↔ Pyaar Trivia |
-| Vercel Blob | ✅ Done | Persistent storage, admin PIN (481516), delete, sort |
+| Vercel Blob | ✅ Done | Persistent storage, delete, sort |
 | Game Gen | ✅ Done | Local-only, AI generator, saved games. Remaining: question swapping, test bank pull |

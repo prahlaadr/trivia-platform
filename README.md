@@ -77,7 +77,7 @@ Switch between **Pyaar Trivia** and **Dirty South Trivia** branding with a singl
 
 ### Vercel Blob Storage
 
-Uploaded quizzes persist across deploys via Vercel Blob. Local mode uses filesystem (`public/data/`), Vercel mode reads/writes from Blob store automatically. Admin PIN gate on upload/delete.
+Uploaded quizzes persist across deploys via Vercel Blob. Local mode uses filesystem (`public/data/`), Vercel mode reads/writes from Blob store automatically.
 
 ### Mobile & PWA
 
@@ -116,7 +116,6 @@ Open [http://localhost:3000](http://localhost:3000) — drag & drop `.docx` or `
 
 Auto-deploys from `main` via GitHub integration. Requires:
 - `BLOB_READ_WRITE_TOKEN` env var (from Vercel Blob store)
-- `ADMIN_PIN` env var (optional — gates upload/delete)
 
 ---
 
