@@ -14,8 +14,10 @@ out/
 .vercel/
 
 # Data (generated from bank/)
-data/
-web/public/data/
+/data/
+# Quiz data (local only, except question bank CSV)
+web/public/data/*
+!web/public/data/question-bank/
 
 # Bank (your question docs — not committed)
 bank/

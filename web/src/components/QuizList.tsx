@@ -228,12 +228,18 @@ export function QuizList() {
           <h1 className="text-3xl sm:text-4xl font-black uppercase text-[#FFD700]">
             {currentBrand.tagline}
           </h1>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Link
               href="/game-gen"
               className="rounded bg-[#FFD700]/20 px-4 py-2 text-sm font-bold text-[#FFD700] transition-all hover:bg-[#FFD700]/30"
             >
               Game Gen
+            </Link>
+            <Link
+              href="/wildcard"
+              className="rounded bg-[#FFD700]/20 px-4 py-2 text-sm font-bold text-[#FFD700] transition-all hover:bg-[#FFD700]/30"
+            >
+              Wildcard
             </Link>
             <Link
               href="/score"

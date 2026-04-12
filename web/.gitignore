@@ -36,8 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
-# quiz data (local only)
-/public/data/
+# quiz data (local only, except question bank)
+/public/data/*
+!/public/data/question-bank/
 
 # typescript
 *.tsbuildinfo

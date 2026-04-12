@@ -12,6 +12,15 @@ export default function PresentPage() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    // Check localStorage first (wildcard games are stored there)
+    if (quizId.startsWith("wildcard-")) {
+      const stored = localStorage.getItem(`quiz_${quizId}`);
+      if (stored) {
+        setQuiz(JSON.parse(stored));
+        return;
+      }
+    }
+
     fetch(`/api/quiz?id=${quizId}`)
       .then((res) => {
         if (!res.ok) throw new Error("Not found");
