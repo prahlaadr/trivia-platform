@@ -124,6 +124,24 @@ export default function WildcardPage() {
           {questions.length.toLocaleString()} questions across {categories.length} categories
         </p>
 
+        {/* Instructions + Random button — hidden when game is generated */}
+        {!generatedGame && (
+          <div className="mb-6">
+            <p className="mb-4 text-sm text-white/50">
+              Select 1–6 categories below and hit <span className="font-semibold text-white/70">Generate Game</span>, or go fully random:
+            </p>
+            <button
+              onClick={() => handleGenerate("wildcard")}
+              className="w-full rounded-lg bg-[#FFD700] py-3.5 text-center font-bold text-black transition-all hover:bg-[#FFD700]/90 sm:py-4"
+            >
+              Random Wildcard Game
+            </button>
+            <p className="mt-1.5 text-center text-xs text-white/30">
+              6 random categories, 8 questions each
+            </p>
+          </div>
+        )}
+
         {/* Generated Game Preview */}
         {generatedGame && (
           <div className="mb-8 rounded-lg border border-[#4EC9B0]/30 bg-[#1B4D3E] p-4 sm:p-6">
@@ -214,29 +232,8 @@ export default function WildcardPage() {
         {/* Category Selection — shown when no game generated */}
         {!generatedGame && (
           <>
-            {/* Quick Generate */}
-            <button
-              onClick={() => handleGenerate("wildcard")}
-              className="mb-8 w-full rounded-lg border-2 border-dashed border-[#FFD700]/30 bg-[#FFD700]/5 p-6 text-center transition-all hover:border-[#FFD700]/50 hover:bg-[#FFD700]/10 sm:p-8"
-            >
-              <span className="block text-xl font-black text-[#FFD700] sm:text-2xl">
-                Random Wildcard Game
-              </span>
-              <span className="mt-1 block text-sm text-white/40">
-                6 random categories, 8 questions each — instant game
-              </span>
-            </button>
-
-            {/* Or pick categories */}
+            {/* Category Selection */}
             <div className="mb-6">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="h-px flex-1 bg-white/10" />
-                <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/30">
-                  or pick categories
-                </p>
-                <div className="h-px flex-1 bg-white/10" />
-              </div>
-
               <p className="mb-3 text-sm text-white/40">
                 Select up to 6 categories{" "}
                 <span className="text-[#FFD700]/60">
