@@ -21,6 +21,7 @@ export default function WildcardPage() {
 
   // Game config
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [difficulty, setDifficulty] = useState<"mixed" | "easy" | "medium" | "hard">("mixed");
   const [generatedGame, setGeneratedGame] = useState<GameGenSession | null>(null);
   const [savedGames, setSavedGames] = useState<SavedGameGen[]>([]);
 
@@ -54,6 +55,7 @@ export default function WildcardPage() {
 
       const game = generateWildcardGame(questions, {
         categories: mode === "custom" ? selectedCategories : undefined,
+        difficulty,
       });
       setGeneratedGame(game);
 
@@ -130,6 +132,31 @@ export default function WildcardPage() {
             <p className="mb-4 text-sm text-white/50">
               Select 1–6 categories below and hit <span className="font-semibold text-white/70">Generate Game</span>, or go fully random:
             </p>
+
+            {/* Difficulty selector */}
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-xs font-medium text-white/40">Difficulty:</span>
+              {(["mixed", "easy", "medium", "hard"] as const).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setDifficulty(d)}
+                  className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-all ${
+                    difficulty === d
+                      ? d === "easy"
+                        ? "bg-green-500/20 text-green-400"
+                        : d === "medium"
+                          ? "bg-yellow-500/20 text-yellow-400"
+                          : d === "hard"
+                            ? "bg-red-500/20 text-red-400"
+                            : "bg-white/15 text-white/80"
+                      : "bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/50"
+                  }`}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+
             <button
               onClick={() => handleGenerate("wildcard")}
               className="w-full rounded-lg bg-[#FFD700] py-3.5 text-center font-bold text-black transition-all hover:bg-[#FFD700]/90 sm:py-4"

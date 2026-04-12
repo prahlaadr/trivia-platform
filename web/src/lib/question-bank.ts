@@ -152,10 +152,12 @@ export function generateWildcardGame(
     numRounds?: number;
     questionsPerRound?: number;
     categories?: string[]; // if provided, use these instead of random
+    difficulty?: "easy" | "medium" | "hard" | "mixed";
   }
 ): GameGenSession {
   const numRounds = options?.numRounds ?? 6;
   const qPerRound = options?.questionsPerRound ?? 8;
+  const difficulty = options?.difficulty === "mixed" ? undefined : options?.difficulty;
 
   // Pick categories
   let categories: string[];
@@ -174,7 +176,7 @@ export function generateWildcardGame(
 
   // Generate rounds
   const rounds: GeneratedRound[] = categories.map((cat, i) => {
-    const picked = pickQuestions(questions, cat, qPerRound);
+    const picked = pickQuestions(questions, cat, qPerRound, difficulty);
     return {
       number: i + 1,
       title: cat,
