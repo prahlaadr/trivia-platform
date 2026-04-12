@@ -275,17 +275,9 @@ export default function WildcardPage() {
                         {cat.count} questions
                       </span>
                     </div>
-                    <div className="flex gap-1.5 text-[10px]">
-                      <span className="rounded bg-green-500/10 px-1.5 py-0.5 text-green-400/60">
-                        {cat.difficulties.easy}
-                      </span>
-                      <span className="rounded bg-yellow-500/10 px-1.5 py-0.5 text-yellow-400/60">
-                        {cat.difficulties.medium}
-                      </span>
-                      <span className="rounded bg-red-500/10 px-1.5 py-0.5 text-red-400/60">
-                        {cat.difficulties.hard}
-                      </span>
-                    </div>
+                    <span className="text-xs text-white/20">
+                      {cat.count}
+                    </span>
                   </button>
                 ))}
               </div>
