@@ -278,6 +278,7 @@ export function buildDeck(): Slide[] {
     date: "Sep 2025",
   });
 
+  // First half: every section + every question (no answers).
   for (const section of sections) {
     slides.push({
       type: "section",
@@ -294,6 +295,24 @@ export function buildDeck(): Slide[] {
         bullets: q.bullets,
         codeBlock: q.codeBlock,
       });
+    }
+  }
+
+  // ANSWERS divider — same template as the cover, says "ANSWERS"
+  slides.push({ type: "answers-divider", date: "Sep 2025" });
+
+  // Second half: per section, replay the section divider, then reveal slides
+  // (question text + answer) in the same order. Sections with no questions
+  // (Section 0 / team intro) are skipped here.
+  for (const section of sections) {
+    if (section.questions.length === 0) continue;
+    slides.push({
+      type: "section",
+      sectionNumber: section.number,
+      sectionTitle: section.title,
+      subtitle: section.subtitle,
+    });
+    for (const q of section.questions) {
       slides.push({
         type: "reveal",
         number: q.number,
@@ -305,8 +324,6 @@ export function buildDeck(): Slide[] {
       });
     }
   }
-
-  slides.push({ type: "answers-divider", date: "Sep 2025" });
 
   return slides;
 }
