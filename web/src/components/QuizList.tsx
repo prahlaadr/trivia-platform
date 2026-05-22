@@ -242,6 +242,12 @@ export function QuizList() {
               Wildcard
             </Link>
             <Link
+              href="/out-of-pocket"
+              className="rounded bg-[#fe8cc2]/20 px-4 py-2 text-sm font-bold text-[#fe8cc2] transition-all hover:bg-[#fe8cc2]/30"
+            >
+              Out of Pocket
+            </Link>
+            <Link
               href="/score"
               className="rounded bg-[#4EC9B0]/20 px-4 py-2 text-sm font-bold text-[#4EC9B0] transition-all hover:bg-[#4EC9B0]/30"
             >

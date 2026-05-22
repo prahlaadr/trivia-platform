@@ -71,7 +71,7 @@ export default function ScorePage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., Pub Quiz #567"
+                  placeholder="e.g., Quiz #567"
                   className="w-full rounded bg-white/10 px-4 py-2.5 text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#FFD700]/40"
                   autoFocus
                   onKeyDown={(e) => e.key === "Enter" && handleCreate()}

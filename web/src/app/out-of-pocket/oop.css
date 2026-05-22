@@ -1,0 +1,34 @@
+/* Out of Pocket brand tokens — extracted from outofpocket.health stylesheet
+ * Pink #fe8cc2 / Cyan #45dcfb / Yellow #faf18c / Navy #051f38
+ * Display font: Baloo Da 2 (their actual primary)
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@400;500;600;700;800&display=swap");
+
+.oop-scope {
+  --oop-pink: #fe8cc2;
+  --oop-pink-light: #ffc4e0;
+  --oop-cyan: #45dcfb;
+  --oop-cyan-light: #6dd8f9;
+  --oop-yellow: #faf18c;
+  --oop-navy: #051f38;
+  --oop-black: #000000;
+  --oop-white: #ffffff;
+
+  --oop-border: 4px solid var(--oop-black);
+  --oop-border-thick: 6px solid var(--oop-black);
+
+  background: var(--oop-white);
+  color: var(--oop-black);
+  font-family: "Baloo Da 2", "Poppins", sans-serif;
+}
+
+.oop-scope * {
+  font-family: inherit;
+}
+
+/* When the OOP layout is mounted, the body bg should be white so green
+ * doesn't leak around safe-area insets / scrollbars / over-scroll. */
+body:has(.oop-scope) {
+  background: var(--oop-white, #fff);
+}

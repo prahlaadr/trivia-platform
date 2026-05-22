@@ -21,13 +21,13 @@ interface BrandConfig {
 const brands: Record<BrandKey, BrandConfig> = {
   "dirty-south": {
     name: "Dirty South Trivia",
-    tagline: "Pub Quiz Presenter",
+    tagline: "Trivia Presenter",
     website: "DirtySouthTrivia.com",
     socialHandle: "dstrivia",
     socialPlatform: "Instagram",
     pageTitle: "Trivia Platform — Dirty South Trivia",
-    pageDescription: "Pub quiz presenter and question bank",
-    quizLabel: "Pub Quiz",
+    pageDescription: "Trivia presenter and question bank",
+    quizLabel: "Quiz",
   },
   pyaar: {
     name: "Pyaar Trivia",
