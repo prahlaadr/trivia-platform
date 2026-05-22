@@ -2,60 +2,46 @@
  * Each component is sized at a 16:9 aspect ratio; in the presenter they fill
  * the viewport, in the showcase they render at scale.
  *
- * Octopus mascot + OOP wordmark are placeholders — drop SVGs into
- * public/oop/ and the components will pick them up.
+ * Assets in public/oop/ are real OOP brand pulls:
+ *  - oop-logo.webp        : caduceus icon mark
+ *  - oop-wordmark.svg     : "OUT-OF-POCKET" wordmark
+ *  - open-quote.svg       : opening quote glyph
+ *  - close-quote.svg      : closing quote glyph
+ *  - dc-badge.webp        : "DATA CAMP 26'" hero badge (replaces the octopus
+ *                           for the Data Camp pitch context)
+ *  - dc-sticker[1-3].webp : Working Together / Freak in the Sheets / Team Excel
+ *  - dc-sticker26.webp    : FHIR SAFETY sticker
  */
+
+/* eslint-disable @next/next/no-img-element */
 
 const ASPECT = "aspect-[16/9]";
 
 function OopWordmark({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-extrabold tracking-tight ${className}`}
+      className={`inline-flex items-center gap-1.5 ${className}`}
+      aria-label="Out of Pocket Health"
     >
-      <span aria-hidden className="text-[1.2em] leading-none">⚕</span>
-      <span>OUT-OF-POCKET</span>
+      <img src="/oop/oop-logo.webp" alt="" className="h-[1.4em] w-auto" />
+      <img src="/oop/oop-wordmark.svg" alt="OUT-OF-POCKET" className="h-[0.9em] w-auto" />
     </span>
   );
 }
 
 function OpenQuote({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <path
-        d="M14 36c0-12 6-18 14-22l4 6c-6 3-10 7-10 14h6v14H14V36zm22 0c0-12 6-18 14-22l4 6c-6 3-10 7-10 14h6v14H36V36z"
-        fill="white"
-        stroke="black"
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+  return <img src="/oop/open-quote.svg" alt="" aria-hidden className={className} />;
 }
 
 function CloseQuote({ className = "" }: { className?: string }) {
+  // The OOP site uses the same glyph rotated 180° for the closing variant.
   return (
-    <svg
-      className={className}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    <img
+      src="/oop/open-quote.svg"
+      alt=""
       aria-hidden
-    >
-      <path
-        d="M50 28c0 12-6 18-14 22l-4-6c6-3 10-7 10-14h-6V16h14v12zm-22 0c0 12-6 18-14 22l-4-6c6-3 10-7 10-14H14V16h14v12z"
-        fill="white"
-        stroke="black"
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
-    </svg>
+      className={`${className} rotate-180`}
+    />
   );
 }
 
@@ -87,13 +73,13 @@ export function OopCoverSlide({
           {subtitle && <p className="mt-6 text-2xl">{subtitle}</p>}
           <div className="mt-auto h-1 w-3/4 bg-black" />
         </div>
-        {/* octopus mascot placeholder */}
-        <div
-          aria-hidden
-          className="absolute -right-6 top-12 h-44 w-44 select-none text-[10rem] leading-none text-[var(--oop-pink)]"
-        >
-          🐙
-        </div>
+        {/* Data Camp 26' badge — the trivia deck mascot, swapped for the DC badge
+            since this build is pitched at Out of Pocket for Data Camp 2026. */}
+        <img
+          src="/oop/dc-badge.webp"
+          alt="Data Camp 26'"
+          className="pointer-events-none absolute -right-2 -top-2 h-44 w-auto select-none"
+        />
       </div>
     </div>
   );
@@ -154,22 +140,29 @@ export function OopQuestionSlide({
   text,
   points,
   bullets,
+  codeBlock,
 }: {
   number: number;
   text: string;
   points: number;
   bullets?: string[];
+  codeBlock?: string;
 }) {
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-[var(--oop-pink)]`}>
       <div className="absolute inset-8 rounded-md border-4 border-black bg-white">
-        <OpenQuote className="absolute -left-6 -top-2 h-14 w-14" />
-        <CloseQuote className="absolute -bottom-2 -right-6 h-14 w-14" />
+        <OpenQuote className="absolute -left-4 -top-4 h-14 w-14" />
+        <CloseQuote className="absolute -bottom-4 -right-4 h-14 w-14" />
         <div className="flex h-full flex-col px-14 py-10">
           <p className="text-3xl font-extrabold leading-snug">
             {number}. {text}{" "}
             <span className="font-bold text-black/60">({points} pt{points === 1 ? "" : "s"})</span>
           </p>
+          {codeBlock && (
+            <pre className="mt-6 overflow-x-auto rounded border-2 border-black bg-[var(--oop-navy)] p-5 font-mono text-xl leading-snug text-[var(--oop-cyan)]">
+              <code>{codeBlock}</code>
+            </pre>
+          )}
           {bullets && bullets.length > 0 && (
             <ul className="mt-6 space-y-2 text-2xl font-bold">
               {bullets.map((b, i) => (
@@ -199,6 +192,7 @@ export function OopRevealSlide({
   bullets,
   imageSrc,
   caption,
+  codeBlock,
 }: {
   number: number;
   text: string;
@@ -207,17 +201,23 @@ export function OopRevealSlide({
   bullets?: { text: string; correct?: boolean }[];
   imageSrc?: string;
   caption?: string;
+  codeBlock?: string;
 }) {
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-[var(--oop-pink)]`}>
       <div className="absolute inset-8 rounded-md border-4 border-black bg-white">
-        <OpenQuote className="absolute -left-6 -top-2 h-14 w-14" />
-        <CloseQuote className="absolute -bottom-2 -right-6 h-14 w-14" />
+        <OpenQuote className="absolute -left-4 -top-4 h-14 w-14" />
+        <CloseQuote className="absolute -bottom-4 -right-4 h-14 w-14" />
         <div className="flex h-full flex-col px-14 py-10">
           <p className="text-2xl font-extrabold leading-snug">
             {number}. {text}{" "}
             <span className="font-bold text-black/60">({points} pt{points === 1 ? "" : "s"})</span>
           </p>
+          {codeBlock && (
+            <pre className="mt-4 overflow-x-auto rounded border-2 border-black bg-[var(--oop-navy)] p-4 font-mono text-base leading-snug text-[var(--oop-cyan)]">
+              <code>{codeBlock}</code>
+            </pre>
+          )}
           {bullets && bullets.length > 0 && (
             <ul className="mt-4 space-y-1.5 text-xl font-bold">
               {bullets.map((b, i) => (
@@ -235,18 +235,19 @@ export function OopRevealSlide({
               ))}
             </ul>
           )}
-          <div className="mt-6 flex flex-1 items-start gap-6">
-            <p className="text-3xl font-extrabold">{answer}</p>
-            {imageSrc && (
-              <div className="ml-auto max-w-[40%]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imageSrc} alt="" className="h-auto w-full" />
-                {caption && (
-                  <p className="mt-1 text-xs text-black/60">{caption}</p>
-                )}
-              </div>
-            )}
-          </div>
+          {answer && (
+            <div className="mt-6 flex flex-1 items-start gap-6">
+              <p className="text-3xl font-extrabold">{answer}</p>
+              {imageSrc && (
+                <div className="ml-auto max-w-[40%]">
+                  <img src={imageSrc} alt="" className="h-auto w-full" />
+                  {caption && (
+                    <p className="mt-1 text-xs text-black/60">{caption}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
           <div className="mt-auto self-end">
             <OopWordmark className="text-xs" />
           </div>
