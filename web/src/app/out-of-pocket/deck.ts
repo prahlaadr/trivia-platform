@@ -30,7 +30,7 @@ export type Slide =
       bullets?: { text: string; correct?: boolean }[];
       codeBlock?: string;
     }
-  | { type: "answers-divider"; date?: string };
+  | { type: "answers-divider"; title?: string; date?: string };
 
 interface DeckQuestion {
   number: number;
@@ -278,7 +278,12 @@ export function buildDeck(): Slide[] {
     date: "Sep 2025",
   });
 
-  // First half: every section + every question (no answers).
+  // Each phase is self-contained: cyan section divider → questions for that
+  // phase → pink "Phase N · Answers" divider → for each question a Q-alone
+  // slide and a Q+answer reveal slide. This is the live-trivia pacing:
+  // read out the round, collect answers, then reveal that round's answers
+  // before moving on to the next phase. Phases with no questions (Section 0
+  // / team intro) emit just the section divider.
   for (const section of sections) {
     slides.push({
       type: "section",
@@ -286,6 +291,9 @@ export function buildDeck(): Slide[] {
       sectionTitle: section.title,
       subtitle: section.subtitle,
     });
+
+    if (section.questions.length === 0) continue;
+
     for (const q of section.questions) {
       slides.push({
         type: "question",
@@ -296,25 +304,13 @@ export function buildDeck(): Slide[] {
         codeBlock: q.codeBlock,
       });
     }
-  }
 
-  // ANSWERS divider — same template as the cover, says "ANSWERS"
-  slides.push({ type: "answers-divider", date: "Sep 2025" });
-
-  // Second half (answer reveals): per section, replay the section divider,
-  // then for each question emit TWO slides — the question by itself (to
-  // re-show what was asked), then the reveal with question + answer. This
-  // gives the presenter a beat to read the question out loud before clicking
-  // to reveal. Sections with no questions (Section 0 / team intro) are
-  // skipped here.
-  for (const section of sections) {
-    if (section.questions.length === 0) continue;
     slides.push({
-      type: "section",
-      sectionNumber: section.number,
-      sectionTitle: section.title,
-      subtitle: section.subtitle,
+      type: "answers-divider",
+      title: `PHASE ${section.number} · ANSWERS`,
+      date: "Sep 2025",
     });
+
     for (const q of section.questions) {
       slides.push({
         type: "question",

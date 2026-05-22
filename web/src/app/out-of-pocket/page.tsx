@@ -45,7 +45,7 @@ function RenderSlide({ slide }: { slide: Slide }) {
         />
       );
     case "answers-divider":
-      return <OopAnswersDividerSlide date={slide.date} />;
+      return <OopAnswersDividerSlide title={slide.title} date={slide.date} />;
   }
 }
 

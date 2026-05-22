@@ -219,6 +219,12 @@ export function OopRevealSlide({
 
 // ── Answers divider ────────────────────────────────────────────────
 
-export function OopAnswersDividerSlide({ date }: { date?: string }) {
-  return <OopCoverSlide title="ANSWERS" date={date} />;
+export function OopAnswersDividerSlide({
+  title = "ANSWERS",
+  date,
+}: {
+  title?: string;
+  date?: string;
+}) {
+  return <OopCoverSlide title={title} date={date} />;
 }
