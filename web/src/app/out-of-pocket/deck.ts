@@ -301,9 +301,12 @@ export function buildDeck(): Slide[] {
   // ANSWERS divider — same template as the cover, says "ANSWERS"
   slides.push({ type: "answers-divider", date: "Sep 2025" });
 
-  // Second half: per section, replay the section divider, then reveal slides
-  // (question text + answer) in the same order. Sections with no questions
-  // (Section 0 / team intro) are skipped here.
+  // Second half (answer reveals): per section, replay the section divider,
+  // then for each question emit TWO slides — the question by itself (to
+  // re-show what was asked), then the reveal with question + answer. This
+  // gives the presenter a beat to read the question out loud before clicking
+  // to reveal. Sections with no questions (Section 0 / team intro) are
+  // skipped here.
   for (const section of sections) {
     if (section.questions.length === 0) continue;
     slides.push({
@@ -313,6 +316,14 @@ export function buildDeck(): Slide[] {
       subtitle: section.subtitle,
     });
     for (const q of section.questions) {
+      slides.push({
+        type: "question",
+        number: q.number,
+        text: q.text,
+        points: q.points,
+        bullets: q.bullets,
+        codeBlock: q.codeBlock,
+      });
       slides.push({
         type: "reveal",
         number: q.number,
