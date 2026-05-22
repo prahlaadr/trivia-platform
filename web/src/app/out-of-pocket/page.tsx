@@ -31,6 +31,9 @@ function RenderSlide({ slide }: { slide: Slide }) {
           points={slide.points}
           bullets={slide.bullets}
           codeBlock={slide.codeBlock}
+          imageSrc={slide.imageSrc}
+          imageSrc2={slide.imageSrc2}
+          caption={slide.caption}
         />
       );
     case "reveal":
@@ -42,6 +45,9 @@ function RenderSlide({ slide }: { slide: Slide }) {
           answer={slide.answer}
           bullets={slide.bullets}
           codeBlock={slide.codeBlock}
+          imageSrc={slide.imageSrc}
+          imageSrc2={slide.imageSrc2}
+          caption={slide.caption}
         />
       );
     case "answers-divider":

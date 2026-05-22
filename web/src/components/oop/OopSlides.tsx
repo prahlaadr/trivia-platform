@@ -101,12 +101,18 @@ export function OopQuestionSlide({
   points,
   bullets,
   codeBlock,
+  imageSrc,
+  imageSrc2,
+  caption,
 }: {
   number: number;
   text: string;
   points: number;
   bullets?: string[];
   codeBlock?: string;
+  imageSrc?: string;
+  imageSrc2?: string;
+  caption?: string;
 }) {
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
@@ -115,8 +121,8 @@ export function OopQuestionSlide({
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-x-[12%] top-[16%] bottom-[16%] flex flex-col items-center justify-center text-center">
-        <p className="text-[2.6cqw] font-extrabold leading-snug text-black">
+      <div className="absolute inset-x-[12%] top-[14%] bottom-[14%] flex flex-col items-center justify-center text-center">
+        <p className="text-[2.4cqw] font-extrabold leading-snug text-black">
           {number}. {text}{" "}
           <span className="font-bold text-black/60">
             ({points} pt{points === 1 ? "" : "s"})
@@ -137,6 +143,19 @@ export function OopQuestionSlide({
             ))}
           </ul>
         )}
+        {(imageSrc || imageSrc2) && (
+          <div className="mt-[2%] flex items-center justify-center gap-[2%]">
+            {imageSrc && (
+              <img src={imageSrc} alt="" className="max-h-[40cqh] w-auto object-contain" />
+            )}
+            {imageSrc2 && (
+              <img src={imageSrc2} alt="" className="max-h-[40cqh] w-auto object-contain" />
+            )}
+          </div>
+        )}
+        {caption && (
+          <p className="mt-[1%] text-[1.2cqw] text-black/60">{caption}</p>
+        )}
       </div>
     </div>
   );
@@ -151,6 +170,7 @@ export function OopRevealSlide({
   answer,
   bullets,
   imageSrc,
+  imageSrc2,
   caption,
   codeBlock,
 }: {
@@ -160,6 +180,7 @@ export function OopRevealSlide({
   answer: string;
   bullets?: { text: string; correct?: boolean }[];
   imageSrc?: string;
+  imageSrc2?: string;
   caption?: string;
   codeBlock?: string;
 }) {
@@ -199,16 +220,23 @@ export function OopRevealSlide({
             ))}
           </ul>
         )}
-        {answer && (
-          <div className="mt-[2.5%] flex w-full flex-col items-center gap-[2%]">
-            <p className="text-[2.6cqw] font-extrabold text-black">{answer}</p>
-            {imageSrc && (
-              <div className="max-w-[40%]">
-                <img src={imageSrc} alt="" className="h-auto w-full" />
-                {caption && (
-                  <p className="mt-1 text-[1cqw] text-black/60">{caption}</p>
+        {(answer || imageSrc || imageSrc2) && (
+          <div className="mt-[2%] flex w-full flex-col items-center gap-[1.5%]">
+            {answer && (
+              <p className="text-[2.4cqw] font-extrabold text-black">{answer}</p>
+            )}
+            {(imageSrc || imageSrc2) && (
+              <div className="flex items-center justify-center gap-[2%]">
+                {imageSrc && (
+                  <img src={imageSrc} alt="" className="max-h-[34cqh] w-auto object-contain" />
+                )}
+                {imageSrc2 && (
+                  <img src={imageSrc2} alt="" className="max-h-[34cqh] w-auto object-contain" />
                 )}
               </div>
+            )}
+            {caption && (
+              <p className="text-[1.2cqw] text-black/60">{caption}</p>
             )}
           </div>
         )}

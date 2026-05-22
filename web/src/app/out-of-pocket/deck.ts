@@ -20,6 +20,9 @@ export type Slide =
       points: number;
       bullets?: string[];
       codeBlock?: string;
+      imageSrc?: string;
+      imageSrc2?: string;
+      caption?: string;
     }
   | {
       type: "reveal";
@@ -29,6 +32,9 @@ export type Slide =
       answer: string;
       bullets?: { text: string; correct?: boolean }[];
       codeBlock?: string;
+      imageSrc?: string;
+      imageSrc2?: string;
+      caption?: string;
     }
   | { type: "answers-divider"; title?: string; date?: string };
 
@@ -40,6 +46,14 @@ interface DeckQuestion {
   bullets?: string[];
   revealBullets?: { text: string; correct?: boolean }[];
   codeBlock?: string;
+  /** Image shown on the question slide (e.g. the porcupine quill SEM). */
+  questionImageSrc?: string;
+  questionImageSrc2?: string;
+  questionCaption?: string;
+  /** Image shown on the reveal slide alongside the answer. */
+  revealImageSrc?: string;
+  revealImageSrc2?: string;
+  revealCaption?: string;
 }
 
 interface DeckSection {
@@ -118,12 +132,16 @@ const sections: DeckSection[] = [
         text: "What movie was “Electric Boogaloo” originally the sequel to?",
         points: 1,
         answer: "Breakin’",
+        revealImageSrc: "/oop/img-breakin.png",
       },
       {
         number: 4,
         text: "Shaun of the Dead, Hot Fuzz, and The World’s End are the movies in this trilogy, named after an ice cream … or a pastry, depending on where in Europe you find yourself",
         points: 1,
         answer: "Cornetto",
+        revealImageSrc: "/oop/img-cornetto.png",
+        revealImageSrc2: "/oop/img-croissant.png",
+        revealCaption: "“Non sono un croissant!” (“I’m not a croissant!” in Italian)",
       },
       {
         number: 5,
@@ -150,6 +168,7 @@ const sections: DeckSection[] = [
         text: "These birds patter their feet on sand or soil in a behavior called worm charming. The prevailing theory is that it sounds enough like rain to drum up assorted invertebrates for the birds to eat",
         points: 1,
         answer: "Seagulls",
+        revealImageSrc: "/oop/img-seagulls.jpg",
       },
       {
         number: 2,
@@ -162,24 +181,31 @@ const sections: DeckSection[] = [
         text: "What’s this thing? (super sharp, sharper than a hypodermic needle; microscopic backward-facing barbs)",
         points: 1,
         answer: "Quill (porcupine)",
+        questionImageSrc: "/oop/img-quill-needle.png",
+        questionImageSrc2: "/oop/img-quill-barbs.png",
       },
       {
         number: 4,
         text: "The world’s biggest one of these can be found in Portugal (Parque da Cidade, Porto). It measures 25,100 sq. m (270,174 sq. ft)",
         points: 1,
         answer: "Quilt",
+        revealImageSrc: "/oop/img-quilt.png",
       },
       {
         number: 5,
         text: "When this is baked into tart form, it becomes Harry Potter’s favorite treat",
         points: 1,
         answer: "Treacle",
+        revealImageSrc: "/oop/img-treacle.png",
       },
       {
         number: 6,
         text: "This dog is half dachshund mixed with ________",
         points: 1,
         answer: "Beagle (his name is Bodhi)",
+        questionImageSrc: "/oop/img-bodhi.jpg",
+        revealImageSrc: "/oop/img-bodhi.jpg",
+        revealCaption: "His name is Bodhi. My brother-in-law’s dog and famous good boy",
       },
     ],
   },
@@ -302,6 +328,9 @@ export function buildDeck(): Slide[] {
         points: q.points,
         bullets: q.bullets,
         codeBlock: q.codeBlock,
+        imageSrc: q.questionImageSrc,
+        imageSrc2: q.questionImageSrc2,
+        caption: q.questionCaption,
       });
     }
 
@@ -319,6 +348,9 @@ export function buildDeck(): Slide[] {
         points: q.points,
         bullets: q.bullets,
         codeBlock: q.codeBlock,
+        imageSrc: q.questionImageSrc,
+        imageSrc2: q.questionImageSrc2,
+        caption: q.questionCaption,
       });
       slides.push({
         type: "reveal",
@@ -328,6 +360,9 @@ export function buildDeck(): Slide[] {
         answer: q.answer,
         bullets: q.revealBullets,
         codeBlock: q.codeBlock,
+        imageSrc: q.revealImageSrc,
+        imageSrc2: q.revealImageSrc2,
+        caption: q.revealCaption,
       });
     }
   }
