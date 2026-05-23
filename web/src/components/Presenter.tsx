@@ -7,6 +7,7 @@ import { buildSlides } from "@/lib/slides";
 import { SlideRenderer } from "./SlideRenderer";
 import { getLatestSession, saveSession, teamTotal, type GameSession } from "@/lib/scoring";
 import { ScoreGrid } from "./ScoreGrid";
+import { recordFeedback, type FeedbackVerdict } from "@/lib/feedback";
 
 interface PresenterProps {
   quiz: Quiz;
@@ -21,6 +22,8 @@ export function Presenter({ quiz }: PresenterProps) {
   const [showScores, setShowScores] = useState(false);
   const [scoreTab, setScoreTab] = useState<"leaderboard" | "scorekeeper">("leaderboard");
   const [scoreSession, setScoreSession] = useState<GameSession | null>(null);
+  const [showFlagMenu, setShowFlagMenu] = useState(false);
+  const [flagToast, setFlagToast] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Load latest scoring session for leaderboard
@@ -126,6 +129,23 @@ export function Presenter({ quiz }: PresenterProps) {
 
   const slide = slides[currentSlide];
   const progress = ((currentSlide + 1) / slides.length) * 100;
+
+  // Question text for the current slide (for flagging). Question + answer slides
+  // carry slide.question; everything else has nothing flaggable.
+  const flaggable = slide?.question
+    ? { text: slide.question.text, answer: slide.question.answer }
+    : null;
+
+  const submitFlag = useCallback(
+    (verdict: FeedbackVerdict) => {
+      if (!flaggable) return;
+      recordFeedback(flaggable.text, flaggable.answer, verdict);
+      setShowFlagMenu(false);
+      setFlagToast(`Flagged as ${verdict.replace("_", " ")}`);
+      setTimeout(() => setFlagToast(null), 1800);
+    },
+    [flaggable]
+  );
   const [showJumpNav, setShowJumpNav] = useState(false);
   const [viewportHeight, setViewportHeight] = useState<number | null>(null);
 
@@ -313,6 +333,40 @@ export function Presenter({ quiz }: PresenterProps) {
           >
             {isFullscreen ? "Exit FS" : "Fullscreen"}
           </button>
+          {flaggable && (
+            <div className="relative">
+              <button
+                onClick={() => setShowFlagMenu((v) => !v)}
+                className="rounded bg-black/60 px-2 py-1 text-xs sm:px-3 sm:text-sm text-white/70 hover:text-white"
+                title="Flag this question"
+              >
+                🚩
+              </button>
+              {showFlagMenu && (
+                <div
+                  className="absolute right-0 top-full z-40 mt-1 w-44 rounded-md border border-white/10 bg-[#1C2E22] p-1 shadow-xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {([
+                    { v: "good", label: "👍 Good question" },
+                    { v: "stale", label: "🕰 Stale / dated" },
+                    { v: "wrong_answer", label: "❌ Wrong answer" },
+                    { v: "ambiguous", label: "❔ Ambiguous" },
+                    { v: "too_hard", label: "😵 Too hard" },
+                    { v: "too_easy", label: "😎 Too easy" },
+                  ] as { v: FeedbackVerdict; label: string }[]).map((opt) => (
+                    <button
+                      key={opt.v}
+                      onClick={() => submitFlag(opt.v)}
+                      className="block w-full rounded px-3 py-1.5 text-left text-xs text-white/85 hover:bg-white/10"
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right: spacer to balance layout — hidden on mobile */}
@@ -590,6 +644,13 @@ export function Presenter({ quiz }: PresenterProps) {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Flag-toast */}
+      {flagToast && (
+        <div className="pointer-events-none absolute bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-md bg-[#8B3530] px-4 py-2 text-sm font-bold text-white shadow-2xl">
+          {flagToast}
         </div>
       )}
     </div>
