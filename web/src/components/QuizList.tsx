@@ -250,7 +250,7 @@ export function QuizList() {
           className={`mb-6 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-all ${
             dragOver
               ? "border-[#8B3530] bg-[#8B3530]/10"
-              : "border-white/20 bg-[#1C2E22]/50 hover:border-[#8B3530]/40"
+              : "border-[#3D3D3A]/30 bg-transparent hover:border-[#8B3530]/60 hover:bg-[#8B3530]/5"
           }`}
         >
           <input
@@ -260,10 +260,10 @@ export function QuizList() {
             onChange={handleFileSelect}
             className="sr-only"
           />
-          <p className="text-lg font-bold text-white/70">
+          <p className="text-lg font-bold text-[#3D3D3A]">
             {uploading ? "Parsing..." : "Drop a .docx or .pdf quiz file here"}
           </p>
-          <p className="mt-1 text-sm text-white/30">or click to browse</p>
+          <p className="mt-1 text-sm text-[#3D3D3A]/60">or click to browse</p>
         </label>
 
         {/* Status message */}
@@ -326,10 +326,10 @@ export function QuizList() {
                 <h2 className="text-xl font-bold text-white">
                   {currentBrand.quizLabel} #{quiz.quiz_number}
                 </h2>
-                <p className="text-sm text-[#9B9B95]/50">{quiz.date}</p>
+                <p className="text-sm text-[#E8DFC8]/60">{quiz.date}</p>
               </Link>
               <div className="flex items-center gap-3">
-                <p className="text-sm text-[#8B3530]/60">
+                <p className="text-sm font-medium text-[#D4A642]/90">
                   {quiz.rounds} rounds
                 </p>
                 <button

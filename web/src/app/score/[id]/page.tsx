@@ -99,8 +99,8 @@ export default function ScoreSheetPage() {
 
         {/* Leaderboard */}
         {showLeaderboard && (
-          <div className="mb-6 rounded-xl border-2 border-[#8B3530]/30 bg-[#3D3D3A] p-4 sm:p-6">
-            <h2 className="mb-4 text-center text-2xl font-black uppercase tracking-wider text-[#8B3530]">
+          <div className="mb-6 rounded-xl border-2 border-[#8B3530]/30 bg-[#1C2E22] p-4 sm:p-6">
+            <h2 className="mb-4 text-center text-2xl font-display font-black uppercase tracking-wider text-[#D4A642]">
               Leaderboard
             </h2>
             {sortedTeams.length === 0 ? (

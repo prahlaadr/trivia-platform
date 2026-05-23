@@ -234,7 +234,7 @@ export function Presenter({ quiz }: PresenterProps) {
   const currentRoundNum = slide.roundNumber ?? null;
 
   return (
-    <div className="fixed inset-0 bg-[#3D3D3A]">
+    <div className="fixed inset-0 bg-[#1C2E22]">
     <div
       className="flex flex-col overflow-hidden"
       style={{ height: viewportHeight ? `${viewportHeight}px` : '100vh' }}
@@ -257,12 +257,12 @@ export function Presenter({ quiz }: PresenterProps) {
       </div>
 
       {/* Bottom toolbar — in flex flow, always visible */}
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-1 bg-[#3D3D3A] px-2 py-1.5 sm:px-4 sm:py-2">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-1 bg-[#1C2E22] px-2 py-1.5 sm:px-4 sm:py-2">
         {/* Left: Jump + Scores */}
         <div className="flex gap-1 sm:gap-2">
           <button
             onClick={() => setShowJumpNav((v) => !v)}
-            className="rounded bg-[#8B3530]/20 px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-bold text-[#8B3530] transition-all hover:bg-[#8B3530]/30"
+            className="rounded bg-[#8B3530]/20 px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-bold text-[#D4A642] transition-all hover:bg-[#8B3530]/30"
           >
             Jump
           </button>
@@ -274,7 +274,7 @@ export function Presenter({ quiz }: PresenterProps) {
             className={`rounded px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-bold transition-all ${
               showScores
                 ? "bg-[#8FAA73] text-black"
-                : "bg-[#8FAA73]/20 text-[#8FAA73] hover:bg-[#8FAA73]/30"
+                : "bg-[#8FAA73]/20 text-[#D4A642] hover:bg-[#8FAA73]/30"
             }`}
           >
             Scores
@@ -326,7 +326,7 @@ export function Presenter({ quiz }: PresenterProps) {
           onClick={() => setShowScores(false)}
         >
           <div
-            className={`max-h-[90vh] overflow-y-auto rounded-xl bg-[#3D3D3A] p-6 shadow-2xl ${
+            className={`max-h-[90vh] overflow-y-auto rounded-xl bg-[#1C2E22] p-6 shadow-2xl ${
               scoreTab === "scorekeeper" ? "w-full max-w-5xl" : "w-full max-w-2xl"
             }`}
             onClick={(e) => e.stopPropagation()}
@@ -370,7 +370,7 @@ export function Presenter({ quiz }: PresenterProps) {
             ) : scoreTab === "leaderboard" ? (
               /* Leaderboard view */
               <>
-                <h2 className="mb-2 text-center text-3xl font-black uppercase tracking-wider text-[#8B3530]">
+                <h2 className="mb-2 text-center text-3xl font-black uppercase tracking-wider text-[#D4A642]">
                   Leaderboard
                 </h2>
                 <p className="mb-6 text-center text-sm text-white/40">
@@ -402,7 +402,7 @@ export function Presenter({ quiz }: PresenterProps) {
                             <span
                               className={`w-10 text-3xl font-black ${
                                 rank === 0
-                                  ? "text-[#8B3530]"
+                                  ? "text-[#D4A642]"
                                   : rank === 1
                                     ? "text-gray-300"
                                     : rank === 2
@@ -415,7 +415,7 @@ export function Presenter({ quiz }: PresenterProps) {
                             <span className="flex-1 text-2xl font-bold text-white">
                               {team.name || "—"}
                             </span>
-                            <span className="text-3xl font-black text-[#8FAA73]">
+                            <span className="text-3xl font-black text-[#D4A642]">
                               {total}
                             </span>
                           </div>
@@ -457,7 +457,7 @@ export function Presenter({ quiz }: PresenterProps) {
           >
             {/* Header: Title + Round shortcuts + TB + Close */}
             <div className="mb-2 flex items-center gap-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#8B3530]">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#D4A642]">
                 Jump
               </p>
               {/* Title slide */}
@@ -544,7 +544,7 @@ export function Presenter({ quiz }: PresenterProps) {
                             <span
                               className={`text-[11px] font-black ${
                                 currentRoundNum === round.roundNum
-                                  ? "text-[#8B3530]"
+                                  ? "text-[#D4A642]"
                                   : "text-white/40"
                               }`}
                             >
@@ -575,7 +575,7 @@ export function Presenter({ quiz }: PresenterProps) {
                                 currentSlide === item.slideIndex
                                   ? "bg-[#8B3530] text-black"
                                   : isAnswer
-                                    ? "bg-[#8FAA73]/15 text-[#8FAA73]/70 hover:bg-[#8FAA73]/25"
+                                    ? "bg-[#8FAA73]/15 text-[#D4A642]/70 hover:bg-[#8FAA73]/25"
                                     : "bg-white/10 text-white/60 hover:bg-white/20"
                               }`}
                             >

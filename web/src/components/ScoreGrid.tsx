@@ -110,13 +110,13 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
       <table ref={gridRef} className="w-full border-collapse">
         <thead>
           <tr className="bg-[#1C2E22]">
-            <th className="sticky left-0 z-10 min-w-[120px] sm:min-w-[200px] bg-[#1C2E22] px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider text-[#8B3530]">
+            <th className="sticky left-0 z-10 min-w-[120px] sm:min-w-[200px] bg-[#1C2E22] px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider text-[#D4A642]">
               Team Name
             </th>
             {Array.from({ length: session.roundCount }, (_, i) => (
               <th
                 key={i}
-                className="min-w-[50px] sm:min-w-[80px] px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold uppercase tracking-wider text-[#8B3530]"
+                className="min-w-[50px] sm:min-w-[80px] px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold uppercase tracking-wider text-[#D4A642]"
               >
                 {i + 1}
                 {i === session.roundCount - 1 && (
