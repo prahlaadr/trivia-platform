@@ -1,2 +1,3 @@
-# Runtime copy of the trivia bank — downloaded from Blob at deploy time.
-*.duckdb
+# Runtime DB lives here so the Next.js API can read it at runtime.
+# Tracked in git for now (small enough; ~25MB) — when it grows past ~100MB
+# move to a Vercel Blob + prebuild-download flow.
