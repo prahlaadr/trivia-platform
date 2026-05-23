@@ -1,271 +1,161 @@
 # Category Taxonomy
 
 The canonical category structure for the Pyaar Project Trivia question bank.
-This is the source of truth — all sources (r-trivia CSV, OpenTDB, el-cms,
-Claude-generated, manual) get mapped INTO this taxonomy at ingest time.
+All sources (r-trivia CSV, OpenTDB, el-cms, Claude-generated, manual) get
+mapped INTO this taxonomy at ingest time.
 
-**Status:** draft v1 — under review.
+**Status:** v1 — locked.
 **Last updated:** 2026-05-23
+**Shape:** 15 top-level categories × 50 subcategories total
 
 ---
 
-## Why a 2-tier taxonomy
+## Design principles
 
-The shape of "things an audience yells at trivia night" is roughly **15
-broad genres** (Film, Music, Sport, etc.) each with **5–15 sub-pockets**
-(Bollywood, Premier League, etc.). One-tier (just "Bollywood") is too
-flat to browse. Three-tier (Film → Bollywood → 90s Bollywood Comedies)
-is too deep for ingest mapping to stay sane.
-
-**Tier 1 = "category"** — what shows up on the homepage as a tile / what
-the host filters by when there's no specific topic.
-**Tier 2 = "subcategory"** — the actual matcher for audience input. When
-a host types "Premier League," we resolve to `sport › football-soccer`
-with tag `region:uk`.
-
-For everything that doesn't fit (regions, eras, audience-appropriateness),
-we use **cross-cutting tags** rather than more subcategories.
+1. **Audience-usefulness over exhaustiveness.** A subcategory exists only if
+   an audience member would actually shout it. "Renaissance painters" is too
+   specific (use the tag `era:pre-1900` on art); "Bollywood" is its own pocket
+   because people do yell it.
+2. **The long tail rides on tags, not subcategories.** Regional flavor
+   (`region:india`, `region:uk`), eras (`era:90s`, `era:2010s`), and
+   audience-fit (`audience:family`, `audience:adult`) are tags, not their own
+   subcat — keeps the catalog small and browsable.
+3. **Consolidate aggressively, split only when critical mass demands.**
+   "Greek mythology" alone wouldn't justify a subcat, but "western mythology"
+   (Greek + Roman + Norse + Egyptian) does. Cricket gets its own (huge
+   audience demand); rugby + AFL + hockey all live in a single misc subcat.
 
 ---
 
 ## The 15 categories
 
-| # | Slug | Name | What's in it |
-|---|------|------|--------------|
-| 1 | `film-tv` | Film & TV | Movies, TV series, animation, awards, directors, franchises, quotes |
-| 2 | `music` | Music | Songs, albums, artists, lyrics, music history, instruments, music theory |
-| 3 | `sport` | Sport | All sports — match/event facts, players, records, governing bodies |
-| 4 | `geography` | Geography | Countries, capitals, rivers, mountains, flags, cities, landmarks, maps |
-| 5 | `history` | History | World history, wars, leaders, civilizations, named eras |
-| 6 | `science-nature` | Science & Nature | Physics, chemistry, biology, animals, space, the body, math |
-| 7 | `food-drink` | Food & Drink | Cuisines, dishes, cocktails, beer, wine, brands, chefs, ingredients |
-| 8 | `literature` | Literature | Books, authors, poetry, plays, characters, awards |
-| 9 | `art-design` | Art & Design | Visual art, architecture, design, fashion, logos |
-| 10 | `games-toys` | Games & Toys | Video games, board games, card games, toys, puzzles |
-| 11 | `tech-internet` | Tech & Internet | Companies, founders, internet history, memes, programming, AI, crypto |
-| 12 | `politics-society` | Politics & Society | World leaders, elections, geopolitics, economics, law |
-| 13 | `myth-religion` | Mythology & Religion | World mythologies, religious traditions, sacred texts |
-| 14 | `language-words` | Language & Words | Etymology, slang, anagrams, idioms, world languages |
-| 15 | `pop-misc` | Pop Culture & Misc | Celebrities, decades-as-themes, internet culture, general knowledge |
+| # | Slug | Name |
+|---|------|------|
+| 1 | `film-tv` | Film & TV |
+| 2 | `music` | Music |
+| 3 | `sport` | Sport |
+| 4 | `geography` | Geography |
+| 5 | `history` | History |
+| 6 | `science-nature` | Science & Nature |
+| 7 | `food-drink` | Food & Drink |
+| 8 | `literature` | Literature |
+| 9 | `art-design` | Art & Design |
+| 10 | `games-toys` | Games & Toys |
+| 11 | `tech-internet` | Tech & Internet |
+| 12 | `politics-society` | Politics & Society |
+| 13 | `myth-religion` | Mythology & Religion |
+| 14 | `language-words` | Language & Words |
+| 15 | `pop-misc` | Pop Culture & Misc |
 
 ---
 
-## Subcategories with audience example phrases
+## Subcategories (50)
 
-Format: `slug` — Name *(example phrases an audience might shout)*
+Format: `slug` — Name *(audience-shouted phrases that resolve here)*
 
-### 1. `film-tv` — Film & TV
+### 1. `film-tv` — Film & TV (5)
 
-- `hollywood` — Hollywood Movies *("Marvel", "Oscar winners", "Tarantino", "Christopher Nolan")*
-- `bollywood` — Bollywood *("Shah Rukh", "90s Bollywood", "Bollywood songs")*
-- `world-cinema` — World Cinema *("Korean cinema", "Studio Ghibli", "French New Wave")*
-- `animation` — Animation *("Pixar", "Disney", "anime", "South Park")*
-- `sitcoms` — Sitcoms *("Friends", "The Office", "Seinfeld", "Schitt's Creek")*
-- `drama-series` — Drama Series *("Breaking Bad", "Succession", "The Wire")*
-- `reality-tv` — Reality TV *("The Bachelor", "Real Housewives", "Survivor")*
-- `awards` — Awards Shows *("Oscars", "Emmys", "Cannes")*
-- `directors-auteurs` — Directors & Auteurs *("Tarantino", "Wes Anderson", "Scorsese")*
-- `franchises` — Franchises *("Marvel", "Star Wars", "Harry Potter", "Fast & Furious")*
-- `film-quotes` — Movie Quotes *("classic quotes", "the most iconic lines")*
-- `kids-tv` — Kids' TV *("Bluey", "SpongeBob", "Avatar TLA")*
-- `documentaries` — Documentaries *("nature docs", "true crime")*
+- `hollywood` — Hollywood Movies *("Marvel", "Tarantino", "Nolan", "Oscars")*
+- `bollywood` — Bollywood *("Shah Rukh", "Hindi cinema", "90s Bollywood")*
+- `world-cinema-animation` — World Cinema & Animation *("Korean cinema", "Studio Ghibli", "Pixar", "anime")*
+- `tv-shows` — TV Shows *("Friends", "Breaking Bad", "Succession", "reality TV", "Bluey")*
+- `franchises-awards` — Franchises & Awards *("Star Wars", "Marvel franchises", "James Bond", "Oscar trivia")*
 
-### 2. `music` — Music
+### 2. `music` — Music (4)
 
-- `rock` — Rock *("classic rock", "Led Zeppelin", "Foo Fighters")*
-- `pop` — Pop *("Taylor Swift", "Madonna", "Billie Eilish")*
-- `hip-hop-rap` — Hip-Hop & Rap *("90s hip-hop", "Kendrick", "Tupac")*
-- `electronic` — Electronic *("EDM", "Daft Punk", "techno")*
-- `classical` — Classical *("Mozart", "Bach", "Tchaikovsky")*
-- `jazz-blues` — Jazz & Blues *("Miles Davis", "John Coltrane", "BB King")*
-- `country-folk` — Country & Folk *("Dolly Parton", "Johnny Cash", "Bob Dylan")*
-- `bollywood-music` — Bollywood Music *("AR Rahman", "Lata Mangeshkar")*
-- `world-music` — World Music *("Afrobeats", "K-pop", "reggaeton")*
-- `lyrics` — Lyrics *("name the song from the lyric")*
-- `albums-songs` — Albums & Songs *("best-selling albums", "Billboard #1s")*
-- `one-hit-wonders` — One-Hit Wonders *("90s one-hit wonders")*
-- `music-history` — Music History *("Woodstock", "British Invasion")*
-- `instruments` — Instruments & Theory *("name the instrument", "music theory")*
+- `rock-pop` — Rock & Pop *("classic rock", "Taylor Swift", "Beatles", "Madonna")*
+- `hip-hop-electronic` — Hip-Hop & Electronic *("90s hip-hop", "Kendrick", "Daft Punk", "EDM")*
+- `bollywood-world-music` — Bollywood & World Music *("AR Rahman", "Afrobeats", "K-pop", "reggaeton")*
+- `music-trivia` — Music Trivia *("classical", "jazz", "lyrics", "albums", "one-hit wonders", "instruments")*
 
-### 3. `sport` — Sport
+### 3. `sport` — Sport (5)
 
 - `football-soccer` — Football / Soccer *("Premier League", "World Cup", "Messi", "Champions League")*
-- `cricket` — Cricket *("IPL", "Tendulkar", "Test cricket")*
-- `basketball` — Basketball *("NBA", "LeBron", "Michael Jordan")*
-- `american-football` — American Football *("NFL", "Super Bowl", "Tom Brady")*
-- `baseball` — Baseball *("MLB", "World Series", "Yankees")*
-- `tennis` — Tennis *("Wimbledon", "Grand Slams", "Federer")*
-- `formula-1` — Formula 1 / Motorsport *("F1", "Schumacher", "Senna")*
-- `olympics` — Olympics *("Summer Olympics", "Usain Bolt", "Phelps")*
-- `rugby` — Rugby *("Six Nations", "All Blacks")*
-- `golf` — Golf *("Masters", "Tiger Woods")*
-- `combat-sports` — Combat Sports *("boxing", "UFC", "Ali")*
-- `esports` — Esports *("League of Legends", "Faker", "DotA")*
-- `sport-history` — Sports History *("Olympic records", "famous moments")*
-- `sport-misc` — Other Sports *("hockey", "swimming", "athletics")*
+- `cricket` — Cricket *("IPL", "Tendulkar", "Test cricket", "Kohli")*
+- `american-sports` — American Sports *("NFL", "NBA", "MLB", "Super Bowl", "LeBron", "Tom Brady")*
+- `tennis-golf-olympics` — Tennis, Golf & Olympics *("Wimbledon", "Masters", "Usain Bolt", "Phelps")*
+- `motorsport-combat` — Motorsport & Combat *("F1", "Schumacher", "Ali", "UFC", "boxing")*
 
-### 4. `geography` — Geography
+### 4. `geography` — Geography (3)
 
-- `countries-capitals` — Countries & Capitals *("capitals of Africa", "what's the capital of...")*
-- `rivers-mountains` — Rivers & Mountains *("longest rivers", "tallest mountains")*
-- `flags` — Flags *("identify the flag")*
-- `world-cities` — World Cities *("famous cities", "city nicknames")*
-- `oceans-seas` — Oceans & Seas *("the five oceans", "what sea is between...")*
-- `europe` — European Geography *("EU countries", "Balkans")*
-- `asia` — Asian Geography *("Southeast Asia", "Middle East")*
-- `americas` — Americas *("US states", "South America")*
-- `africa` — African Geography *("African countries", "the Sahel")*
-- `oceania` — Oceania *("Australia", "Pacific islands")*
-- `landmarks` — Famous Landmarks *("the Eiffel Tower", "wonders of the world")*
-- `cartography` — Maps & Cartography *("the Equator", "map projections")*
+- `countries-capitals-flags` — Countries, Capitals & Flags *("capital of...", "identify the flag", "European countries")*
+- `cities-landmarks` — Cities & Landmarks *("famous cities", "Eiffel Tower", "wonders of the world")*
+- `physical-geography` — Physical Geography *("rivers", "mountains", "oceans", "deserts", "tectonics")*
 
-### 5. `history` — History
+### 5. `history` — History (3)
 
-- `ancient-world` — Ancient World *("ancient Rome", "Egyptians", "Greeks")*
-- `medieval` — Medieval *("the Black Death", "the Crusades")*
-- `early-modern` — Early Modern *("the Renaissance", "Age of Exploration")*
-- `world-war-1` — World War I *("WW1", "trench warfare")*
-- `world-war-2` — World War II *("WW2", "D-Day", "Hitler", "Pearl Harbor")*
-- `cold-war` — Cold War *("USSR", "Cuban Missile Crisis", "Berlin Wall")*
-- `indian-history` — Indian History *("Indian independence", "Gandhi", "Mughals")*
-- `us-history` — US History *("Civil War", "founding fathers", "Civil Rights")*
-- `uk-history` — UK & British History *("Tudors", "the Empire")*
-- `world-leaders-historical` — Historical World Leaders *("emperors", "kings")*
-- `inventions-discoveries` — Inventions & Discoveries *("who invented...")*
-- `disasters-events` — Disasters & Major Events *("Titanic", "Chernobyl", "9/11")*
+- `ancient-medieval` — Ancient & Medieval *("Ancient Rome", "Egyptians", "the Crusades", "Black Death")*
+- `world-wars-cold-war` — World Wars & Cold War *("WW1", "WW2", "D-Day", "USSR", "Berlin Wall")*
+- `modern-history` — Modern History *("Indian independence", "Civil Rights", "founding fathers", "Mughals")*
 
-### 6. `science-nature` — Science & Nature
+### 6. `science-nature` — Science & Nature (4)
 
-- `physics` — Physics *("speed of light", "Einstein", "quantum")*
-- `chemistry` — Chemistry *("periodic table", "elements")*
-- `biology` — Biology *("DNA", "cell biology")*
-- `animals` — Animals & Zoology *("name that animal", "endangered species")*
-- `plants` — Plants & Botany *("trees", "flowers")*
-- `space-astronomy` — Space & Astronomy *("planets", "NASA", "black holes")*
-- `human-body` — The Human Body *("organs", "anatomy", "diseases")*
-- `medicine` — Medicine & Health *("famous doctors", "vaccines")*
-- `earth-environment` — Earth & Environment *("climate", "tectonics")*
-- `math` — Mathematics *("famous mathematicians", "Pi")*
-- `inventors-scientists` — Famous Scientists *("Newton", "Marie Curie")*
+- `physics-chemistry-math` — Physics, Chemistry & Math *("Einstein", "periodic table", "Pi", "elements")*
+- `biology-body-medicine` — Biology, Body & Medicine *("DNA", "anatomy", "diseases", "vaccines")*
+- `animals-plants-earth` — Animals, Plants & Earth *("name that animal", "trees", "climate")*
+- `space-scientists` — Space & Scientists *("planets", "NASA", "black holes", "Newton", "Marie Curie")*
 
-### 7. `food-drink` — Food & Drink
+### 7. `food-drink` — Food & Drink (3)
 
-- `cuisines-world` — World Cuisines *("French cuisine", "what country is this dish from")*
-- `indian-food` — Indian Food *("biryani", "dosa", "regional Indian")*
-- `italian-food` — Italian Food *("pasta shapes", "regional Italian")*
-- `cocktails` — Cocktails *("classic cocktails", "name the drink")*
-- `beer-wine` — Beer & Wine *("wine regions", "beer styles")*
-- `baking-desserts` — Baking & Desserts *("cakes", "pastries")*
-- `fast-food-brands` — Fast Food & Brands *("McDonald's", "KFC origin")*
-- `chefs-restaurants` — Chefs & Restaurants *("Michelin stars", "Gordon Ramsay")*
-- `ingredients` — Ingredients *("spices", "what's in this dish")*
-- `food-history` — Food History *("origins of pizza", "Columbian exchange")*
-- `non-alcoholic` — Non-Alcoholic Drinks *("coffee", "tea", "sodas")*
+- `world-cuisines` — World Cuisines *("Indian food", "Italian", "biryani", "French cuisine")*
+- `drinks` — Drinks *("cocktails", "wine regions", "beer styles", "coffee", "tea")*
+- `food-culture` — Food Culture *("Michelin", "Gordon Ramsay", "fast food brands", "food history")*
 
-### 8. `literature` — Literature
+### 8. `literature` — Literature (3)
 
-- `classic-novels` — Classic Novels *("Dickens", "Austen", "Tolstoy")*
-- `modern-fiction` — Modern Fiction *("Booker Prize", "contemporary")*
-- `poetry` — Poetry *("famous poems", "name the poet")*
-- `plays-drama` — Plays & Drama *("Shakespeare", "Tennessee Williams")*
-- `sci-fi-fantasy` — Sci-Fi & Fantasy *("LOTR", "Asimov", "Game of Thrones books")*
-- `kids-books` — Kids' Books *("Roald Dahl", "Dr. Seuss", "Harry Potter")*
-- `non-fiction` — Non-Fiction *("biographies", "famous essays")*
-- `mystery-thriller` — Mystery & Thriller *("Agatha Christie", "Sherlock Holmes")*
-- `literary-characters` — Literary Characters *("name the character", "famous protagonists")*
-- `authors` — Authors *("name the author", "nationalities")*
-- `awards-lit` — Literary Awards *("Nobel Lit", "Pulitzer")*
+- `classics-poetry-theatre` — Classics, Poetry & Theatre *("Shakespeare", "Dickens", "famous poems")*
+- `genre-fiction` — Genre Fiction *("LOTR", "Game of Thrones books", "Agatha Christie", "Harry Potter")*
+- `authors-characters-awards` — Authors, Characters & Awards *("name the author", "Booker", "Pulitzer", "literary characters")*
 
-### 9. `art-design` — Art & Design
+### 9. `art-design` — Art & Design (2)
 
-- `painting` — Painting *("Van Gogh", "Picasso", "movements")*
-- `sculpture` — Sculpture *("Michelangelo", "Rodin")*
-- `architecture` — Architecture *("Gaudi", "famous buildings", "styles")*
-- `photography` — Photography *("famous photographers")*
-- `fashion` — Fashion *("designers", "houses", "iconic looks")*
-- `logos-brands` — Logos & Brands *("identify the logo", "brand origins")*
-- `art-history` — Art History *("Renaissance", "Impressionism")*
-- `design-objects` — Design Objects *("chairs", "industrial design")*
+- `art-architecture` — Art & Architecture *("Van Gogh", "Picasso", "Gaudi", "art movements")*
+- `fashion-logos-design` — Fashion, Logos & Design *("designers", "identify the logo", "iconic looks")*
 
-### 10. `games-toys` — Games & Toys
+### 10. `games-toys` — Games & Toys (2)
 
-- `video-games-classic` — Classic Video Games *("Mario", "Sonic", "Tetris")*
-- `video-games-modern` — Modern Video Games *("Fortnite", "BG3", "Elden Ring")*
-- `board-games` — Board Games *("Monopoly", "Settlers", "Pandemic")*
-- `card-games` — Card Games *("poker", "bridge", "UNO")*
-- `puzzles` — Puzzles & Brain Teasers *("crosswords", "rebus")*
-- `toys` — Toys *("LEGO", "Barbie", "Hot Wheels")*
-- `tabletop-rpg` — Tabletop RPGs *("D&D", "Critical Role")*
-- `gaming-culture` — Gaming Culture *("speedruns", "Twitch", "MMORPGs")*
+- `video-games` — Video Games *("Mario", "Fortnite", "Tetris", "Elden Ring", "consoles")*
+- `analog-games-toys` — Analog Games & Toys *("Monopoly", "D&D", "LEGO", "crosswords", "card games")*
 
-### 11. `tech-internet` — Tech & Internet
+### 11. `tech-internet` — Tech & Internet (3)
 
-- `companies-founders` — Companies & Founders *("who founded Apple")*
-- `social-media` — Social Media *("Twitter/X", "TikTok")*
-- `memes` — Memes *("identify the meme", "meme origins")*
-- `programming` — Programming *("programming languages", "famous bugs")*
-- `gadgets-hardware` — Gadgets & Hardware *("iPhone history", "famous gadgets")*
-- `gaming-tech` — Gaming Tech *("consoles", "GPU history")*
-- `crypto-fintech` — Crypto & Fintech *("Bitcoin", "FTX")*
-- `ai` — AI *("ChatGPT", "famous AI models")*
-- `internet-history` — Internet History *("Web 1.0", "the dot-com bubble")*
-- `startups` — Startups & VC *("unicorns", "YC")*
+- `companies-tech` — Companies & Tech *("Apple", "tech founders", "famous startups", "Bitcoin")*
+- `internet-memes-social` — Internet, Memes & Social *("TikTok", "identify the meme", "Twitter/X", "internet history")*
+- `programming-ai-gadgets` — Programming, AI & Gadgets *("programming languages", "ChatGPT", "iPhone history")*
 
-### 12. `politics-society` — Politics & Society
+### 12. `politics-society` — Politics & Society (3)
 
-- `us-presidents` — US Presidents *("name the president")*
-- `uk-pms-monarchy` — UK PMs & Monarchy *("UK prime ministers", "the royal family")*
-- `world-leaders-modern` — World Leaders (Modern) *("current world leaders")*
-- `indian-politics` — Indian Politics *("PMs of India", "states & CMs")*
-- `elections` — Elections & Voting *("electoral systems", "famous campaigns")*
-- `un-international` — UN & International Bodies *("WTO", "G7")*
-- `economics` — Economics *("inflation", "famous economists")*
-- `law-legal` — Law & Famous Cases *("Roe v Wade", "Supreme Court")*
+- `leaders-world` — World Leaders *("US presidents", "UK PMs", "Indian PMs", "monarchs")*
+- `elections-economics` — Elections & Economics *("electoral systems", "inflation", "famous campaigns")*
+- `law-international` — Law & International *("Supreme Court", "UN", "famous cases", "treaties")*
 
-### 13. `myth-religion` — Mythology & Religion
+### 13. `myth-religion` — Mythology & Religion (3)
 
-- `greek-mythology` — Greek Mythology *("the Olympians", "Greek myths")*
-- `roman-mythology` — Roman Mythology *("Roman gods")*
-- `norse-mythology` — Norse Mythology *("Thor", "Loki", "Ragnarok")*
-- `hindu-mythology` — Hindu Mythology *("Ramayana", "Mahabharata", "Hindu gods")*
-- `egyptian-mythology` — Egyptian Mythology *("Anubis", "Ra")*
-- `christianity` — Christianity *("the Bible", "saints", "popes")*
-- `islam` — Islam *("the Quran", "Five Pillars")*
-- `buddhism-hinduism` — Buddhism & Hinduism *("religious practices", "founders")*
-- `judaism` — Judaism *("Torah", "Jewish holidays")*
-- `other-religions` — Other Religions *("Sikhism", "Jainism", "Shinto")*
-- `folklore` — Folklore & Legends *("urban legends", "Arthurian legends")*
+- `western-myth` — Western Mythology *("Greek gods", "Norse mythology", "Roman gods", "Egyptian myth")*
+- `eastern-myth-religion` — Eastern Mythology & Religion *("Hindu mythology", "Ramayana", "Buddhism", "Sikhism")*
+- `abrahamic-folklore` — Abrahamic Religions & Folklore *("Bible", "Quran", "Torah", "urban legends")*
 
-### 14. `language-words` — Language & Words
+### 14. `language-words` — Language & Words (2)
 
-- `etymology` — Etymology *("origin of the word")*
-- `idioms-phrases` — Idioms & Phrases *("complete the phrase")*
-- `slang` — Slang *("90s slang", "Gen Z slang")*
-- `world-languages` — World Languages *("most spoken languages", "language families")*
-- `anagrams-wordplay` — Anagrams & Wordplay *("rearrange these letters")*
-- `quotes-famous` — Famous Quotes *("who said it")*
-- `punctuation-grammar` — Punctuation & Grammar *("the Oxford comma")*
+- `etymology-idioms-slang` — Etymology, Idioms & Slang *("origin of the word", "complete the phrase", "Gen Z slang")*
+- `wordplay-quotes-grammar` — Wordplay, Quotes & Grammar *("anagrams", "who said it", "the Oxford comma")*
 
-### 15. `pop-misc` — Pop Culture & Misc
+### 15. `pop-misc` — Pop Culture & Misc (5)
 
-- `celebrities` — Celebrities *("name the celeb", "celebrity gossip")*
-- `decades-90s` — The 90s *("90s pop culture")*
-- `decades-2000s` — The 2000s *("Y2K", "MTV era")*
-- `decades-2010s` — The 2010s *("2010s pop culture")*
-- `decades-pre-90s` — Pre-90s Nostalgia *("60s/70s/80s pop culture")*
-- `internet-culture` — Internet Culture *("Reddit history", "stan culture")*
-- `general-knowledge` — General Knowledge *("classic pub trivia")*
-- `weird-facts` — Weird Facts *("did you know")*
-- `superlatives` — Superlatives *("tallest, biggest, fastest")*
-- `wedding-relationships` — Weddings & Relationships *("traditions", "famous couples")*
+- `celebrities-people` — Celebrities & People *("name the celeb", "celebrity gossip", "famous couples")*
+- `decades-nostalgia` — Decades & Nostalgia *("the 90s", "Y2K", "80s pop culture")*
+- `internet-culture` — Internet Culture *("Reddit history", "stan culture", "Discord")*
+- `weird-facts` — Weird Facts *("did you know", "trivia oddities")*
+- `general-knowledge` — General Knowledge *("classic pub trivia", "superlatives", "tallest/biggest/fastest")*
 
-**Subcategory count: 161** (close to the ~170 target — finalize after taxonomy review).
+**Total: 50 subcategories.**
 
 ---
 
 ## Cross-cutting tags
 
-Tags are M:N with questions. Slug format: `{kind}:{value}`.
+Tags are M:N with questions and carry the "long tail" detail that doesn't
+deserve its own subcategory. Slug format: `{kind}:{value}`.
 
 ### `kind: region`
 `region:india` · `region:uk` · `region:us` · `region:eu` · `region:latam` · `region:asia` · `region:africa` · `region:oceania` · `region:mena` · `region:global`
@@ -286,85 +176,87 @@ Tags are M:N with questions. Slug format: `{kind}:{value}`.
 These map upstream source categories → our canonical `(category, subcategory)`
 at ingest time. Defined in `scripts/ingest/_taxonomy/mappings.json`.
 
-### r-trivia (the Reddit scrape, 19 cats)
+### r-trivia (Reddit scrape, 19 cats)
 
-| r-trivia category | → canonical category | → subcategory |
+| r-trivia category | → category | → subcategory (default before keyword rules) |
 |---|---|---|
-| Geography | `geography` | (run keyword rules) |
-| Language & Wordplay | `language-words` | (run keyword rules) |
-| Entertainment (Movies & TV) | `film-tv` | (run keyword rules) |
-| History | `history` | (run keyword rules) |
-| Science & Nature | `science-nature` | (run keyword rules) |
-| Sports | `sport` | (run keyword rules) |
-| Food & Drink | `food-drink` | (run keyword rules) |
-| Entertainment (Music) | `music` | (run keyword rules) |
-| Entertainment (Books & Literature) | `literature` | (run keyword rules) |
+| Geography | `geography` | `countries-capitals-flags` |
+| Language & Wordplay | `language-words` | `wordplay-quotes-grammar` |
+| Entertainment (Movies & TV) | `film-tv` | `hollywood` |
+| History | `history` | `modern-history` |
+| Science & Nature | `science-nature` | `animals-plants-earth` |
+| Sports | `sport` | `american-sports` |
+| Food & Drink | `food-drink` | `world-cuisines` |
+| Entertainment (Music) | `music` | `rock-pop` |
+| Entertainment (Books & Literature) | `literature` | `classics-poetry-theatre` |
 | General Knowledge | `pop-misc` | `general-knowledge` |
-| Mythology & Religion | `myth-religion` | (run keyword rules) |
-| Politics & Government | `politics-society` | (run keyword rules) |
-| Technology | `tech-internet` | (run keyword rules) |
-| Art & Culture | `art-design` | (run keyword rules) |
-| Pop Culture | `pop-misc` | (run keyword rules) |
+| Mythology & Religion | `myth-religion` | `western-myth` |
+| Politics & Government | `politics-society` | `leaders-world` |
+| Technology | `tech-internet` | `companies-tech` |
+| Art & Culture | `art-design` | `art-architecture` |
+| Pop Culture | `pop-misc` | `celebrities-people` |
+
+After this default, keyword rules refine the subcat (e.g. a Sports row
+mentioning "Premier League" gets moved to `football-soccer`).
 
 ### OpenTDB (24 cats, opentdb.com/api_category.php)
 
-| OpenTDB ID + name | → canonical category | → subcategory |
+| OpenTDB | → category | → subcategory |
 |---|---|---|
 | 9 General Knowledge | `pop-misc` | `general-knowledge` |
-| 10 Books | `literature` | (keyword rules) |
+| 10 Books | `literature` | `classics-poetry-theatre` |
 | 11 Film | `film-tv` | `hollywood` |
-| 12 Music | `music` | (keyword rules) |
-| 13 Musicals & Theatres | `literature` | `plays-drama` |
-| 14 Television | `film-tv` | (keyword rules) |
-| 15 Video Games | `games-toys` | (keyword rules) |
-| 16 Board Games | `games-toys` | `board-games` |
-| 17 Science & Nature | `science-nature` | (keyword rules) |
-| 18 Computers | `tech-internet` | (keyword rules) |
-| 19 Mathematics | `science-nature` | `math` |
-| 20 Mythology | `myth-religion` | (keyword rules) |
-| 21 Sports | `sport` | (keyword rules) |
-| 22 Geography | `geography` | (keyword rules) |
-| 23 History | `history` | (keyword rules) |
-| 24 Politics | `politics-society` | (keyword rules) |
-| 25 Art | `art-design` | (keyword rules) |
-| 26 Celebrities | `pop-misc` | `celebrities` |
-| 27 Animals | `science-nature` | `animals` |
+| 12 Music | `music` | `rock-pop` |
+| 13 Musicals & Theatres | `literature` | `classics-poetry-theatre` |
+| 14 Television | `film-tv` | `tv-shows` |
+| 15 Video Games | `games-toys` | `video-games` |
+| 16 Board Games | `games-toys` | `analog-games-toys` |
+| 17 Science & Nature | `science-nature` | `animals-plants-earth` |
+| 18 Computers | `tech-internet` | `programming-ai-gadgets` |
+| 19 Mathematics | `science-nature` | `physics-chemistry-math` |
+| 20 Mythology | `myth-religion` | `western-myth` |
+| 21 Sports | `sport` | `american-sports` |
+| 22 Geography | `geography` | `countries-capitals-flags` |
+| 23 History | `history` | `modern-history` |
+| 24 Politics | `politics-society` | `leaders-world` |
+| 25 Art | `art-design` | `art-architecture` |
+| 26 Celebrities | `pop-misc` | `celebrities-people` |
+| 27 Animals | `science-nature` | `animals-plants-earth` |
 | 28 Vehicles | `pop-misc` | `general-knowledge` |
-| 29 Comics | `literature` | `sci-fi-fantasy` |
-| 30 Gadgets | `tech-internet` | `gadgets-hardware` |
-| 31 Anime & Manga | `film-tv` | `animation` |
-| 32 Cartoons | `film-tv` | `animation` |
+| 29 Comics | `literature` | `genre-fiction` |
+| 30 Gadgets | `tech-internet` | `programming-ai-gadgets` |
+| 31 Anime & Manga | `film-tv` | `world-cinema-animation` |
+| 32 Cartoons | `film-tv` | `world-cinema-animation` |
 
 ### el-cms (~15 cats, varies by language)
 
-Map by their `category_id` field. Detailed mapping table to be written during
-the el-cms ingest task — pattern matches OpenTDB closely (it's derived from
-the same lineage).
+Mirrors the OpenTDB scheme; detailed mapping written when the el-cms ingest
+task is built.
 
 ---
 
-## Keyword rules (subcategory refinement)
+## Keyword rules (subcategory refinement & tagging)
 
-When a source row is ambiguous (a Reddit "Sports" row could be football, NBA,
-cricket, anything), we apply keyword-matching rules to refine the subcategory
+When a source row is ambiguous (a Reddit "Sports" row could be soccer,
+cricket, anything), we apply keyword-matching rules to refine the subcat
 and add tags. Defined in `scripts/ingest/_taxonomy/keyword_rules.yaml`.
 
 Sketched grammar:
 
 ```yaml
-- match: '/(?i)\b(bollywood|shahrukh|sharukh|hindi cinema|amitabh|kapoor)\b/'
+- match: '/(?i)\b(bollywood|shahrukh|shah rukh|hindi cinema|amitabh|kapoor|aishwarya)\b/'
   set:
     subcategory: bollywood
     tags: ['region:india']
 
-- match: '/(?i)\b(premier league|epl|manchester united|liverpool|arsenal|chelsea)\b/'
+- match: '/(?i)\b(premier league|EPL|manchester united|liverpool|arsenal|chelsea)\b/'
   set:
     subcategory: football-soccer
     tags: ['region:uk']
 
 - match: '/(?i)\b(NFL|super bowl|tom brady|patriots|quarterback)\b/'
   set:
-    subcategory: american-football
+    subcategory: american-sports
     tags: ['region:us', 'flag:us-centric']
 
 - match: '/(?i)\b(IPL|tendulkar|kohli|test cricket|virat|dhoni)\b/'
@@ -378,37 +270,45 @@ Sketched grammar:
 
 - match: '/(?i)\b(US president|president of the united states|POTUS)\b/'
   set:
-    subcategory: us-presidents
+    subcategory: leaders-world
     tags: ['region:us', 'flag:us-centric']
+
+- match: '/(?i)\b(ramayana|mahabharata|krishna|vishnu|shiva|brahma|hindu god)\b/'
+  set:
+    subcategory: eastern-myth-religion
+    tags: ['region:india']
 ```
 
-A `validate.py` pass after ingest reports any rows still with
-`subcategory IS NULL` for manual triage.
+A `validate.py` pass after ingest reports any rows where the default mapping
+didn't refine — i.e. rows still sitting on the catch-all subcat — so they
+can be inspected.
 
 ---
 
-## Triage workflow (unmapped questions)
+## Triage workflow (unmapped or vague questions)
 
 After every ingest:
 
-1. `validate.py` prints rows where `subcategory IS NULL` grouped by category.
+1. `validate.py` prints rows still on the default catch-all subcat per category.
 2. Reviewer either:
    - Adds a new keyword rule (if the pattern is recurring) and re-runs `reclassify.py`.
    - Sets the subcategory manually via the admin UI (Phase B.2).
    - Marks the row `flag:low-confidence` if it's genuinely uncategorizable.
 
-The goal is to keep **`subcategory IS NULL` count under 5%** of the bank.
+Goal: keep questions on the default catch-all subcat **under 20%** of each
+top-level category.
 
 ---
 
-## Changes & evolution
+## Evolution rules
 
-Renaming or splitting a subcategory requires:
+Renaming or splitting a subcategory:
 
-1. Add new subcategory row (do not delete the old one yet).
+1. Add new subcategory row (don't delete the old one yet).
 2. Update keyword rules to point at the new subcategory.
-3. Run `reclassify.py` — moves matching questions to the new subcategory.
+3. Run `reclassify.py` — moves matching questions.
 4. Verify old subcategory has 0 questions, then soft-delete (`active = false`).
 5. Bump version in this doc; add `CHANGELOG.md` entry.
 
-Top-level renames are higher-stakes; require an explicit migration script.
+Top-level renames are higher-stakes; require an explicit migration script
+and a discussion thread, since they affect the homepage UI tiles.
