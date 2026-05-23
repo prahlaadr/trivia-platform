@@ -21,6 +21,7 @@ function RenderSlide({ slide }: { slide: Slide }) {
           sectionNumber={slide.sectionNumber}
           sectionTitle={slide.sectionTitle}
           subtitle={slide.subtitle}
+          body={slide.body}
         />
       );
     case "question":

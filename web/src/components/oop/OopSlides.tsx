@@ -12,7 +12,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-const ASPECT = "aspect-[16/9] [container-type:inline-size]";
+const ASPECT = "aspect-[16/9] [container-type:size]";
 
 // ── Cover ──────────────────────────────────────────────────────────
 
@@ -62,10 +62,12 @@ export function OopSectionSlide({
   sectionNumber,
   sectionTitle,
   subtitle,
+  body,
 }: {
   sectionNumber: number;
   sectionTitle: string;
   subtitle?: string;
+  body?: string;
 }) {
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
@@ -80,12 +82,17 @@ export function OopSectionSlide({
           SECTION {sectionNumber}
         </p>
         {/* Title sits in the white body of the folder card */}
-        <h2 className="absolute left-[10%] top-[50%] max-w-[80%] text-[4.5cqw] font-extrabold leading-tight text-black">
+        <h2 className="absolute left-[10%] top-[46%] max-w-[80%] text-[4cqw] font-extrabold leading-tight text-black">
           {sectionTitle}
         </h2>
         {subtitle && (
-          <p className="absolute left-[10%] top-[68%] text-[1.8cqw] text-black/60">
+          <p className="absolute left-[10%] top-[63%] max-w-[80%] text-[1.8cqw] text-black/60">
             {subtitle}
+          </p>
+        )}
+        {body && (
+          <p className="absolute left-[10%] top-[72%] max-w-[80%] text-[1.5cqw] leading-snug text-black">
+            {body}
           </p>
         )}
       </div>
@@ -125,20 +132,20 @@ export function OopQuestionSlide({
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-x-[12%] top-[14%] bottom-[14%] flex flex-col items-center justify-center text-center">
-        <p className="text-[2.4cqw] font-extrabold leading-snug text-black">
+      <div className="absolute inset-x-[12%] top-[12%] bottom-[14%] flex flex-col items-center justify-center gap-[1.5cqh] overflow-hidden text-center">
+        <p className="text-[2.2cqw] font-extrabold leading-snug text-black">
           {number}. {text}{" "}
           <span className="font-bold text-black/60">
             ({points} pt{points === 1 ? "" : "s"})
           </span>
         </p>
         {codeBlock && (
-          <pre className="mt-[2%] inline-block overflow-x-auto rounded border-2 border-black bg-[var(--oop-navy)] p-[1.8%] text-left font-mono text-[1.9cqw] leading-snug text-[var(--oop-cyan)]">
+          <pre className="inline-block overflow-x-auto rounded border-2 border-black bg-[var(--oop-navy)] p-[1.4%] text-left font-mono text-[1.8cqw] leading-snug text-[var(--oop-cyan)]">
             <code>{codeBlock}</code>
           </pre>
         )}
         {bullets && bullets.length > 0 && (
-          <ul className="mt-[2.5%] inline-block space-y-[0.8%] text-left text-[2.1cqw] font-bold text-black">
+          <ul className="inline-block space-y-[0.8cqh] text-left text-[1.9cqw] font-bold text-black">
             {bullets.map((b, i) => (
               <li key={i} className="flex items-baseline gap-3">
                 <span aria-hidden className="text-[1cqw]">●</span>
@@ -148,24 +155,24 @@ export function OopQuestionSlide({
           </ul>
         )}
         {(imageSrc || imageSrc2) && (
-          <div className="mt-[2%] flex items-center justify-center gap-[2%]">
+          <div className="flex min-h-0 flex-1 items-center justify-center gap-[2cqw]">
             {imageSrc && (
-              <img src={imageSrc} alt="" className="max-h-[40cqh] w-auto object-contain" />
+              <img src={imageSrc} alt="" className="max-h-full w-auto max-w-[40cqw] object-contain" />
             )}
             {imageSrc2 && (
-              <img src={imageSrc2} alt="" className="max-h-[40cqh] w-auto object-contain" />
+              <img src={imageSrc2} alt="" className="max-h-full w-auto max-w-[40cqw] object-contain" />
             )}
           </div>
         )}
         {caption && (
-          <p className="mt-[1%] text-[1.2cqw] text-black/60">{caption}</p>
+          <p className="text-[1.2cqw] text-black/60">{caption}</p>
         )}
         {sourceUrl && (
           <a
             href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-[0.5%] text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
+            className="text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
           >
             {sourceLabel ?? "source"} ↗
           </a>
@@ -209,20 +216,20 @@ export function OopRevealSlide({
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-x-[12%] top-[14%] bottom-[14%] flex flex-col items-center justify-center text-center">
-        <p className="text-[2.1cqw] font-extrabold leading-snug text-black">
+      <div className="absolute inset-x-[12%] top-[12%] bottom-[14%] flex flex-col items-center justify-center gap-[1.2cqh] overflow-hidden text-center">
+        <p className="text-[1.9cqw] font-extrabold leading-snug text-black">
           {number}. {text}{" "}
           <span className="font-bold text-black/60">
             ({points} pt{points === 1 ? "" : "s"})
           </span>
         </p>
         {codeBlock && (
-          <pre className="mt-[1.6%] inline-block overflow-x-auto rounded border-2 border-black bg-[var(--oop-navy)] p-[1.4%] text-left font-mono text-[1.6cqw] leading-snug text-[var(--oop-cyan)]">
+          <pre className="inline-block overflow-x-auto rounded border-2 border-black bg-[var(--oop-navy)] p-[1.2%] text-left font-mono text-[1.5cqw] leading-snug text-[var(--oop-cyan)]">
             <code>{codeBlock}</code>
           </pre>
         )}
         {bullets && bullets.length > 0 && (
-          <ul className="mt-[1.8%] inline-block space-y-[0.6%] text-left text-[1.8cqw] font-bold text-black">
+          <ul className="inline-block space-y-[0.6cqh] text-left text-[1.6cqw] font-bold text-black">
             {bullets.map((b, i) => (
               <li key={i} className="flex items-baseline gap-3">
                 <span aria-hidden className="text-[1cqw]">●</span>
@@ -238,35 +245,31 @@ export function OopRevealSlide({
             ))}
           </ul>
         )}
-        {(answer || imageSrc || imageSrc2) && (
-          <div className="mt-[2%] flex w-full flex-col items-center gap-[1.5%]">
-            {answer && (
-              <p className="text-[2.4cqw] font-extrabold text-black">{answer}</p>
+        {answer && (
+          <p className="text-[2.2cqw] font-extrabold text-black">{answer}</p>
+        )}
+        {(imageSrc || imageSrc2) && (
+          <div className="flex min-h-0 flex-1 items-center justify-center gap-[2cqw]">
+            {imageSrc && (
+              <img src={imageSrc} alt="" className="max-h-full w-auto max-w-[40cqw] object-contain" />
             )}
-            {(imageSrc || imageSrc2) && (
-              <div className="flex items-center justify-center gap-[2%]">
-                {imageSrc && (
-                  <img src={imageSrc} alt="" className="max-h-[34cqh] w-auto object-contain" />
-                )}
-                {imageSrc2 && (
-                  <img src={imageSrc2} alt="" className="max-h-[34cqh] w-auto object-contain" />
-                )}
-              </div>
-            )}
-            {caption && (
-              <p className="text-[1.2cqw] text-black/60">{caption}</p>
-            )}
-            {sourceUrl && (
-              <a
-                href={sourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
-              >
-                {sourceLabel ?? "source"} ↗
-              </a>
+            {imageSrc2 && (
+              <img src={imageSrc2} alt="" className="max-h-full w-auto max-w-[40cqw] object-contain" />
             )}
           </div>
+        )}
+        {caption && (
+          <p className="text-[1.2cqw] text-black/60">{caption}</p>
+        )}
+        {sourceUrl && (
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
+          >
+            {sourceLabel ?? "source"} ↗
+          </a>
         )}
       </div>
     </div>

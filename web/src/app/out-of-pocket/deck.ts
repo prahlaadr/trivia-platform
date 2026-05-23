@@ -12,6 +12,7 @@ export type Slide =
       sectionNumber: number;
       sectionTitle: string;
       subtitle?: string;
+      body?: string;
     }
   | {
       type: "question";
@@ -68,6 +69,8 @@ interface DeckSection {
   number: number;
   title: string;
   subtitle?: string;
+  /** Long-form body text rendered on the section divider (e.g. Section 0 team intro). */
+  body?: string;
   questions: DeckQuestion[];
 }
 
@@ -75,7 +78,8 @@ const sections: DeckSection[] = [
   {
     number: 0,
     title: "Get into your teams + team name",
-    subtitle: "we’re all zero-indexed, right?",
+    subtitle: "(we’re all zero-indexed, right?)",
+    body: "You should have gotten your team number assigned at the start. If not or you forgot, introduce yourself to a team! Also, think of a team name. Some ideas to get you started: Drop table like it’s hot; dude, where’s my data; null pointer sisters; smells like updag in here",
     questions: [],
   },
   {
@@ -333,6 +337,7 @@ export function buildDeck(): Slide[] {
       sectionNumber: section.number,
       sectionTitle: section.title,
       subtitle: section.subtitle,
+      body: section.body,
     });
 
     if (section.questions.length === 0) continue;
