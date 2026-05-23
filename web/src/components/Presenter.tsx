@@ -457,7 +457,7 @@ export function Presenter({ quiz }: PresenterProps) {
           >
             {/* Header: Title + Round shortcuts + TB + Close */}
             <div className="mb-2 flex items-center gap-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#D4A642]">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#8B3530]">
                 Jump
               </p>
               {/* Title slide */}
@@ -468,8 +468,8 @@ export function Presenter({ quiz }: PresenterProps) {
                 }}
                 className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
                   currentSlide === 0
-                    ? "bg-[#8B3530] text-black"
-                    : "bg-white/10 text-white/70 hover:bg-white/20"
+                    ? "bg-[#8B3530] text-white"
+                    : "bg-[#3D3D3A]/8 text-[#3D3D3A]/80 hover:bg-[#3D3D3A]/15"
                 }`}
               >
                 Title
@@ -487,8 +487,8 @@ export function Presenter({ quiz }: PresenterProps) {
                     }}
                     className={`rounded px-2 py-0.5 text-[11px] font-bold transition-all ${
                       currentRoundNum === round.roundNum
-                        ? "bg-[#8B3530] text-black"
-                        : "bg-white/10 text-white/60 hover:bg-white/20"
+                        ? "bg-[#8B3530] text-white"
+                        : "bg-[#3D3D3A]/8 text-[#3D3D3A]/80 hover:bg-[#3D3D3A]/15"
                     }`}
                   >
                     R{round.roundNum}
@@ -508,8 +508,8 @@ export function Presenter({ quiz }: PresenterProps) {
                   }}
                   className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
                     currentSlide === item.slideIndex
-                      ? "bg-[#8B3530] text-black"
-                      : "bg-white/10 text-white/70 hover:bg-white/20"
+                      ? "bg-[#8B3530] text-white"
+                      : "bg-[#3D3D3A]/8 text-[#3D3D3A]/80 hover:bg-[#3D3D3A]/15"
                   }`}
                 >
                   {item.label}
@@ -518,7 +518,7 @@ export function Presenter({ quiz }: PresenterProps) {
               <div className="flex-1" />
               <button
                 onClick={() => setShowJumpNav(false)}
-                className="text-xs text-white/40 hover:text-white"
+                className="text-xs text-[#3D3D3A]/60 hover:text-[#3D3D3A]"
               >
                 Close
               </button>
@@ -531,7 +531,7 @@ export function Presenter({ quiz }: PresenterProps) {
                   key={round.roundNum}
                   className={`rounded px-2 py-1 ${
                     currentRoundNum === round.roundNum
-                      ? "bg-white/[0.04]"
+                      ? "bg-[#3D3D3A]/5"
                       : ""
                   }`}
                 >
@@ -544,8 +544,8 @@ export function Presenter({ quiz }: PresenterProps) {
                             <span
                               className={`text-[11px] font-black ${
                                 currentRoundNum === round.roundNum
-                                  ? "text-[#D4A642]"
-                                  : "text-white/40"
+                                  ? "text-[#8B3530]"
+                                  : "text-[#3D3D3A]/50"
                               }`}
                             >
                               R{round.roundNum}
@@ -558,7 +558,7 @@ export function Presenter({ quiz }: PresenterProps) {
                           <span className="w-full" />
                         )}
                       </div>
-                      <span className="w-14 shrink-0 text-right text-[9px] font-bold uppercase text-white/20">
+                      <span className="w-14 shrink-0 text-right text-[9px] font-bold uppercase text-[#3D3D3A]/40">
                         {row.label}
                       </span>
                       <div className="flex flex-wrap gap-1">
@@ -573,10 +573,10 @@ export function Presenter({ quiz }: PresenterProps) {
                               }}
                               className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
                                 currentSlide === item.slideIndex
-                                  ? "bg-[#8B3530] text-black"
+                                  ? "bg-[#8B3530] text-white"
                                   : isAnswer
-                                    ? "bg-[#8FAA73]/15 text-[#D4A642]/70 hover:bg-[#8FAA73]/25"
-                                    : "bg-white/10 text-white/60 hover:bg-white/20"
+                                    ? "bg-[#1C2E22]/10 text-[#1C2E22]/80 hover:bg-[#1C2E22]/20"
+                                    : "bg-[#3D3D3A]/8 text-[#3D3D3A]/70 hover:bg-[#3D3D3A]/15"
                               }`}
                             >
                               {item.label}
