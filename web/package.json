@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
+    "@duckdb/node-api": "^1.5.3-r.1",
     "@vercel/blob": "^2.3.1",
     "mammoth": "^1.11.0",
     "next": "16.1.6",
@@ -32,6 +33,7 @@
     "unrs-resolver"
   ],
   "trustedDependencies": [
+    "duckdb",
     "sharp",
     "unrs-resolver"
   ]

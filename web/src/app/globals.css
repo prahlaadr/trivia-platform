@@ -1,9 +1,10 @@
-@import "tailwindcss";
-
 /* Pyaar Project brand fonts — Karma (display) + General Sans (body).
- * Karma is on Google Fonts; General Sans is on Fontshare (Indian Type Foundry). */
+ * Karma is on Google Fonts; General Sans is on Fontshare (Indian Type Foundry).
+ * MUST be before @import "tailwindcss" per CSS spec (@import precedes rules). */
 @import url("https://fonts.googleapis.com/css2?family=Karma:wght@400;500;600;700&display=swap");
 @import url("https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap");
+
+@import "tailwindcss";
 
 @theme {
   --font-display: "Karma", serif;

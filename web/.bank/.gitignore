@@ -1,0 +1,2 @@
+# Runtime copy of the trivia bank — downloaded from Blob at deploy time.
+*.duckdb
