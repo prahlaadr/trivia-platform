@@ -30,20 +30,43 @@ export async function POST(req: Request) {
 
   const count = body.count ?? 8;
   const resolved = await resolveTopic(body.topic);
+  const warnings: string[] = [];
+  let fallbackUsed: "subcategory" | "category" | "fuzzy" | null = null;
 
-  // Tier 1: pull from bank using resolution + topic fallback
-  let questions = await pickQuestions({
-    categorySlug: resolved.categorySlug ?? undefined,
-    subcategorySlug: resolved.subcategorySlug ?? undefined,
-    fuzzyTopic: resolved.matched === "exact-slug" ? undefined : body.topic,
-    count,
-    difficulty: body.difficulty,
-    excludeIds: body.excludeIds,
-    allowTimeSensitive: body.allowTimeSensitive,
-  });
+  // Try 1: subcategory exact (most precise). Only if we actually resolved something.
+  let questions: Awaited<ReturnType<typeof pickQuestions>> = [];
+  if (resolved.categorySlug || resolved.subcategorySlug) {
+    questions = await pickQuestions({
+      categorySlug: resolved.categorySlug ?? undefined,
+      subcategorySlug: resolved.subcategorySlug ?? undefined,
+      count,
+      difficulty: body.difficulty,
+      excludeIds: body.excludeIds,
+      allowTimeSensitive: body.allowTimeSensitive,
+    });
+    if (questions.length > 0) fallbackUsed = "subcategory";
+  }
 
-  // If exact-slug match returned nothing (edge case), fall back to fuzzy
-  if (questions.length === 0 && resolved.matched === "exact-slug") {
+  // Try 2: widen to parent category (the audience yelled a subtopic
+  // we don't have content for, but the parent has plenty)
+  if (questions.length === 0 && resolved.categorySlug) {
+    questions = await pickQuestions({
+      categorySlug: resolved.categorySlug,
+      count,
+      difficulty: body.difficulty,
+      excludeIds: body.excludeIds,
+      allowTimeSensitive: body.allowTimeSensitive,
+    });
+    if (questions.length > 0) {
+      fallbackUsed = "category";
+      warnings.push(
+        `No questions found specifically for "${body.topic}" in ${resolved.subcategorySlug}; using broader ${resolved.categorySlug} category.`
+      );
+    }
+  }
+
+  // Try 3: fuzzy LIKE search across the bank
+  if (questions.length === 0) {
     questions = await pickQuestions({
       fuzzyTopic: body.topic,
       count,
@@ -51,18 +74,28 @@ export async function POST(req: Request) {
       excludeIds: body.excludeIds,
       allowTimeSensitive: body.allowTimeSensitive,
     });
+    if (questions.length > 0) {
+      fallbackUsed = "fuzzy";
+      warnings.push(
+        `"${body.topic}" wasn't a known category; pulled fuzzy matches from across the bank.`
+      );
+    }
   }
 
-  const warnings: string[] = [];
-  if (questions.length < count) {
+  if (questions.length === 0) {
     warnings.push(
-      `Bank only returned ${questions.length}/${count} questions for "${body.topic}". Tiers 2+3 not wired yet — try a different topic or smaller count.`
+      `No questions in the bank match "${body.topic}". Try a broader topic or pick a category tile.`
+    );
+  } else if (questions.length < count) {
+    warnings.push(
+      `Bank only returned ${questions.length}/${count} questions for "${body.topic}".`
     );
   }
 
   return NextResponse.json({
     topic: body.topic,
     resolved,
+    fallbackUsed,
     questions,
     tierUsed: 1,
     warnings,
