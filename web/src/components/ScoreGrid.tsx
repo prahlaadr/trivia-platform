@@ -109,24 +109,24 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
     <div className="overflow-x-auto rounded-lg border border-white/10">
       <table ref={gridRef} className="w-full border-collapse">
         <thead>
-          <tr className="bg-[#1B4D3E]">
-            <th className="sticky left-0 z-10 min-w-[120px] sm:min-w-[200px] bg-[#1B4D3E] px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider text-[#FFD700]">
+          <tr className="bg-[#1C2E22]">
+            <th className="sticky left-0 z-10 min-w-[120px] sm:min-w-[200px] bg-[#1C2E22] px-2 sm:px-4 py-2 sm:py-3 text-left text-xs sm:text-sm font-bold uppercase tracking-wider text-[#8B3530]">
               Team Name
             </th>
             {Array.from({ length: session.roundCount }, (_, i) => (
               <th
                 key={i}
-                className="min-w-[50px] sm:min-w-[80px] px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold uppercase tracking-wider text-[#FFD700]"
+                className="min-w-[50px] sm:min-w-[80px] px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold uppercase tracking-wider text-[#8B3530]"
               >
                 {i + 1}
                 {i === session.roundCount - 1 && (
-                  <span className="ml-1 text-[10px] text-[#E84D5A]">
+                  <span className="ml-1 text-[10px] text-[#C26B3E]">
                     2x
                   </span>
                 )}
               </th>
             ))}
-            <th className="min-w-[60px] sm:min-w-[90px] px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-black uppercase tracking-wider text-[#FFD700]">
+            <th className="min-w-[60px] sm:min-w-[90px] px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-black uppercase tracking-wider text-[#8B3530]">
               Total
             </th>
             <th className="w-10 px-2 py-3" />
@@ -138,12 +138,12 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
               key={teamIdx}
               className="border-t border-white/5 transition-colors hover:bg-white/[0.03]"
             >
-              <td className="sticky left-0 z-10 bg-[#143B2E] px-2 py-1">
+              <td className="sticky left-0 z-10 bg-[#E8DFC8] px-2 py-1">
                 <input
                   type="text"
                   value={team.name}
                   onChange={(e) => updateTeamName(teamIdx, e.target.value)}
-                  className="w-full rounded bg-transparent px-1 sm:px-2 py-1.5 sm:py-2 text-sm sm:text-lg font-bold text-white outline-none focus:bg-white/5 focus:ring-1 focus:ring-[#FFD700]/30"
+                  className="w-full rounded bg-transparent px-1 sm:px-2 py-1.5 sm:py-2 text-sm sm:text-lg font-bold text-white outline-none focus:bg-white/5 focus:ring-1 focus:ring-[#8B3530]/30"
                   placeholder="Team name"
                   tabIndex={-1}
                 />
@@ -162,18 +162,18 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
                       handleScoreCellKeyDown(e, teamIdx, roundIdx)
                     }
                     onFocus={(e) => e.target.select()}
-                    className="w-full rounded bg-transparent px-1 sm:px-2 py-1.5 sm:py-2 text-center text-sm sm:text-lg tabular-nums text-white outline-none focus:bg-[#FFD700]/10 focus:ring-1 focus:ring-[#FFD700]/40"
+                    className="w-full rounded bg-transparent px-1 sm:px-2 py-1.5 sm:py-2 text-center text-sm sm:text-lg tabular-nums text-white outline-none focus:bg-[#8B3530]/10 focus:ring-1 focus:ring-[#8B3530]/40"
                     placeholder="—"
                   />
                 </td>
               ))}
-              <td className="px-2 sm:px-4 py-2 text-center text-base sm:text-xl font-black tabular-nums text-[#4EC9B0]">
+              <td className="px-2 sm:px-4 py-2 text-center text-base sm:text-xl font-black tabular-nums text-[#8FAA73]">
                 {teamTotal(team, session.roundCount)}
               </td>
               <td className="px-2 py-2">
                 <button
                   onClick={() => removeTeam(teamIdx)}
-                  className="text-sm text-white/20 hover:text-[#E84D5A]"
+                  className="text-sm text-white/20 hover:text-[#C26B3E]"
                   title="Remove team"
                   tabIndex={-1}
                 >
@@ -185,11 +185,11 @@ export function ScoreGrid({ session, onUpdate }: ScoreGridProps) {
 
           {/* Add team row */}
           <tr className="border-t border-white/5">
-            <td className="sticky left-0 z-10 bg-[#143B2E] px-2 py-1">
+            <td className="sticky left-0 z-10 bg-[#E8DFC8] px-2 py-1">
               <input
                 type="text"
                 placeholder="+ Add team name..."
-                className="w-full rounded bg-transparent px-1 sm:px-2 py-1.5 sm:py-2 text-sm sm:text-lg text-white/40 outline-none placeholder-white/20 focus:bg-white/5 focus:text-white focus:ring-1 focus:ring-[#FFD700]/30"
+                className="w-full rounded bg-transparent px-1 sm:px-2 py-1.5 sm:py-2 text-sm sm:text-lg text-white/40 outline-none placeholder-white/20 focus:bg-white/5 focus:text-white focus:ring-1 focus:ring-[#8B3530]/30"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     const input = e.currentTarget;

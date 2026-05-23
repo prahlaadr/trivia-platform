@@ -138,9 +138,9 @@ export function Presenter({ quiz }: PresenterProps) {
     // Lock body to prevent scroll and match presenter background
     const prevBg = document.body.style.background;
     const prevOverflow = document.body.style.overflow;
-    document.body.style.background = "#0F1B2D";
+    document.body.style.background = "#3D3D3A";
     document.body.style.overflow = "hidden";
-    document.documentElement.style.background = "#0F1B2D";
+    document.documentElement.style.background = "#3D3D3A";
 
     return () => {
       window.removeEventListener("resize", measure);
@@ -234,7 +234,7 @@ export function Presenter({ quiz }: PresenterProps) {
   const currentRoundNum = slide.roundNumber ?? null;
 
   return (
-    <div className="fixed inset-0 bg-[#0F1B2D]">
+    <div className="fixed inset-0 bg-[#3D3D3A]">
     <div
       className="flex flex-col overflow-hidden"
       style={{ height: viewportHeight ? `${viewportHeight}px` : '100vh' }}
@@ -251,18 +251,18 @@ export function Presenter({ quiz }: PresenterProps) {
       {/* Progress bar */}
       <div className="h-1 w-full shrink-0 bg-black/30">
         <div
-          className="h-full bg-[#FFD700] transition-all duration-300"
+          className="h-full bg-[#8B3530] transition-all duration-300"
           style={{ width: `${progress}%` }}
         />
       </div>
 
       {/* Bottom toolbar — in flex flow, always visible */}
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-1 bg-[#0F1B2D] px-2 py-1.5 sm:px-4 sm:py-2">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-1 bg-[#3D3D3A] px-2 py-1.5 sm:px-4 sm:py-2">
         {/* Left: Jump + Scores */}
         <div className="flex gap-1 sm:gap-2">
           <button
             onClick={() => setShowJumpNav((v) => !v)}
-            className="rounded bg-[#FFD700]/20 px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-bold text-[#FFD700] transition-all hover:bg-[#FFD700]/30"
+            className="rounded bg-[#8B3530]/20 px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-bold text-[#8B3530] transition-all hover:bg-[#8B3530]/30"
           >
             Jump
           </button>
@@ -273,8 +273,8 @@ export function Presenter({ quiz }: PresenterProps) {
             }}
             className={`rounded px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm font-bold transition-all ${
               showScores
-                ? "bg-[#4EC9B0] text-black"
-                : "bg-[#4EC9B0]/20 text-[#4EC9B0] hover:bg-[#4EC9B0]/30"
+                ? "bg-[#8FAA73] text-black"
+                : "bg-[#8FAA73]/20 text-[#8FAA73] hover:bg-[#8FAA73]/30"
             }`}
           >
             Scores
@@ -285,7 +285,7 @@ export function Presenter({ quiz }: PresenterProps) {
         <div className="flex items-center gap-1.5 sm:gap-3">
           <button
             onClick={exitPresenter}
-            className="rounded bg-[#E84D5A]/80 px-2 py-1 text-xs sm:px-3 sm:text-sm font-bold text-white"
+            className="rounded bg-[#C26B3E]/80 px-2 py-1 text-xs sm:px-3 sm:text-sm font-bold text-white"
             title="Esc"
           >
             Exit
@@ -326,7 +326,7 @@ export function Presenter({ quiz }: PresenterProps) {
           onClick={() => setShowScores(false)}
         >
           <div
-            className={`max-h-[90vh] overflow-y-auto rounded-xl bg-[#0F1B2D] p-6 shadow-2xl ${
+            className={`max-h-[90vh] overflow-y-auto rounded-xl bg-[#3D3D3A] p-6 shadow-2xl ${
               scoreTab === "scorekeeper" ? "w-full max-w-5xl" : "w-full max-w-2xl"
             }`}
             onClick={(e) => e.stopPropagation()}
@@ -338,7 +338,7 @@ export function Presenter({ quiz }: PresenterProps) {
                   onClick={() => setScoreTab("leaderboard")}
                   className={`rounded-md px-4 py-1.5 text-sm font-bold transition-all ${
                     scoreTab === "leaderboard"
-                      ? "bg-[#FFD700] text-black"
+                      ? "bg-[#8B3530] text-black"
                       : "text-white/50 hover:text-white/80"
                   }`}
                 >
@@ -348,7 +348,7 @@ export function Presenter({ quiz }: PresenterProps) {
                   onClick={() => setScoreTab("scorekeeper")}
                   className={`rounded-md px-4 py-1.5 text-sm font-bold transition-all ${
                     scoreTab === "scorekeeper"
-                      ? "bg-[#4EC9B0] text-black"
+                      ? "bg-[#8FAA73] text-black"
                       : "text-white/50 hover:text-white/80"
                   }`}
                 >
@@ -370,7 +370,7 @@ export function Presenter({ quiz }: PresenterProps) {
             ) : scoreTab === "leaderboard" ? (
               /* Leaderboard view */
               <>
-                <h2 className="mb-2 text-center text-3xl font-black uppercase tracking-wider text-[#FFD700]">
+                <h2 className="mb-2 text-center text-3xl font-black uppercase tracking-wider text-[#8B3530]">
                   Leaderboard
                 </h2>
                 <p className="mb-6 text-center text-sm text-white/40">
@@ -391,7 +391,7 @@ export function Presenter({ quiz }: PresenterProps) {
                             key={rank}
                             className={`flex items-center gap-4 rounded-lg px-6 py-3 ${
                               rank === 0
-                                ? "bg-[#FFD700]/15"
+                                ? "bg-[#8B3530]/15"
                                 : rank === 1
                                   ? "bg-white/5"
                                   : rank === 2
@@ -402,7 +402,7 @@ export function Presenter({ quiz }: PresenterProps) {
                             <span
                               className={`w-10 text-3xl font-black ${
                                 rank === 0
-                                  ? "text-[#FFD700]"
+                                  ? "text-[#8B3530]"
                                   : rank === 1
                                     ? "text-gray-300"
                                     : rank === 2
@@ -415,7 +415,7 @@ export function Presenter({ quiz }: PresenterProps) {
                             <span className="flex-1 text-2xl font-bold text-white">
                               {team.name || "—"}
                             </span>
-                            <span className="text-3xl font-black text-[#4EC9B0]">
+                            <span className="text-3xl font-black text-[#8FAA73]">
                               {total}
                             </span>
                           </div>
@@ -452,12 +452,12 @@ export function Presenter({ quiz }: PresenterProps) {
           onClick={() => setShowJumpNav(false)}
         >
           <div
-            className="w-full max-w-[95vw] rounded-xl bg-[#143B2E] px-4 py-3 shadow-2xl"
+            className="w-full max-w-[95vw] rounded-xl bg-[#E8DFC8] px-4 py-3 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header: Title + Round shortcuts + TB + Close */}
             <div className="mb-2 flex items-center gap-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#FFD700]">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#8B3530]">
                 Jump
               </p>
               {/* Title slide */}
@@ -468,7 +468,7 @@ export function Presenter({ quiz }: PresenterProps) {
                 }}
                 className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
                   currentSlide === 0
-                    ? "bg-[#FFD700] text-black"
+                    ? "bg-[#8B3530] text-black"
                     : "bg-white/10 text-white/70 hover:bg-white/20"
                 }`}
               >
@@ -487,13 +487,13 @@ export function Presenter({ quiz }: PresenterProps) {
                     }}
                     className={`rounded px-2 py-0.5 text-[11px] font-bold transition-all ${
                       currentRoundNum === round.roundNum
-                        ? "bg-[#FFD700] text-black"
+                        ? "bg-[#8B3530] text-black"
                         : "bg-white/10 text-white/60 hover:bg-white/20"
                     }`}
                   >
                     R{round.roundNum}
                     {round.isLast && (
-                      <span className="ml-0.5 text-[9px] text-[#E84D5A]">2x</span>
+                      <span className="ml-0.5 text-[9px] text-[#C26B3E]">2x</span>
                     )}
                   </button>
                 );
@@ -508,7 +508,7 @@ export function Presenter({ quiz }: PresenterProps) {
                   }}
                   className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
                     currentSlide === item.slideIndex
-                      ? "bg-[#FFD700] text-black"
+                      ? "bg-[#8B3530] text-black"
                       : "bg-white/10 text-white/70 hover:bg-white/20"
                   }`}
                 >
@@ -544,14 +544,14 @@ export function Presenter({ quiz }: PresenterProps) {
                             <span
                               className={`text-[11px] font-black ${
                                 currentRoundNum === round.roundNum
-                                  ? "text-[#FFD700]"
+                                  ? "text-[#8B3530]"
                                   : "text-white/40"
                               }`}
                             >
                               R{round.roundNum}
                             </span>
                             {round.isLast && (
-                              <span className="text-[9px] font-bold text-[#E84D5A]">2x</span>
+                              <span className="text-[9px] font-bold text-[#C26B3E]">2x</span>
                             )}
                           </>
                         ) : (
@@ -573,9 +573,9 @@ export function Presenter({ quiz }: PresenterProps) {
                               }}
                               className={`rounded px-2 py-0.5 text-[11px] font-medium transition-all ${
                                 currentSlide === item.slideIndex
-                                  ? "bg-[#FFD700] text-black"
+                                  ? "bg-[#8B3530] text-black"
                                   : isAnswer
-                                    ? "bg-[#4EC9B0]/15 text-[#4EC9B0]/70 hover:bg-[#4EC9B0]/25"
+                                    ? "bg-[#8FAA73]/15 text-[#8FAA73]/70 hover:bg-[#8FAA73]/25"
                                     : "bg-white/10 text-white/60 hover:bg-white/20"
                               }`}
                             >

@@ -32,11 +32,11 @@ export default function PresentPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#143B2E]">
+      <div className="flex min-h-screen items-center justify-center bg-[#E8DFC8]">
         <div className="text-center">
-          <h1 className="text-4xl font-black text-[#FFD700]">Quiz Not Found</h1>
+          <h1 className="text-4xl font-black text-[#8B3530]">Quiz Not Found</h1>
           <p className="mt-2 text-white/50">Quiz #{quizId} doesn&apos;t exist.</p>
-          <a href="/" className="mt-4 inline-block text-[#4EC9B0] hover:underline">
+          <a href="/" className="mt-4 inline-block text-[#8FAA73] hover:underline">
             Back to quizzes
           </a>
         </div>
@@ -46,7 +46,7 @@ export default function PresentPage() {
 
   if (!quiz) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#143B2E]">
+      <div className="flex min-h-screen items-center justify-center bg-[#E8DFC8]">
         <p className="text-xl text-white/50">Loading...</p>
       </div>
     );

@@ -36,16 +36,16 @@ export default function ScorePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#143B2E] p-4 sm:p-8">
+    <div className="min-h-screen bg-[#E8DFC8] p-4 sm:p-8">
       <div className="mx-auto max-w-3xl">
         <Link href="/" className="text-sm text-white/40 hover:text-white/60">
           &larr; Back to quizzes
         </Link>
 
-        <p className="mt-4 mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
+        <p className="mt-4 mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#8B3530]/50">
           {getBrand().name}
         </p>
-        <h1 className="mb-6 text-3xl sm:text-4xl font-black uppercase text-[#FFD700]">
+        <h1 className="mb-6 text-3xl sm:text-4xl font-black uppercase text-[#8B3530]">
           Scorekeeper
         </h1>
 
@@ -53,13 +53,13 @@ export default function ScorePage() {
         {!showCreate ? (
           <button
             onClick={() => setShowCreate(true)}
-            className="mb-6 w-full rounded-lg border-2 border-dashed border-white/20 bg-[#1B4D3E]/50 p-6 text-lg font-bold text-white/70 transition-all hover:border-[#FFD700]/40"
+            className="mb-6 w-full rounded-lg border-2 border-dashed border-white/20 bg-[#1C2E22]/50 p-6 text-lg font-bold text-white/70 transition-all hover:border-[#8B3530]/40"
           >
             + New Game Session
           </button>
         ) : (
-          <div className="mb-6 rounded-lg border border-[#FFD700]/30 bg-[#1B4D3E] p-4 sm:p-6">
-            <h2 className="mb-4 text-lg font-bold text-[#FFD700]">
+          <div className="mb-6 rounded-lg border border-[#8B3530]/30 bg-[#1C2E22] p-4 sm:p-6">
+            <h2 className="mb-4 text-lg font-bold text-[#8B3530]">
               New Game Session
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -72,7 +72,7 @@ export default function ScorePage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g., Quiz #567"
-                  className="w-full rounded bg-white/10 px-4 py-2.5 text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#FFD700]/40"
+                  className="w-full rounded bg-white/10 px-4 py-2.5 text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#8B3530]/40"
                   autoFocus
                   onKeyDown={(e) => e.key === "Enter" && handleCreate()}
                 />
@@ -83,7 +83,7 @@ export default function ScorePage() {
                   type="text"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full rounded bg-white/10 px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-[#FFD700]/40"
+                  className="w-full rounded bg-white/10 px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-[#8B3530]/40"
                 />
               </div>
               <div>
@@ -98,7 +98,7 @@ export default function ScorePage() {
                   }
                   min={1}
                   max={20}
-                  className="w-full rounded bg-white/10 px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-[#FFD700]/40"
+                  className="w-full rounded bg-white/10 px-4 py-2.5 text-white outline-none focus:ring-2 focus:ring-[#8B3530]/40"
                 />
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function ScorePage() {
               <button
                 onClick={handleCreate}
                 disabled={!name.trim()}
-                className="rounded bg-[#FFD700] px-6 py-2 font-bold text-black transition-all hover:bg-[#FFD700]/90 disabled:opacity-30"
+                className="rounded bg-[#8B3530] px-6 py-2 font-bold text-black transition-all hover:bg-[#8B3530]/90 disabled:opacity-30"
               >
                 Create
               </button>
@@ -122,26 +122,26 @@ export default function ScorePage() {
 
         {/* Session list */}
         <div className="mb-4 flex items-center gap-3">
-          <div className="h-px flex-1 bg-[#FFD700]/20" />
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#FFD700]/40">
+          <div className="h-px flex-1 bg-[#8B3530]/20" />
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#8B3530]/40">
             {sessions.length} game{sessions.length !== 1 ? "s" : ""}
           </p>
-          <div className="h-px flex-1 bg-[#FFD700]/20" />
+          <div className="h-px flex-1 bg-[#8B3530]/20" />
         </div>
 
         <div className="space-y-3">
           {sessions.map((s) => (
             <div
               key={s.id}
-              className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1B4D3E] p-5 transition-all hover:border-[#FFD700]/40"
+              className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1C2E22] p-5 transition-all hover:border-[#8B3530]/40"
             >
               <Link href={`/score/${s.id}`} className="flex-1">
                 <h2 className="text-xl font-bold text-white">{s.name}</h2>
-                <p className="text-sm text-[#F5E6C8]/50">{s.date}</p>
+                <p className="text-sm text-[#9B9B95]/50">{s.date}</p>
               </Link>
               <button
                 onClick={() => handleDelete(s.id)}
-                className="ml-4 rounded px-3 py-1 text-sm text-[#E84D5A]/60 hover:bg-[#E84D5A]/10 hover:text-[#E84D5A]"
+                className="ml-4 rounded px-3 py-1 text-sm text-[#C26B3E]/60 hover:bg-[#C26B3E]/10 hover:text-[#C26B3E]"
               >
                 Delete
               </button>

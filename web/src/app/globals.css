@@ -1,73 +1,46 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Poppins";
-  src: url("/fonts/Poppins-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+/* Pyaar Project brand fonts — Karma (display) + General Sans (body).
+ * Karma is on Google Fonts; General Sans is on Fontshare (Indian Type Foundry). */
+@import url("https://fonts.googleapis.com/css2?family=Karma:wght@400;500;600;700&display=swap");
+@import url("https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap");
 
-@font-face {
-  font-family: "Poppins";
-  src: url("/fonts/Poppins-Italic.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Poppins";
-  src: url("/fonts/Poppins-Medium.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Poppins";
-  src: url("/fonts/Poppins-SemiBold.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Poppins";
-  src: url("/fonts/Poppins-Bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Poppins";
-  src: url("/fonts/Poppins-ExtraBold.ttf") format("truetype");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Poppins";
-  src: url("/fonts/Poppins-Black.ttf") format("truetype");
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
+/* Pyaar Project brand tokens — see pyaarproject.org/standards
+ *   --pyaar-cream    : Kasavu cream, light canvas
+ *   --pyaar-charcoal : body text, dark canvas
+ *   --pyaar-plantation: brand-defining green, dark canvas blocks
+ *   --pyaar-madder   : action driver, links, primary accent
+ *   --pyaar-pacha    : secondary accent (paddy fields)
+ *   --pyaar-spice    : warm secondary (terracotta)
+ *   --pyaar-saffron  : active marker / hover
+ *   --pyaar-grey     : utility neutral, captions, dividers */
+:root {
+  --pyaar-cream: #E8DFC8;
+  --pyaar-charcoal: #3D3D3A;
+  --pyaar-plantation: #1C2E22;
+  --pyaar-madder: #8B3530;
+  --pyaar-pacha: #8FAA73;
+  --pyaar-spice: #C26B3E;
+  --pyaar-saffron: #D4A642;
+  --pyaar-grey: #9B9B95;
 }
 
 html,
 body {
-  background: #143B2E;
-  color: #ededed;
-  font-family: "Poppins", sans-serif;
+  background: var(--pyaar-cream);
+  color: var(--pyaar-charcoal);
+  font-family: "General Sans", "Inter", system-ui, sans-serif;
   margin: 0;
   padding: 0;
   min-height: 100vh;
   min-height: 100dvh;
-  /* Safe area for notched phones in standalone mode */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+}
+
+h1, h2, h3 {
+  font-family: "Karma", serif;
+  letter-spacing: -0.015em;
 }

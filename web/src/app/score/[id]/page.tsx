@@ -61,7 +61,7 @@ export default function ScoreSheetPage() {
     .sort((a, b) => teamTotal(b, session.roundCount) - teamTotal(a, session.roundCount));
 
   return (
-    <div className="min-h-screen bg-[#143B2E] p-3 sm:p-6">
+    <div className="min-h-screen bg-[#E8DFC8] p-3 sm:p-6">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -72,7 +72,7 @@ export default function ScoreSheetPage() {
             >
               &larr; All games
             </Link>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#FFD700]">
+            <h1 className="text-2xl sm:text-3xl font-black text-[#8B3530]">
               {session.name}
             </h1>
             <p className="text-sm text-white/40">{session.date}</p>
@@ -82,8 +82,8 @@ export default function ScoreSheetPage() {
               onClick={() => setShowLeaderboard((v) => !v)}
               className={`rounded px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm font-bold transition-all ${
                 showLeaderboard
-                  ? "bg-[#FFD700] text-black"
-                  : "bg-[#FFD700]/20 text-[#FFD700] hover:bg-[#FFD700]/30"
+                  ? "bg-[#8B3530] text-black"
+                  : "bg-[#8B3530]/20 text-[#8B3530] hover:bg-[#8B3530]/30"
               }`}
             >
               Leaderboard (L)
@@ -99,8 +99,8 @@ export default function ScoreSheetPage() {
 
         {/* Leaderboard */}
         {showLeaderboard && (
-          <div className="mb-6 rounded-xl border-2 border-[#FFD700]/30 bg-[#0F1B2D] p-4 sm:p-6">
-            <h2 className="mb-4 text-center text-2xl font-black uppercase tracking-wider text-[#FFD700]">
+          <div className="mb-6 rounded-xl border-2 border-[#8B3530]/30 bg-[#3D3D3A] p-4 sm:p-6">
+            <h2 className="mb-4 text-center text-2xl font-black uppercase tracking-wider text-[#8B3530]">
               Leaderboard
             </h2>
             {sortedTeams.length === 0 ? (
@@ -114,7 +114,7 @@ export default function ScoreSheetPage() {
                       key={team.originalIndex}
                       className={`flex items-center gap-4 rounded-lg px-5 py-3 ${
                         rank === 0
-                          ? "bg-[#FFD700]/15"
+                          ? "bg-[#8B3530]/15"
                           : rank === 1
                             ? "bg-white/5"
                             : rank === 2
@@ -125,7 +125,7 @@ export default function ScoreSheetPage() {
                       <span
                         className={`w-8 text-2xl font-black ${
                           rank === 0
-                            ? "text-[#FFD700]"
+                            ? "text-[#8B3530]"
                             : rank === 1
                               ? "text-gray-300"
                               : rank === 2
@@ -138,7 +138,7 @@ export default function ScoreSheetPage() {
                       <span className="flex-1 text-xl font-bold text-white">
                         {team.name || "—"}
                       </span>
-                      <span className="text-2xl font-black text-[#4EC9B0]">
+                      <span className="text-2xl font-black text-[#8FAA73]">
                         {total}
                       </span>
                     </div>

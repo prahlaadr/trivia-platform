@@ -7,14 +7,14 @@ import { getBrand } from "@/lib/branding";
  * Color Palette — edit these hex values to rebrand.
  * Also update globals.css body background if changing primary bg.
  *
- * - Deep green:   #1B4D3E (primary bg)
- * - Dark green:   #143B2E (alt bg)
- * - Navy:         #0F1B2D (dark sections)
- * - Gold/Yellow:  #FFD700 (headings, accents)
+ * - Deep green:   #1C2E22 (primary bg)
+ * - Dark green:   #E8DFC8 (alt bg)
+ * - Navy:         #3D3D3A (dark sections)
+ * - Gold/Yellow:  #8B3530 (headings, accents)
  * - White:        #FFFFFF (body text)
- * - Light green:  #4EC9B0 (answers, success)
- * - Coral red:    #E84D5A (question numbers, alerts)
- * - Cream:        #F5E6C8 (subtle text)
+ * - Light green:  #8FAA73 (answers, success)
+ * - Coral red:    #C26B3E (question numbers, alerts)
+ * - Cream:        #9B9B95 (subtle text)
  */
 
 interface SlideRendererProps {
@@ -55,24 +55,24 @@ export function SlideRenderer({ slide }: SlideRendererProps) {
 function TitleSlide({ slide }: { slide: Slide }) {
   const quiz = slide.quiz!;
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-5 bg-[#1B4D3E]">
-      <p className="text-2xl font-bold uppercase tracking-[0.3em] text-[#F5E6C8]">
+    <div className="flex h-full flex-col items-center justify-center gap-5 bg-[#1C2E22]">
+      <p className="text-2xl font-bold uppercase tracking-[0.3em] text-[#9B9B95]">
         {getBrand().name}
       </p>
-      <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black uppercase text-[#FFD700] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+      <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black uppercase text-[#8B3530] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
         {getBrand().quizLabel} #{quiz.quiz_number}
       </h1>
       <p className="text-3xl font-medium text-white/80">{quiz.date}</p>
-      <div className="mt-4 w-16 border-t-2 border-[#FFD700]" />
+      <div className="mt-4 w-16 border-t-2 border-[#8B3530]" />
       <div className="mt-3 space-y-2">
         {quiz.rounds.map((r) => (
           <p key={r.number} className="text-center text-lg sm:text-2xl text-white">
-            <span className="mr-2 font-bold text-[#FFD700]">
+            <span className="mr-2 font-bold text-[#8B3530]">
               {r.number}.
             </span>
             {r.title}
             {r.joker_eligible && (
-              <span className="ml-2 text-base text-[#4EC9B0]">JOKER</span>
+              <span className="ml-2 text-base text-[#8FAA73]">JOKER</span>
             )}
           </p>
         ))}
@@ -91,18 +91,18 @@ function RoundTitleSlide({ slide }: { slide: Slide }) {
       : `${round.points_per_question} Point${round.points_per_question > 1 ? "s" : ""} Per Correct Answer`;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 bg-[#143B2E]">
-      <p className="text-2xl font-bold uppercase tracking-[0.4em] text-[#FFD700]/70">
+    <div className="flex h-full flex-col items-center justify-center gap-4 bg-[#E8DFC8]">
+      <p className="text-2xl font-bold uppercase tracking-[0.4em] text-[#8B3530]/70">
         Round {round.number}
       </p>
       <h2 className="max-w-4xl text-center text-3xl sm:text-5xl lg:text-7xl font-black uppercase text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
         {round.title}
       </h2>
-      <div className="mt-2 w-24 border-t-2 border-[#FFD700]" />
+      <div className="mt-2 w-24 border-t-2 border-[#8B3530]" />
       <p className="mt-4 text-2xl text-white/70">{ptsText}</p>
       <p
         className={`text-xl font-bold uppercase tracking-wider ${
-          round.joker_eligible ? "text-[#4EC9B0]" : "text-[#E84D5A]"
+          round.joker_eligible ? "text-[#8FAA73]" : "text-[#C26B3E]"
         }`}
       >
         {round.joker_eligible
@@ -110,14 +110,14 @@ function RoundTitleSlide({ slide }: { slide: Slide }) {
           : "Joker Is NOT In Play"}
       </p>
       {slide.isLastRound && (
-        <div className="mt-6 rounded-lg border-2 border-[#FFD700]/60 bg-[#FFD700]/10 px-6 py-3">
-          <p className="text-xl font-black uppercase tracking-wider text-[#FFD700]">
+        <div className="mt-6 rounded-lg border-2 border-[#8B3530]/60 bg-[#8B3530]/10 px-6 py-3">
+          <p className="text-xl font-black uppercase tracking-wider text-[#8B3530]">
             Final Round — Points Are Doubled For Everyone
           </p>
         </div>
       )}
       {round.theme_description && (
-        <p className="mt-6 max-w-3xl text-center text-xl italic text-[#F5E6C8]/80">
+        <p className="mt-6 max-w-3xl text-center text-xl italic text-[#9B9B95]/80">
           {round.theme_description}
         </p>
       )}
@@ -131,14 +131,14 @@ function InternetQuestionSlide({ slide }: { slide: Slide }) {
   const round = slide.round!;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-[#1B4D3E] px-4 sm:px-8 lg:px-12">
+    <div className="flex h-full flex-col items-center justify-center bg-[#1C2E22] px-4 sm:px-8 lg:px-12">
       <p className="mb-4 text-lg font-medium uppercase tracking-[0.2em] text-white/50">
         Round {round.number} &mdash; {round.title}
       </p>
-      <div className="mb-6 flex h-16 w-16 sm:h-28 sm:w-28 items-center justify-center rounded-full border-4 border-[#FFD700]">
-        <span className="text-6xl font-black text-[#FFD700]">1</span>
+      <div className="mb-6 flex h-16 w-16 sm:h-28 sm:w-28 items-center justify-center rounded-full border-4 border-[#8B3530]">
+        <span className="text-6xl font-black text-[#8B3530]">1</span>
       </div>
-      <p className="mb-3 text-3xl font-bold uppercase tracking-wider text-[#FFD700]">
+      <p className="mb-3 text-3xl font-bold uppercase tracking-wider text-[#8B3530]">
         Internet-Only Question
       </p>
       <p className="mb-8 max-w-2xl text-center text-2xl text-white/70">
@@ -163,20 +163,20 @@ function QuestionsOverviewSlide({ slide }: { slide: Slide }) {
   const round = slide.round!;
 
   return (
-    <div className="flex h-full flex-col bg-[#1B4D3E] p-10 pt-8">
+    <div className="flex h-full flex-col bg-[#1C2E22] p-10 pt-8">
       <div className="mb-5 flex items-center gap-3">
-        <div className="h-px flex-1 bg-[#FFD700]/30" />
-        <p className="text-lg font-bold uppercase tracking-[0.3em] text-[#FFD700]">
+        <div className="h-px flex-1 bg-[#8B3530]/30" />
+        <p className="text-lg font-bold uppercase tracking-[0.3em] text-[#8B3530]">
           Round {round.number} &mdash; {round.title}
         </p>
-        <div className="h-px flex-1 bg-[#FFD700]/30" />
+        <div className="h-px flex-1 bg-[#8B3530]/30" />
       </div>
       <div className="flex flex-1 flex-col justify-center gap-3">
         {round.questions.map((q) => (
           <div key={q.number}>
             {q.is_internet_only ? (
               <p className="text-xl leading-snug text-white/40 italic">
-                <span className="mr-2 inline-block w-9 text-right font-bold text-[#FFD700]/40">
+                <span className="mr-2 inline-block w-9 text-right font-bold text-[#8B3530]/40">
                   {q.number}.
                 </span>
                 Internet-Only Question &mdash; {getBrand().website}
@@ -184,7 +184,7 @@ function QuestionsOverviewSlide({ slide }: { slide: Slide }) {
             ) : (
             <>
               <p className="text-xl leading-snug text-white">
-                <span className="mr-2 inline-block w-9 text-right font-bold text-[#FFD700]">
+                <span className="mr-2 inline-block w-9 text-right font-bold text-[#8B3530]">
                   {q.number}.
                 </span>
                 {q.text}
@@ -217,12 +217,12 @@ function QuestionSlide({ slide }: { slide: Slide }) {
   const q = slide.question!;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-[#1B4D3E] px-4 sm:px-8 lg:px-12">
+    <div className="flex h-full flex-col items-center justify-center bg-[#1C2E22] px-4 sm:px-8 lg:px-12">
       <p className="mb-4 text-lg font-medium uppercase tracking-[0.2em] text-white/50">
         Round {round.number} &mdash; {round.title}
       </p>
-      <div className="mb-6 flex h-16 w-16 sm:h-28 sm:w-28 items-center justify-center rounded-full border-4 border-[#FFD700]">
-        <span className="text-6xl font-black text-[#FFD700]">{q.number}</span>
+      <div className="mb-6 flex h-16 w-16 sm:h-28 sm:w-28 items-center justify-center rounded-full border-4 border-[#8B3530]">
+        <span className="text-6xl font-black text-[#8B3530]">{q.number}</span>
       </div>
       <p className="max-w-4xl text-center text-xl sm:text-3xl lg:text-4xl font-medium leading-relaxed text-white">
         {q.text}
@@ -232,7 +232,7 @@ function QuestionSlide({ slide }: { slide: Slide }) {
           {q.choices.map((c, i) => (
             <p
               key={i}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 sm:px-6 sm:py-4 text-lg sm:text-2xl text-[#F5E6C8]"
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 sm:px-6 sm:py-4 text-lg sm:text-2xl text-[#9B9B95]"
             >
               {c
                 .replace(/✅/g, "")
@@ -253,16 +253,16 @@ function AnswerSlide({ slide }: { slide: Slide }) {
   const q = slide.question!;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-[#0F1B2D] px-4 sm:px-8 lg:px-12">
+    <div className="flex h-full flex-col items-center justify-center bg-[#3D3D3A] px-4 sm:px-8 lg:px-12">
       <p className="mb-3 text-lg font-medium uppercase tracking-[0.2em] text-white/40">
         Round {round.number} &mdash; {round.title}
       </p>
-      <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full border-3 border-[#FFD700]/50">
-        <span className="text-5xl font-black text-[#FFD700]/70">{q.number}</span>
+      <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full border-3 border-[#8B3530]/50">
+        <span className="text-5xl font-black text-[#8B3530]/70">{q.number}</span>
       </div>
       <p className="max-w-4xl text-center text-3xl text-white/60">{q.text}</p>
-      <div className="mt-6 w-16 border-t border-[#4EC9B0]/40" />
-      <p className="mt-5 max-w-4xl text-center text-3xl sm:text-5xl lg:text-6xl font-black text-[#4EC9B0] drop-shadow-[0_2px_8px_rgba(78,201,176,0.3)]">
+      <div className="mt-6 w-16 border-t border-[#8FAA73]/40" />
+      <p className="mt-5 max-w-4xl text-center text-3xl sm:text-5xl lg:text-6xl font-black text-[#8FAA73] drop-shadow-[0_2px_8px_rgba(78,201,176,0.3)]">
         {q.answer}
       </p>
     </div>
@@ -277,13 +277,13 @@ function ProgressiveClueSlide({ slide }: { slide: Slide }) {
   const currentClue = round.clues[currentIdx];
 
   return (
-    <div className="flex h-full flex-col bg-[#1B4D3E] p-10">
+    <div className="flex h-full flex-col bg-[#1C2E22] p-10">
       <p className="mb-2 text-lg font-medium uppercase tracking-[0.2em] text-white/50">
         Round {round.number} &mdash; {round.title}
       </p>
       <div className="mb-8 flex items-center justify-center">
-        <div className="rounded-full border-2 border-[#FFD700] bg-[#FFD700]/10 px-8 py-3">
-          <span className="text-4xl font-black text-[#FFD700]">
+        <div className="rounded-full border-2 border-[#8B3530] bg-[#8B3530]/10 px-8 py-3">
+          <span className="text-4xl font-black text-[#8B3530]">
             {currentClue.points} POINTS
           </span>
         </div>
@@ -294,13 +294,13 @@ function ProgressiveClueSlide({ slide }: { slide: Slide }) {
             key={i}
             className={`rounded-lg border-l-4 px-6 py-5 ${
               i === currentIdx
-                ? "border-[#FFD700] bg-white/5"
+                ? "border-[#8B3530] bg-white/5"
                 : "border-white/10 bg-transparent"
             }`}
           >
             <span
               className={`mr-3 text-base font-bold ${
-                i === currentIdx ? "text-[#FFD700]" : "text-white/30"
+                i === currentIdx ? "text-[#8B3530]" : "text-white/30"
               }`}
             >
               {clue.points}pts
@@ -325,14 +325,14 @@ function ProgressiveAnswerSlide({ slide }: { slide: Slide }) {
   const round = slide.round!;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-[#0F1B2D]">
+    <div className="flex h-full flex-col items-center justify-center bg-[#3D3D3A]">
       <p className="mb-2 text-lg font-medium uppercase tracking-[0.2em] text-white/40">
         Round {round.number} &mdash; {round.title}
       </p>
       <p className="mb-6 text-2xl font-bold uppercase tracking-wider text-white/50">
         The Answer Is...
       </p>
-      <p className="text-3xl sm:text-5xl lg:text-7xl font-black text-[#4EC9B0] drop-shadow-[0_2px_8px_rgba(78,201,176,0.3)]">
+      <p className="text-3xl sm:text-5xl lg:text-7xl font-black text-[#8FAA73] drop-shadow-[0_2px_8px_rgba(78,201,176,0.3)]">
         {round.progressive_answer}
       </p>
     </div>
@@ -345,18 +345,18 @@ function VideoAnswersSlide({ slide }: { slide: Slide }) {
   const round = slide.round!;
 
   return (
-    <div className="flex h-full flex-col bg-[#0F1B2D] p-10">
+    <div className="flex h-full flex-col bg-[#3D3D3A] p-10">
       <div className="mb-6 flex items-center gap-3">
-        <div className="h-px flex-1 bg-[#FFD700]/30" />
-        <p className="text-lg font-bold uppercase tracking-[0.3em] text-[#FFD700]">
+        <div className="h-px flex-1 bg-[#8B3530]/30" />
+        <p className="text-lg font-bold uppercase tracking-[0.3em] text-[#8B3530]">
           Round {round.number} &mdash; {round.title} &mdash; Answers
         </p>
-        <div className="h-px flex-1 bg-[#FFD700]/30" />
+        <div className="h-px flex-1 bg-[#8B3530]/30" />
       </div>
       <div className="flex flex-1 flex-col justify-center gap-4">
         {round.questions.map((q) => (
-          <p key={q.number} className="text-lg sm:text-2xl lg:text-3xl font-semibold text-[#4EC9B0]">
-            <span className="mr-3 inline-block w-10 text-right text-[#FFD700]">
+          <p key={q.number} className="text-lg sm:text-2xl lg:text-3xl font-semibold text-[#8FAA73]">
+            <span className="mr-3 inline-block w-10 text-right text-[#8B3530]">
               {q.number}.
             </span>
             {q.answer || q.text}
@@ -373,9 +373,9 @@ function TieBreakerQuestionSlide({ slide }: { slide: Slide }) {
   const quiz = slide.quiz!;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-[#1B4D3E] p-4 sm:p-8 lg:p-12">
-      <div className="mb-8 rounded-lg border-2 border-[#FFD700] bg-[#FFD700]/10 px-10 py-4">
-        <span className="text-4xl font-black uppercase tracking-wider text-[#FFD700]">
+    <div className="flex h-full flex-col items-center justify-center bg-[#1C2E22] p-4 sm:p-8 lg:p-12">
+      <div className="mb-8 rounded-lg border-2 border-[#8B3530] bg-[#8B3530]/10 px-10 py-4">
+        <span className="text-4xl font-black uppercase tracking-wider text-[#8B3530]">
           Tie Breaker
         </span>
       </div>
@@ -390,17 +390,17 @@ function TieBreakerAnswerSlide({ slide }: { slide: Slide }) {
   const quiz = slide.quiz!;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-[#0F1B2D] p-4 sm:p-8 lg:p-12">
-      <div className="mb-8 rounded-lg border-2 border-[#FFD700]/40 px-10 py-4">
-        <span className="text-3xl font-black uppercase tracking-wider text-[#FFD700]/60">
+    <div className="flex h-full flex-col items-center justify-center bg-[#3D3D3A] p-4 sm:p-8 lg:p-12">
+      <div className="mb-8 rounded-lg border-2 border-[#8B3530]/40 px-10 py-4">
+        <span className="text-3xl font-black uppercase tracking-wider text-[#8B3530]/60">
           Tie Breaker
         </span>
       </div>
       <p className="max-w-4xl text-center text-3xl text-white/60">
         {quiz.tie_breaker_question}
       </p>
-      <div className="mt-6 w-16 border-t border-[#4EC9B0]/40" />
-      <p className="mt-5 text-3xl sm:text-5xl lg:text-6xl font-black text-[#4EC9B0] drop-shadow-[0_2px_8px_rgba(78,201,176,0.3)]">
+      <div className="mt-6 w-16 border-t border-[#8FAA73]/40" />
+      <p className="mt-5 text-3xl sm:text-5xl lg:text-6xl font-black text-[#8FAA73] drop-shadow-[0_2px_8px_rgba(78,201,176,0.3)]">
         {quiz.tie_breaker_answer}
       </p>
     </div>

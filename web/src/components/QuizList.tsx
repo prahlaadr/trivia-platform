@@ -199,27 +199,27 @@ export function QuizList() {
   });
 
   return (
-    <div className="min-h-screen bg-[#143B2E] p-4 sm:p-8">
+    <div className="min-h-screen bg-[#E8DFC8] p-4 sm:p-8">
       <div className="mx-auto max-w-3xl">
         <div className="mb-1">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
+          <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#8B3530]/50">
             {currentBrand.name}
           </p>
         </div>
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <h1 className="text-3xl sm:text-4xl font-black uppercase text-[#FFD700]">
+          <h1 className="text-3xl sm:text-4xl font-black uppercase text-[#8B3530]">
             {currentBrand.tagline}
           </h1>
           <div className="flex flex-wrap gap-2">
             <Link
               href="/game-gen"
-              className="rounded bg-[#FFD700]/20 px-4 py-2 text-sm font-bold text-[#FFD700] transition-all hover:bg-[#FFD700]/30"
+              className="rounded bg-[#8B3530]/20 px-4 py-2 text-sm font-bold text-[#8B3530] transition-all hover:bg-[#8B3530]/30"
             >
               Game Gen
             </Link>
             <Link
               href="/wildcard"
-              className="rounded bg-[#FFD700]/20 px-4 py-2 text-sm font-bold text-[#FFD700] transition-all hover:bg-[#FFD700]/30"
+              className="rounded bg-[#8B3530]/20 px-4 py-2 text-sm font-bold text-[#8B3530] transition-all hover:bg-[#8B3530]/30"
             >
               Wildcard
             </Link>
@@ -231,7 +231,7 @@ export function QuizList() {
             </Link>
             <Link
               href="/score"
-              className="rounded bg-[#4EC9B0]/20 px-4 py-2 text-sm font-bold text-[#4EC9B0] transition-all hover:bg-[#4EC9B0]/30"
+              className="rounded bg-[#8FAA73]/20 px-4 py-2 text-sm font-bold text-[#8FAA73] transition-all hover:bg-[#8FAA73]/30"
             >
               Scorekeeper
             </Link>
@@ -249,8 +249,8 @@ export function QuizList() {
           onDrop={handleDrop}
           className={`mb-6 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-all ${
             dragOver
-              ? "border-[#FFD700] bg-[#FFD700]/10"
-              : "border-white/20 bg-[#1B4D3E]/50 hover:border-[#FFD700]/40"
+              ? "border-[#8B3530] bg-[#8B3530]/10"
+              : "border-white/20 bg-[#1C2E22]/50 hover:border-[#8B3530]/40"
           }`}
         >
           <input
@@ -271,8 +271,8 @@ export function QuizList() {
           <div
             className={`mb-6 rounded-lg px-4 py-3 text-sm font-medium ${
               messageType === "success"
-                ? "bg-[#4EC9B0]/10 text-[#4EC9B0]"
-                : "bg-[#E84D5A]/10 text-[#E84D5A]"
+                ? "bg-[#8FAA73]/10 text-[#8FAA73]"
+                : "bg-[#C26B3E]/10 text-[#C26B3E]"
             }`}
           >
             {message}
@@ -281,11 +281,11 @@ export function QuizList() {
 
         {/* Quiz list header with sort */}
         <div className="mb-4 flex items-center gap-3">
-          <div className="h-px flex-1 bg-[#FFD700]/20" />
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#FFD700]/40">
+          <div className="h-px flex-1 bg-[#8B3530]/20" />
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#8B3530]/40">
             {loading ? "Loading..." : quizzes.length + " quizzes in bank"}
           </p>
-          <div className="h-px flex-1 bg-[#FFD700]/20" />
+          <div className="h-px flex-1 bg-[#8B3530]/20" />
         </div>
 
         {!loading && quizzes.length > 1 && (
@@ -294,7 +294,7 @@ export function QuizList() {
               onClick={() => toggleSort("number")}
               className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
                 sortKey === "number"
-                  ? "bg-[#FFD700]/20 text-[#FFD700]"
+                  ? "bg-[#8B3530]/20 text-[#8B3530]"
                   : "text-white/30 hover:text-white/50"
               }`}
             >
@@ -304,7 +304,7 @@ export function QuizList() {
               onClick={() => toggleSort("date")}
               className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
                 sortKey === "date"
-                  ? "bg-[#FFD700]/20 text-[#FFD700]"
+                  ? "bg-[#8B3530]/20 text-[#8B3530]"
                   : "text-white/30 hover:text-white/50"
               }`}
             >
@@ -317,7 +317,7 @@ export function QuizList() {
           {sortedQuizzes.map((quiz) => (
             <div
               key={quiz.quiz_number}
-              className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1B4D3E] p-5 transition-all hover:border-[#FFD700]/40 hover:bg-[#1B4D3E]/80"
+              className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1C2E22] p-5 transition-all hover:border-[#8B3530]/40 hover:bg-[#1C2E22]/80"
             >
               <Link
                 href={"/present/" + quiz.quiz_number}
@@ -326,16 +326,16 @@ export function QuizList() {
                 <h2 className="text-xl font-bold text-white">
                   {currentBrand.quizLabel} #{quiz.quiz_number}
                 </h2>
-                <p className="text-sm text-[#F5E6C8]/50">{quiz.date}</p>
+                <p className="text-sm text-[#9B9B95]/50">{quiz.date}</p>
               </Link>
               <div className="flex items-center gap-3">
-                <p className="text-sm text-[#FFD700]/60">
+                <p className="text-sm text-[#8B3530]/60">
                   {quiz.rounds} rounds
                 </p>
                 <button
                   onClick={() => deleteQuiz(quiz.quiz_number)}
                   disabled={deleting === quiz.quiz_number}
-                  className="rounded px-2 py-1 text-xs text-[#E84D5A]/40 transition-colors hover:bg-[#E84D5A]/10 hover:text-[#E84D5A] disabled:opacity-30"
+                  className="rounded px-2 py-1 text-xs text-[#C26B3E]/40 transition-colors hover:bg-[#C26B3E]/10 hover:text-[#C26B3E] disabled:opacity-30"
                   title="Delete quiz"
                 >
                   {deleting === quiz.quiz_number ? "..." : "×"}
