@@ -48,7 +48,7 @@ export async function pickQuestions(opts: PickOptions): Promise<BankQuestion[]> 
     if (opts.categorySlug && q.categorySlug !== opts.categorySlug) return false;
     if (opts.subcategorySlug && q.subcategorySlug !== opts.subcategorySlug) return false;
     if (opts.difficulty && opts.difficulty !== "mixed" && q.difficulty !== opts.difficulty) return false;
-    if (fuzzyLower && !opts.subcategorySlug) {
+    if (fuzzyLower) {
       const hay = (q.text + " " + q.answer).toLowerCase();
       if (!hay.includes(fuzzyLower)) return false;
     }
