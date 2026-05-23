@@ -19,8 +19,9 @@ out/
 web/public/data/*
 !web/public/data/question-bank/
 
-# Bank (your question docs — not committed)
-bank/
+# Repo-root "bank/" holds your raw question docs — not committed.
+# Leading slash anchors to repo root only, so web/src/lib/bank/ is NOT ignored.
+/bank/
 
 # Generated output
 output/
