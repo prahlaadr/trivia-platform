@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { getBrand, getBrandKey, setBrandKey, brands, type BrandKey } from "@/lib/branding";
+import { getBrand } from "@/lib/branding";
 
 interface QuizSummary {
   quiz_number: number;
@@ -28,22 +28,11 @@ export function QuizList() {
   const [dragOver, setDragOver] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"success" | "error">("success");
-  const [brandKey, setBrandKeyState] = useState<BrandKey>("pyaar");
   const [sortKey, setSortKey] = useState<SortKey>("number");
   const [sortAsc, setSortAsc] = useState(false);
   const [deleting, setDeleting] = useState<number | null>(null);
 
-  useEffect(() => {
-    setBrandKeyState(getBrandKey());
-  }, []);
-
-  const currentBrand = brands[brandKey];
-
-  const toggleBrand = () => {
-    const next: BrandKey = brandKey === "pyaar" ? "dirty-south" : "pyaar";
-    setBrandKey(next);
-    setBrandKeyState(next);
-  };
+  const currentBrand = getBrand();
 
   const refreshQuizzes = useCallback(async () => {
     try {
@@ -212,17 +201,10 @@ export function QuizList() {
   return (
     <div className="min-h-screen bg-[#143B2E] p-4 sm:p-8">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-1 flex items-center justify-between">
+        <div className="mb-1">
           <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#FFD700]/50">
             {currentBrand.name}
           </p>
-          <button
-            onClick={toggleBrand}
-            className="rounded px-2 py-1 text-xs font-medium text-white/30 transition-colors hover:bg-white/5 hover:text-white/50"
-            title={`Switch to ${brandKey === "pyaar" ? "Dirty South" : "Pyaar"} branding`}
-          >
-            {brandKey === "pyaar" ? "DST" : "PT"}
-          </button>
         </div>
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <h1 className="text-3xl sm:text-4xl font-black uppercase text-[#FFD700]">

@@ -1,11 +1,11 @@
 /**
- * Branding configuration — supports toggling between brands.
+ * Branding configuration.
  *
- * Colors are defined as CSS custom properties in globals.css.
- * Text, social handles, and metadata are defined here.
+ * Single brand: Pyaar Project Trivia. The colors are defined as Tailwind
+ * classes in the components (greens + gold) — not in this file.
  */
 
-export type BrandKey = "dirty-south" | "pyaar";
+export type BrandKey = "pyaar";
 
 interface BrandConfig {
   name: string;
@@ -19,41 +19,26 @@ interface BrandConfig {
 }
 
 const brands: Record<BrandKey, BrandConfig> = {
-  "dirty-south": {
-    name: "Dirty South Trivia",
-    tagline: "Trivia Presenter",
-    website: "DirtySouthTrivia.com",
-    socialHandle: "dstrivia",
-    socialPlatform: "Instagram",
-    pageTitle: "Trivia Platform — Dirty South Trivia",
-    pageDescription: "Trivia presenter and question bank",
-    quizLabel: "Quiz",
-  },
   pyaar: {
-    name: "Pyaar Trivia",
-    tagline: "Trivia Platform",
-    website: "pyaar-trivia.vercel.app",
+    name: "Pyaar Project Trivia",
+    tagline: "Trivia Presenter",
+    website: "trivia.pyaarproject.org",
     socialHandle: "pyaartrivia",
     socialPlatform: "Instagram",
-    pageTitle: "Pyaar Trivia",
-    pageDescription: "Trivia platform — presenter, scorekeeper, and test bank",
+    pageTitle: "Pyaar Project Trivia",
+    pageDescription: "Trivia presenter and question bank",
     quizLabel: "Quiz",
   },
 };
 
-const DEFAULT_BRAND: BrandKey = "dirty-south";
+const DEFAULT_BRAND: BrandKey = "pyaar";
 
 export function getBrandKey(): BrandKey {
-  if (typeof window === "undefined") return DEFAULT_BRAND;
-  return (localStorage.getItem("trivia-brand") as BrandKey) || DEFAULT_BRAND;
-}
-
-export function setBrandKey(key: BrandKey) {
-  localStorage.setItem("trivia-brand", key);
+  return DEFAULT_BRAND;
 }
 
 export function getBrand(): BrandConfig {
-  return brands[getBrandKey()];
+  return brands[DEFAULT_BRAND];
 }
 
 /** Static brand for server-side rendering (layout metadata) */
