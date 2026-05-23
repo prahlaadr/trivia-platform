@@ -126,10 +126,26 @@ export default function OutOfPocketPresenter() {
       </div>
 
       {/* Slide viewport */}
-      <div className="flex flex-1 items-center justify-center p-6">
+      <div className="relative flex flex-1 items-center justify-center p-6">
         <div className="w-full max-w-6xl">
           <RenderSlide slide={slide} />
         </div>
+        {/* Tap zones — left half = prev, right half = next.
+            Source links inside slides escape via z-index. */}
+        <button
+          type="button"
+          onClick={goPrev}
+          disabled={index === 0}
+          aria-label="Previous slide"
+          className="absolute inset-y-0 left-0 z-10 w-1/2 cursor-w-resize bg-transparent disabled:cursor-default"
+        />
+        <button
+          type="button"
+          onClick={goNext}
+          disabled={index === total - 1}
+          aria-label="Next slide"
+          className="absolute inset-y-0 right-0 z-10 w-1/2 cursor-e-resize bg-transparent disabled:cursor-default"
+        />
       </div>
 
       {/* Bottom nav */}

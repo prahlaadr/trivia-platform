@@ -171,7 +171,7 @@ export function OopQuestionSlide({
             href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
+            className="relative z-20 text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
           >
             {sourceLabel ?? "source"} ↗
           </a>
@@ -265,7 +265,7 @@ export function OopRevealSlide({
             href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
+            className="relative z-20 text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
           >
             {sourceLabel ?? "source"} ↗
           </a>
