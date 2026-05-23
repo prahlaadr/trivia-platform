@@ -81,20 +81,19 @@ export function OopSectionSlide({
         <p className="absolute left-[15%] top-[22%] text-[1.4cqw] font-extrabold tracking-[0.3em] text-[var(--oop-cyan)]">
           SECTION {sectionNumber}
         </p>
-        {/* Title sits in the white body of the folder card */}
-        <h2 className="absolute left-[10%] top-[46%] max-w-[80%] text-[4cqw] font-extrabold leading-tight text-black">
-          {sectionTitle}
-        </h2>
-        {subtitle && (
-          <p className="absolute left-[10%] top-[63%] max-w-[80%] text-[1.8cqw] text-black/60">
-            {subtitle}
-          </p>
-        )}
-        {body && (
-          <p className="absolute left-[10%] top-[72%] max-w-[80%] text-[1.5cqw] leading-snug text-black">
-            {body}
-          </p>
-        )}
+        {/* Content stacks vertically and stays clear of the baked-in black
+            divider line near the bottom of the card. */}
+        <div className="absolute inset-x-[10%] top-[42%] bottom-[15%] flex flex-col gap-[1.5cqh] overflow-hidden">
+          <h2 className="text-[3.6cqw] font-extrabold leading-tight text-black">
+            {sectionTitle}
+          </h2>
+          {subtitle && (
+            <p className="text-[1.6cqw] text-black/60">{subtitle}</p>
+          )}
+          {body && (
+            <p className="text-[1.3cqw] leading-snug text-black">{body}</p>
+          )}
+        </div>
       </div>
     </div>
   );
