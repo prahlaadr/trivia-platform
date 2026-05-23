@@ -253,16 +253,16 @@ function AnswerSlide({ slide }: { slide: Slide }) {
   const q = slide.question!;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-[#1C2E22] px-4 sm:px-8 lg:px-12">
-      <p className="mb-3 text-lg font-medium uppercase tracking-[0.2em] text-white/40">
+    <div className="flex h-full flex-col items-center justify-center bg-[#E8DFC8] px-4 sm:px-8 lg:px-12">
+      <p className="mb-3 text-lg font-medium uppercase tracking-[0.2em] text-[#3D3D3A]/50">
         Round {round.number} &mdash; {round.title}
       </p>
-      <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full border-3 border-[#8B3530]/50">
-        <span className="text-5xl font-display font-black text-[#D4A642]/70">{q.number}</span>
+      <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full border-3 border-[#8B3530]/40">
+        <span className="text-5xl font-display font-black text-[#8B3530]/80">{q.number}</span>
       </div>
-      <p className="max-w-4xl text-center text-3xl text-white/60">{q.text}</p>
-      <div className="mt-6 w-16 border-t border-[#8FAA73]/40" />
-      <p className="mt-5 max-w-4xl text-center text-3xl sm:text-5xl lg:text-6xl font-display font-black text-[#D4A642] drop-shadow-[0_2px_8px_rgba(212,166,66,0.35)]">
+      <p className="max-w-4xl text-center text-3xl text-[#3D3D3A]/70">{q.text}</p>
+      <div className="mt-6 w-16 border-t-2 border-[#8B3530]/40" />
+      <p className="mt-5 max-w-4xl text-center text-3xl sm:text-5xl lg:text-6xl font-display font-black text-[#8B3530]">
         {q.answer}
       </p>
     </div>
@@ -325,14 +325,14 @@ function ProgressiveAnswerSlide({ slide }: { slide: Slide }) {
   const round = slide.round!;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-[#1C2E22]">
-      <p className="mb-2 text-lg font-medium uppercase tracking-[0.2em] text-white/40">
+    <div className="flex h-full flex-col items-center justify-center bg-[#E8DFC8]">
+      <p className="mb-2 text-lg font-medium uppercase tracking-[0.2em] text-[#3D3D3A]/50">
         Round {round.number} &mdash; {round.title}
       </p>
-      <p className="mb-6 text-2xl font-bold uppercase tracking-wider text-white/50">
+      <p className="mb-6 text-2xl font-bold uppercase tracking-wider text-[#3D3D3A]/60">
         The Answer Is...
       </p>
-      <p className="text-3xl sm:text-5xl lg:text-7xl font-display font-black text-[#D4A642] drop-shadow-[0_2px_8px_rgba(212,166,66,0.35)]">
+      <p className="text-3xl sm:text-5xl lg:text-7xl font-display font-black text-[#8B3530]">
         {round.progressive_answer}
       </p>
     </div>
@@ -345,18 +345,18 @@ function VideoAnswersSlide({ slide }: { slide: Slide }) {
   const round = slide.round!;
 
   return (
-    <div className="flex h-full flex-col bg-[#1C2E22] p-10">
+    <div className="flex h-full flex-col bg-[#E8DFC8] p-10">
       <div className="mb-6 flex items-center gap-3">
-        <div className="h-px flex-1 bg-[#8B3530]/30" />
-        <p className="text-lg font-bold uppercase tracking-[0.3em] text-[#D4A642]">
+        <div className="h-px flex-1 bg-[#8B3530]/40" />
+        <p className="text-lg font-bold uppercase tracking-[0.3em] text-[#8B3530]">
           Round {round.number} &mdash; {round.title} &mdash; Answers
         </p>
-        <div className="h-px flex-1 bg-[#8B3530]/30" />
+        <div className="h-px flex-1 bg-[#8B3530]/40" />
       </div>
       <div className="flex flex-1 flex-col justify-center gap-4">
         {round.questions.map((q) => (
-          <p key={q.number} className="text-lg sm:text-2xl lg:text-3xl font-semibold text-[#D4A642]">
-            <span className="mr-3 inline-block w-10 text-right text-[#D4A642]">
+          <p key={q.number} className="text-lg sm:text-2xl lg:text-3xl font-semibold text-[#3D3D3A]">
+            <span className="mr-3 inline-block w-10 text-right text-[#8B3530]">
               {q.number}.
             </span>
             {q.answer || q.text}
@@ -390,17 +390,17 @@ function TieBreakerAnswerSlide({ slide }: { slide: Slide }) {
   const quiz = slide.quiz!;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center bg-[#1C2E22] p-4 sm:p-8 lg:p-12">
+    <div className="flex h-full flex-col items-center justify-center bg-[#E8DFC8] p-4 sm:p-8 lg:p-12">
       <div className="mb-8 rounded-lg border-2 border-[#8B3530]/40 px-10 py-4">
-        <span className="text-3xl font-display font-black uppercase tracking-wider text-[#D4A642]/60">
+        <span className="text-3xl font-display font-black uppercase tracking-wider text-[#8B3530]/70">
           Tie Breaker
         </span>
       </div>
-      <p className="max-w-4xl text-center text-3xl text-white/60">
+      <p className="max-w-4xl text-center text-3xl text-[#3D3D3A]/70">
         {quiz.tie_breaker_question}
       </p>
-      <div className="mt-6 w-16 border-t border-[#8FAA73]/40" />
-      <p className="mt-5 text-3xl sm:text-5xl lg:text-6xl font-display font-black text-[#D4A642] drop-shadow-[0_2px_8px_rgba(212,166,66,0.35)]">
+      <div className="mt-6 w-16 border-t-2 border-[#8B3530]/40" />
+      <p className="mt-5 text-3xl sm:text-5xl lg:text-6xl font-display font-black text-[#8B3530]">
         {quiz.tie_breaker_answer}
       </p>
     </div>
