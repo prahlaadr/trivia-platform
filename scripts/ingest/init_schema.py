@@ -87,8 +87,12 @@ CREATE INDEX IF NOT EXISTS idx_question_cat
 CREATE INDEX IF NOT EXISTS idx_question_dedup_active
     ON question(dedup_hash);
 
+-- NOTE: no FK on question_id. DuckDB's FK check fires on parent UPDATEs
+-- (even ones that don't touch the id), which blocks reclassify when a
+-- question already has tag rows. We rely on cleanup-by-convention at
+-- ingest/reclassify time instead.
 CREATE TABLE IF NOT EXISTS question_tag (
-    question_id UUID REFERENCES question(id),
+    question_id UUID,
     tag_id      INTEGER REFERENCES tag(id),
     PRIMARY KEY (question_id, tag_id)
 );

@@ -27,6 +27,53 @@
 
 subcategory_rules:
 
+  # ─────────────────────────────────────────────────────────────
+  # CROSS-CATEGORY RULES — fire regardless of current category.
+  # Use set_category + set_subcategory to re-route across top-level
+  # cats. Patterns are written tight to avoid false positives.
+  # Added 2026-05-23 after the bank audit (see CHANGELOG).
+  # ─────────────────────────────────────────────────────────────
+
+  # Video game franchises stuck in film-tv / history / pop-misc
+  - match: '(?i)\b(in (the (game|video game)|halo|gears of war|call of duty|valorant|overwatch|assassin''s creed|uncharted|resident evil|metal gear solid|god of war|elden ring|bloodborne|dark souls|kingdom hearts|final fantasy|grand theft auto|red dead redemption|skyrim|fallout|destiny 2|warframe|league of legends|world of warcraft|fortnite|minecraft|pokemon (red|blue|gold|silver|sword|shield)|super mario|the legend of zelda|sonic the hedgehog|street fighter|mortal kombat|tekken))\b'
+    set_category: games-toys
+    set_subcategory: video-games
+
+  # Movie / film adaptation questions stuck in literature
+  - if_category: literature
+    match: '(?i)\b((the )?[12]\d{3} (film|movie)|directed by|starring|cinematography|box office|screenplay|movie adaptation of|film adaptation of)\b'
+    set_category: film-tv
+    set_subcategory: hollywood
+
+  # Rocks, minerals, geology stuck in language-words (or pop-misc)
+  - match: '(?i)\b(igneous rock|sedimentary rock|metamorphic rock|granite|basalt|limestone|obsidian|quartz|feldspar|mica|mineral formation|tectonic plate|fault line|geological period)\b'
+    set_category: science-nature
+    set_subcategory: animals-plants-earth
+
+  # Plants / botanical / animals stuck in language-words
+  - if_category: language-words
+    match: '(?i)\b(plant species|botanical|tree species|flower species|herb|fungus|fungi|species of (bird|fish|mammal|reptile|insect))\b'
+    set_category: science-nature
+    set_subcategory: animals-plants-earth
+
+  # ZIP / postal codes stuck in language-words
+  - if_category: language-words
+    match: '(?i)\b(ZIP code|postal code|area code|postcode)\b'
+    set_category: pop-misc
+    set_subcategory: general-knowledge
+
+  # Award shows / Oscar / Cannes specifically should sit under franchises-awards
+  - if_category: film-tv
+    match: '(?i)\b(academy award|oscar|golden globe|emmy award|bafta|cannes|palme d''or|sundance|venice film festival|tony award|grammy nomin)\b'
+    set_subcategory: franchises-awards
+
+  # Broadway / musical theatre specifically belongs under tv-shows
+  - if_category: film-tv
+    match: '(?i)\b(broadway|musical theatre|musical theater|stage musical|hamilton musical|phantom of the opera|les miserables|chicago musical|wicked musical|west side story)\b'
+    set_subcategory: tv-shows
+
+
+
   # ── HISTORY ──
   - if_category: history
     match: '\b(world war (i|ii|1|2)|ww[12]|wwi|wwii|nazi|hitler|holocaust|stalin|d[ -]day|pearl harbor|cold war|ussr|soviet union|berlin wall|cuban missile|vietnam war|korean war|kennedy assassination|jfk assassination)\b'

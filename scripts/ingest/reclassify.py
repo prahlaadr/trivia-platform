@@ -77,26 +77,32 @@ def reclassify(con: duckdb.DuckDBPyConnection, source: str | None, dry_run: bool
 
     moved = 0
     tags_added = 0
-    updates = []           # list of (new_sub_id, qid)
+    updates = []           # list of (new_cat_id, new_sub_id, qid)
     tag_inserts = set()    # set of (qid, tag_id) to insert
-    move_log = {}          # {(from_slug, to_slug): count}
+    move_log = {}          # {(from_path, to_path): count}
 
     for qid, qtext, atext, cat_slug, sub_slug, on_catchall in rows:
         haystack = f"{qtext}  {atext}"
-        # Subcategory rules — first match wins, only within the same top-level
+        # Subcategory rules — first match wins.
+        # Rules may optionally re-route across top-level categories via
+        # set_category (combined with set_subcategory).
         for rule in sub_rules:
             if rule.get("if_category") and rule["if_category"] != cat_slug:
                 continue
+            target_cat_slug = rule.get("set_category") or cat_slug
             new_sub_slug = rule.get("set_subcategory")
             if not new_sub_slug:
                 continue
             if rule["_re"].search(haystack):
-                if new_sub_slug != sub_slug:
-                    new_sub_id = sub_id_by_slugs.get((cat_slug, new_sub_slug))
-                    if new_sub_id is not None:
-                        updates.append((new_sub_id, qid))
+                if target_cat_slug != cat_slug or new_sub_slug != sub_slug:
+                    new_cat_id = cat_id_by_slug.get(target_cat_slug)
+                    new_sub_id = sub_id_by_slugs.get((target_cat_slug, new_sub_slug))
+                    if new_cat_id is not None and new_sub_id is not None:
+                        updates.append((new_cat_id, new_sub_id, qid))
                         moved += 1
-                        key = (sub_slug, new_sub_slug)
+                        from_path = f"{cat_slug}/{sub_slug}"
+                        to_path = f"{target_cat_slug}/{new_sub_slug}"
+                        key = (from_path, to_path)
                         move_log[key] = move_log.get(key, 0) + 1
                 # Also pick up any tags from this rule
                 for tag_str in rule.get("add_tags", []) or []:
@@ -122,8 +128,27 @@ def reclassify(con: duckdb.DuckDBPyConnection, source: str | None, dry_run: bool
         return {"moved": moved, "tags_added": 0, "tag_total": len(tag_inserts)}
 
     con.execute("BEGIN")
-    for new_sub_id, qid in updates:
-        con.execute("UPDATE question SET subcategory_id = ? WHERE id = ?", [new_sub_id, qid])
+    if updates:
+        # Batch UPDATE via a temp table. Per-row UPDATEs trip DuckDB's
+        # FK constraint check on question_tag.question_id even though
+        # we aren't changing the id.
+        con.execute("CREATE OR REPLACE TEMP TABLE pending_moves (qid UUID, cat_id INTEGER, sub_id INTEGER)")
+        import pyarrow as pa
+        tbl = pa.table({
+            "qid": [u[2] for u in updates],
+            "cat_id": [u[0] for u in updates],
+            "sub_id": [u[1] for u in updates],
+        })
+        con.register("pending_moves_stage", tbl)
+        con.execute("INSERT INTO pending_moves SELECT qid::UUID, cat_id, sub_id FROM pending_moves_stage")
+        con.unregister("pending_moves_stage")
+        con.execute("""
+            UPDATE question
+            SET category_id = pm.cat_id, subcategory_id = pm.sub_id
+            FROM pending_moves pm
+            WHERE question.id = pm.qid
+        """)
+        con.execute("DROP TABLE pending_moves")
 
     # Tag UPSERTs
     for qid, tid in tag_inserts:
