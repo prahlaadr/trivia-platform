@@ -18,27 +18,25 @@ import {
   deleteSavedGame,
 } from "@/lib/game-gen";
 
+// Mirrors the 15 canonical categories in docs/category-taxonomy.md so
+// Game Gen and Wildcard speak the same vocabulary. Teams can still type
+// any free-form topic via the input below.
 const SUGGESTED_TOPICS = [
-  "Pop Culture",
-  "Geography",
-  "Food & Drink",
+  "Film & TV",
   "Music",
-  "Movies",
-  "TV Shows",
-  "Sports",
-  "Science",
+  "Sport",
+  "Geography",
   "History",
+  "Science & Nature",
+  "Food & Drink",
   "Literature",
-  "Art",
-  "Technology",
-  "Animals",
-  "Video Games",
-  "Hip Hop",
-  "90s Nostalgia",
-  "True Crime",
-  "Celebrities",
-  "World Records",
-  "Myths & Legends",
+  "Art & Design",
+  "Games & Toys",
+  "Tech & Internet",
+  "Politics & Society",
+  "Mythology & Religion",
+  "Language & Words",
+  "Pop Culture & Misc",
 ];
 
 export default function GameGenPage() {
