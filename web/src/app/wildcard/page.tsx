@@ -41,7 +41,11 @@ export default function WildcardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [selected, setSelected] = useState<string[]>([]);
+  // Selected items can be either a category slug (from tile click) or a
+  // free-text topic the host typed (audience yelled it). Marked by `.kind`.
+  type Pick = { kind: "category"; slug: string; label: string } | { kind: "topic"; topic: string };
+  const [selected, setSelected] = useState<Pick[]>([]);
+  const [topicInput, setTopicInput] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("mixed");
   const [generated, setGenerated] = useState<GameGenSession | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -65,10 +69,31 @@ export default function WildcardPage() {
 
   const totalQuestions = categories.reduce((sum, c) => sum + c.questionCount, 0);
 
-  const toggleCategory = useCallback((slug: string) => {
-    setSelected((prev) =>
-      prev.includes(slug) ? prev.filter((s) => s !== slug) : prev.length >= DEFAULT_ROUNDS ? prev : [...prev, slug]
-    );
+  const toggleCategory = useCallback(
+    (slug: string, label: string) => {
+      setSelected((prev) => {
+        const has = prev.find((p) => p.kind === "category" && p.slug === slug);
+        if (has) return prev.filter((p) => !(p.kind === "category" && p.slug === slug));
+        if (prev.length >= DEFAULT_ROUNDS) return prev;
+        return [...prev, { kind: "category", slug, label }];
+      });
+    },
+    []
+  );
+
+  const addTopic = useCallback(() => {
+    const t = topicInput.trim();
+    if (!t) return;
+    setSelected((prev) => {
+      if (prev.length >= DEFAULT_ROUNDS) return prev;
+      if (prev.find((p) => p.kind === "topic" && p.topic.toLowerCase() === t.toLowerCase())) return prev;
+      return [...prev, { kind: "topic", topic: t }];
+    });
+    setTopicInput("");
+  }, [topicInput]);
+
+  const removeSelected = useCallback((i: number) => {
+    setSelected((prev) => prev.filter((_, idx) => idx !== i));
   }, []);
 
   const generate = useCallback(
@@ -77,53 +102,51 @@ export default function WildcardPage() {
       setGenerating(true);
       setError(null);
 
-      // Pick categories
-      let pickSlugs: string[];
+      // Build the list of round picks. Either:
+      //   "wildcard" → 6 random categories
+      //   "custom"   → host's selected mix of categories + audience-yelled topics
+      type RoundPick = { topic: string; label: string };
+      let picks: RoundPick[];
       if (mode === "custom") {
-        pickSlugs = selected;
+        picks = selected.map((p) =>
+          p.kind === "category" ? { topic: p.slug, label: p.label } : { topic: p.topic, label: p.topic }
+        );
       } else {
         const shuffled = [...categories].sort(() => Math.random() - 0.5);
-        pickSlugs = shuffled.slice(0, DEFAULT_ROUNDS).map((c) => c.slug);
+        picks = shuffled.slice(0, DEFAULT_ROUNDS).map((c) => ({ topic: c.slug, label: c.name }));
       }
 
       try {
         const results = await Promise.all(
-          pickSlugs.map((slug) =>
+          picks.map((p) =>
             fetch("/api/wildcard/topic", {
               method: "POST",
               headers: { "content-type": "application/json" },
-              body: JSON.stringify({
-                topic: slug,
-                count: QUESTIONS_PER_ROUND,
-                difficulty,
-              }),
+              body: JSON.stringify({ topic: p.topic, count: QUESTIONS_PER_ROUND, difficulty }),
             }).then((r) => r.json() as Promise<TopicResponse>)
           )
         );
 
-        const rounds: GeneratedRound[] = results.map((res, i) => {
-          const catName = categories.find((c) => c.slug === pickSlugs[i])?.name ?? pickSlugs[i];
-          return {
-            number: i + 1,
-            title: catName,
-            topic: pickSlugs[i],
-            questions: res.questions.map(
-              (q, j): GeneratedQuestion => ({
-                number: j + 1,
-                text: q.text,
-                answer: q.answer,
-                topic: pickSlugs[i],
-                source: "bank",
-              })
-            ),
-          };
-        });
+        const rounds: GeneratedRound[] = results.map((res, i) => ({
+          number: i + 1,
+          title: picks[i].label,
+          topic: picks[i].topic,
+          questions: res.questions.map(
+            (q, j): GeneratedQuestion => ({
+              number: j + 1,
+              text: q.text,
+              answer: q.answer,
+              topic: picks[i].topic,
+              source: "bank",
+            })
+          ),
+        }));
 
-        // Tiebreaker: pull one more question from the first chosen category, hard difficulty
+        // Tiebreaker: pull a hard question from the first pick
         const tbRes = await fetch("/api/wildcard/topic", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ topic: pickSlugs[0], count: 1, difficulty: "hard" }),
+          body: JSON.stringify({ topic: picks[0].topic, count: 1, difficulty: "hard" }),
         }).then((r) => r.json() as Promise<TopicResponse>);
         const tb = tbRes.questions[0];
 
@@ -224,18 +247,69 @@ export default function WildcardPage() {
               {generating ? "Generating…" : "Random Wildcard Game"}
             </button>
 
-            {/* Category grid for custom picking */}
-            <div className="mb-6">
+            {/* Audience-yelled topic input */}
+            <div className="mb-4">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[#3D3D3A]/60">
+                Audience yelled a topic? Type it in
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={topicInput}
+                  onChange={(e) => setTopicInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addTopic();
+                    }
+                  }}
+                  placeholder="e.g. Bollywood, Premier League, Marvel"
+                  className="flex-1 rounded border border-[#3D3D3A]/25 bg-white/40 px-3 py-2 text-sm text-[#3D3D3A] placeholder-[#3D3D3A]/40 outline-none focus:border-[#8B3530] focus:ring-1 focus:ring-[#8B3530]/40"
+                />
+                <button
+                  onClick={addTopic}
+                  disabled={!topicInput.trim() || selected.length >= DEFAULT_ROUNDS}
+                  className="rounded border-2 border-[#8B3530] bg-[#8B3530]/10 px-4 text-sm font-bold text-[#8B3530] transition-all hover:bg-[#8B3530]/20 disabled:opacity-40"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Selected chips (mix of category + topic picks) */}
+            {selected.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {selected.map((p, i) => (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-2 rounded-full bg-[#8B3530] py-1 pl-3 pr-1 text-sm font-medium text-white"
+                  >
+                    {p.kind === "topic" && <span className="text-[10px] uppercase text-white/70">topic</span>}
+                    <span>{p.kind === "category" ? p.label : p.topic}</span>
+                    <button
+                      onClick={() => removeSelected(i)}
+                      className="flex h-5 w-5 items-center justify-center rounded-full bg-white/15 text-xs text-white hover:bg-white/30"
+                      aria-label="Remove"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Category grid for tile picking */}
+            <div className="mb-4">
               <p className="mb-3 text-xs font-bold uppercase tracking-wider text-[#3D3D3A]/60">
                 Or pick categories ({selected.length}/{DEFAULT_ROUNDS})
               </p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {categories.map((c) => {
-                  const isSel = selected.includes(c.slug);
+                  const isSel = selected.some((p) => p.kind === "category" && p.slug === c.slug);
                   return (
                     <button
                       key={c.slug}
-                      onClick={() => toggleCategory(c.slug)}
+                      onClick={() => toggleCategory(c.slug, c.name)}
                       className={`flex items-center justify-between rounded border px-3 py-2 text-left text-sm transition-all ${
                         isSel
                           ? "border-[#8B3530] bg-[#8B3530]/10 text-[#8B3530]"
@@ -248,14 +322,15 @@ export default function WildcardPage() {
                   );
                 })}
               </div>
-              <button
-                onClick={() => generate("custom")}
-                disabled={generating || selected.length === 0}
-                className="mt-3 w-full rounded-lg border-2 border-[#8B3530] bg-transparent py-3 font-bold text-[#8B3530] transition-all hover:bg-[#8B3530]/10 disabled:opacity-40"
-              >
-                {generating ? "Generating…" : `Generate from ${selected.length || "—"} selected`}
-              </button>
             </div>
+
+            <button
+              onClick={() => generate("custom")}
+              disabled={generating || selected.length === 0}
+              className="mt-3 w-full rounded-lg border-2 border-[#8B3530] bg-transparent py-3 font-bold text-[#8B3530] transition-all hover:bg-[#8B3530]/10 disabled:opacity-40"
+            >
+              {generating ? "Generating…" : `Generate from ${selected.length || "—"} selected`}
+            </button>
           </>
         )}
 
