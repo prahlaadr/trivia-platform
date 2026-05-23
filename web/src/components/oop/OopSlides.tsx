@@ -154,12 +154,12 @@ export function OopQuestionSlide({
           </ul>
         )}
         {(imageSrc || imageSrc2) && (
-          <div className="flex min-h-0 flex-1 items-center justify-center gap-[2cqw]">
+          <div className="flex items-center justify-center gap-[2cqw]">
             {imageSrc && (
-              <img src={imageSrc} alt="" className="max-h-full w-auto max-w-[40cqw] object-contain" />
+              <img src={imageSrc} alt="" className="max-h-[45cqh] w-auto max-w-[40cqw] object-contain" />
             )}
             {imageSrc2 && (
-              <img src={imageSrc2} alt="" className="max-h-full w-auto max-w-[40cqw] object-contain" />
+              <img src={imageSrc2} alt="" className="max-h-[45cqh] w-auto max-w-[40cqw] object-contain" />
             )}
           </div>
         )}
@@ -248,12 +248,12 @@ export function OopRevealSlide({
           <p className="text-[2.2cqw] font-extrabold text-black">{answer}</p>
         )}
         {(imageSrc || imageSrc2) && (
-          <div className="flex min-h-0 flex-1 items-center justify-center gap-[2cqw]">
+          <div className="flex items-center justify-center gap-[2cqw]">
             {imageSrc && (
-              <img src={imageSrc} alt="" className="max-h-full w-auto max-w-[40cqw] object-contain" />
+              <img src={imageSrc} alt="" className="max-h-[45cqh] w-auto max-w-[40cqw] object-contain" />
             )}
             {imageSrc2 && (
-              <img src={imageSrc2} alt="" className="max-h-full w-auto max-w-[40cqw] object-contain" />
+              <img src={imageSrc2} alt="" className="max-h-[45cqh] w-auto max-w-[40cqw] object-contain" />
             )}
           </div>
         )}
