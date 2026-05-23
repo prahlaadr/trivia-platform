@@ -1,0 +1,205 @@
+# Keyword rules for subcategory refinement + tag assignment.
+#
+# Each rule has:
+#   match:       Python regex (case-insensitive by default). Applied to the
+#                concatenated "question_text  answer_text" string.
+#   if_category: optional — only fire if the question's current top-level
+#                category slug matches this. Lets us say "rule X only
+#                applies to questions already classified as sport".
+#   set_subcategory: optional — moves the question to this subcategory slug.
+#                    Only the FIRST matching subcategory rule wins per question.
+#   add_tags:    optional list of "kind:slug" tags. Multiple rules can stack
+#                tags onto the same question.
+#
+# Apply via:  uv run python -m scripts.ingest.reclassify
+#
+# Style:
+#   - Prefer high precision over high recall. Better to leave on the catchall
+#     than to misclassify ("Eminem" question shouldn't go to bollywood just
+#     because someone uses the word "rap" in the context).
+#   - Use \b word boundaries to avoid mid-word matches.
+#   - Keep specific patterns BEFORE generic ones (e.g. "Bollywood music" rule
+#     should fire before generic "music" rules).
+
+# ─────────────────────────────────────────────────────────────────
+# SUBCATEGORY REFINEMENT — fires only within its top-level category
+# ─────────────────────────────────────────────────────────────────
+
+subcategory_rules:
+
+  # ── HISTORY ──
+  - if_category: history
+    match: '\b(world war (i|ii|1|2)|ww[12]|wwi|wwii|nazi|hitler|holocaust|stalin|d[ -]day|pearl harbor|cold war|ussr|soviet union|berlin wall|cuban missile|vietnam war|korean war|kennedy assassination|jfk assassination)\b'
+    set_subcategory: world-wars-cold-war
+  - if_category: history
+    match: '\b(ancient rome|ancient greece|ancient egypt|roman empire|caesar|cleopatra|pharaoh|pyramids|medieval|crusades|black death|byzantine|maya|aztec|incan|babylonian|sumerian|persian empire|colosseum|ottoman|tudor|magna carta|joan of arc|charlemagne|attila|genghis khan)\b'
+    set_subcategory: ancient-medieval
+
+  # ── GEOGRAPHY ──
+  - if_category: geography
+    match: '\b(eiffel tower|big ben|statue of liberty|colosseum|taj mahal|machu picchu|stonehenge|great wall|notre dame|cathedral|skyscraper|burj khalifa|empire state|mount rushmore|landmark|world heritage)\b'
+    set_subcategory: cities-landmarks
+  - if_category: geography
+    match: '\b(river|mountain|ocean|sea|desert|lake|continent|tectonic|equator|hemisphere|peninsula|volcano|glacier|biome|tropic|amazon|nile|himalaya|alps|andes|sahara|antarctic|arctic)\b'
+    set_subcategory: physical-geography
+  - if_category: geography
+    match: '\b(city|metropolitan|capital city|town)\b'
+    set_subcategory: cities-landmarks
+
+  # ── FILM & TV ──
+  - if_category: film-tv
+    match: '\b(bollywood|shahrukh|shah rukh|hindi cinema|amitabh bachchan|aishwarya rai|deepika padukone|priyanka chopra|hrithik|salman khan|akshay kumar)\b'
+    set_subcategory: bollywood
+  - if_category: film-tv
+    match: '\b(anime|manga|miyazaki|kurosawa|studio ghibli|spirited away|akira|princess mononoke|pixar|disney animation|toy story|finding nemo|frozen|moana|lion king|korean cinema|parasite|squid game|french cinema|japanese cinema|tarantino|wong kar wai|kurosawa)\b'
+    set_subcategory: world-cinema-animation
+  - if_category: film-tv
+    match: '\b(marvel|MCU|avengers|iron man|captain america|spider[ -]man|x[ -]men|DC comics|batman|superman|wonder woman|justice league|star wars|jedi|sith|harry potter|hogwarts|james bond|007|spectre|lord of the rings|LOTR|hobbit|jurassic park|fast and furious|the matrix|terminator|alien|predator|oscar|academy award|golden globe|emmy award|cannes)\b'
+    set_subcategory: franchises-awards
+  - if_category: film-tv
+    match: '\b(TV (show|series|episode)|sitcom|sitcoms|drama series|netflix series|HBO|prime video|hulu|amazon prime|season finale|episode|seinfeld|friends|the office|parks and rec|breaking bad|the wire|sopranos|succession|the bachelor|reality TV|game of thrones|GoT|stranger things|the crown|ted lasso|simpsons|south park|family guy|spongebob|bluey)\b'
+    set_subcategory: tv-shows
+
+  # ── SCIENCE & NATURE ──
+  - if_category: science-nature
+    match: '\b(physics|physicist|chemistry|chemist|mathemat|equation|formula|theorem|periodic table|element|atomic|molecule|einstein|newton|quantum|relativity|pi|prime number|geometry|algebra|calculus|isaac newton)\b'
+    set_subcategory: physics-chemistry-math
+  - if_category: science-nature
+    match: '\b(space|planet|NASA|galaxy|astronaut|astronomy|astronomer|mars|jupiter|saturn|venus|mercury|uranus|neptune|pluto|black hole|asteroid|comet|nebula|solar system|milky way|hubble|kepler|copernicus|galileo)\b'
+    set_subcategory: space-scientists
+  - if_category: science-nature
+    match: '\b(DNA|gene|cell|organ|anatomy|skeleton|disease|vaccine|virus|bacteria|biolog|medicine|medical|hospital|doctor|surgery|symptom|hormone|enzyme|protein|RNA|antibody|cancer|diabetes|tuberculosis|hippocrates|pasteur|marie curie|alexander fleming)\b'
+    set_subcategory: biology-body-medicine
+
+  # ── SPORT ──
+  - if_category: sport
+    match: '\b(cricket|test cricket|IPL|tendulkar|kohli|dhoni|virat|sachin|wicket|bowler|batsman|ashes|sixer|wickets|over rate|cricket world cup)\b'
+    set_subcategory: cricket
+    add_tags: ['region:india']
+  - if_category: sport
+    match: '\b(football|soccer|premier league|EPL|FIFA|UEFA|world cup|FA cup|champions league|messi|ronaldo|cristiano ronaldo|pele|maradona|mbappe|neymar|man united|manchester united|liverpool|arsenal|chelsea|real madrid|FC barcelona|barcelona|bayern munich|MLS)\b'
+    set_subcategory: football-soccer
+  - if_category: sport
+    match: '\b(NFL|super bowl|tom brady|patriots|NBA|lebron|michael jordan|kobe bryant|magic johnson|larry bird|MLB|world series|yankees|red sox|dodgers|stanley cup|NHL|quarterback|touchdown|home run|slam dunk|basketball|baseball|american football|MVP award)\b'
+    set_subcategory: american-sports
+    add_tags: ['region:us', 'flag:us-centric']
+  - if_category: sport
+    match: '\b(tennis|wimbledon|federer|nadal|djokovic|grand slam|US Open|french open|australian open|golf|masters tournament|tiger woods|jack nicklaus|olympics|olympic|usain bolt|michael phelps|simone biles|gold medal|silver medal|bronze medal|decathlon)\b'
+    set_subcategory: tennis-golf-olympics
+  - if_category: sport
+    match: '\b(F1|formula 1|formula one|ferrari|schumacher|lewis hamilton|ayrton senna|MotoGP|nascar|indycar|UFC|MMA|boxing|muhammad ali|mike tyson|conor mcgregor|kareem|knockout)\b'
+    set_subcategory: motorsport-combat
+
+  # ── MUSIC ──
+  - if_category: music
+    match: '\b(hip hop|hip-hop|rap|rapper|kendrick lamar|tupac|biggie|drake|jay[ -]z|kanye|eminem|nicki minaj|snoop dogg|EDM|electronic dance|techno|house music|daft punk|deadmau5|skrillex|calvin harris|david guetta|disclosure|aphex twin)\b'
+    set_subcategory: hip-hop-electronic
+  - if_category: music
+    match: '\b(bollywood music|hindi song|ar rahman|lata mangeshkar|asha bhosle|kishore kumar|arijit singh|sufi|K-pop|kpop|BTS|blackpink|afrobeats|burna boy|reggaeton|bad bunny|world music|salsa music|mariachi)\b'
+    set_subcategory: bollywood-world-music
+  - if_category: music
+    match: '\b(classical music|symphony|orchestra|opera|baroque|mozart|bach|beethoven|tchaikovsky|chopin|wagner|jazz|miles davis|coltrane|louis armstrong|ella fitzgerald|country music|blues|delta blues|musical instrument|piano|violin|saxophone|chord|key signature|conductor)\b'
+    set_subcategory: music-trivia
+
+  # ── FOOD & DRINK ──
+  - if_category: food-drink
+    match: '\b(cocktail|martini|whiskey|whisky|wine|beer|brewery|champagne|vodka|gin|rum|tequila|mezcal|coffee|espresso|tea|chai|soda|coca[ -]cola|pepsi|red bull|smoothie|bourbon|scotch|sake)\b'
+    set_subcategory: drinks
+  - if_category: food-drink
+    match: '\b(chef|restaurant|michelin|gordon ramsay|jamie oliver|wolfgang puck|julia child|food chain|fast food|mcdonald|KFC|burger king|wendys|chipotle|food critic|food history)\b'
+    set_subcategory: food-culture
+
+  # ── LITERATURE ──
+  - if_category: literature
+    match: "\\b(sci[ -]fi|science fiction|fantasy novel|tolkien|asimov|stephen king|crime novel|mystery novel|thriller|agatha christie|sherlock holmes|hercule poirot|gone girl|girl with the dragon tattoo|harry potter book|children's book|young adult|YA fiction|narnia|hunger games|percy jackson|game of thrones book)\\b"
+    set_subcategory: genre-fiction
+  - if_category: literature
+    match: '\b(author|novelist|wrote|nobel prize in literature|pulitzer|booker prize|literary award|man booker)\b'
+    set_subcategory: authors-characters-awards
+
+  # ── MYTH & RELIGION ──
+  - if_category: myth-religion
+    match: '\b(hindu|hinduism|ramayana|mahabharata|krishna|vishnu|shiva|brahma|ganesha|hanuman|durga|kali|laxmi|saraswati|buddha|buddhism|sikh|sikhism|guru nanak|jain|shinto|taoism|confucian|dharma|karma|yoga sutra|moksha|nirvana)\b'
+    set_subcategory: eastern-myth-religion
+    add_tags: ['region:india']
+  - if_category: myth-religion
+    match: '\b(christian|christianity|jesus christ|bible|new testament|old testament|moses|abraham|jewish|judaism|torah|hebrew|muslim|islam|quran|koran|allah|prophet muhammad|pope|cardinal|vatican|pilgrimage|legend|folklore|urban legend|king arthur|robin hood|loch ness|big foot)\b'
+    set_subcategory: abrahamic-folklore
+
+  # ── TECH & INTERNET ──
+  - if_category: tech-internet
+    match: '\b(twitter|tweet|tiktok|instagram|facebook|youtube|reddit|meme|viral|hashtag|snapchat|whatsapp|social media|stan culture|fandom)\b'
+    set_subcategory: internet-memes-social
+  - if_category: tech-internet
+    match: '\b(programming|code|software|javascript|python|java|C\+\+|ruby|rust|golang|artificial intelligence|machine learning|chatGPT|openAI|claude|anthropic|google AI|iphone|android|google pixel|samsung galaxy|gadget|airpods|tesla)\b'
+    set_subcategory: programming-ai-gadgets
+
+  # ── POLITICS & SOCIETY ──
+  - if_category: politics-society
+    match: '\b(election|presidential election|voted|democrat|republican|labor party|conservative party|congress|parliament|economic|inflation|recession|GDP|stock market|wall street|federal reserve|interest rate)\b'
+    set_subcategory: elections-economics
+  - if_category: politics-society
+    match: '\b(supreme court|UN|united nations|treaty|geneva convention|NATO|WTO|G7|G20|G8|legal|constitution|first amendment|second amendment|civil rights act|trial|verdict|verdict|jurisdiction)\b'
+    set_subcategory: law-international
+
+  # ── ART & DESIGN ──
+  - if_category: art-design
+    match: '\b(fashion|designer brand|chanel|louis vuitton|gucci|prada|haute couture|runway|fashion week|logo|brand identity|industrial design|graphic design)\b'
+    set_subcategory: fashion-logos-design
+
+  # ── GAMES & TOYS (catchall is video-games per the mapping; only override for analog) ──
+  - if_category: games-toys
+    match: '\b(board game|monopoly|scrabble|risk|chess|checkers|backgammon|card game|poker|bridge|UNO|jenga|LEGO|barbie|hot wheels|toy|jigsaw|crossword|sudoku|D&D|dungeons and dragons|magic the gathering)\b'
+    set_subcategory: analog-games-toys
+
+  # ── LANGUAGE & WORDS ──
+  - if_category: language-words
+    match: '\b(quote|quoted|anagram|palindrome|portmanteau|grammar|punctuation|comma|semicolon|apostrophe|spelling|spelling bee|crossword)\b'
+    set_subcategory: wordplay-quotes-grammar
+
+  # ── POP CULTURE & MISC ──
+  - if_category: pop-misc
+    match: '\b(the (60s|70s|80s|90s|2000s|2010s|2020s)|1960s|1970s|1980s|1990s|nostalgia|Y2K|millennium)\b'
+    set_subcategory: decades-nostalgia
+  - if_category: pop-misc
+    match: '\b(internet meme|stan culture|fandom|cosplay|comic[ -]con|fan fiction|forum|subreddit|wojak|pepe|doge meme)\b'
+    set_subcategory: internet-culture
+  - if_category: pop-misc
+    match: '\b(did you know|fun fact|weird fact|odd|strangest|bizarre)\b'
+    set_subcategory: weird-facts
+
+
+# ─────────────────────────────────────────────────────────────────
+# TAG-ONLY RULES — add cross-cutting tags (region, era, flag)
+# Don't change subcategory; can stack on top of any row.
+# ─────────────────────────────────────────────────────────────────
+
+tag_rules:
+
+  # Region tags
+  - match: '\b(bollywood|shahrukh|amitabh|hindi|delhi|mumbai|kolkata|chennai|bengaluru|hyderabad|punjab|kerala|tamil nadu|maharashtra|gujarat|indian (cuisine|food|festival|epic|mythology)|rupee|raj)\b'
+    add_tags: ['region:india']
+
+  - match: '\b(UK|united kingdom|british|england|english (king|queen|throne)|london|cambridge|oxford university|queen elizabeth|prince charles|prince william|royal family|premier league|EPL|BBC|tudor|edinburgh|wales|scottish|northern ireland)\b'
+    add_tags: ['region:uk']
+
+  - match: '\b(USA|united states|america|american (history|civil war)|US president|POTUS|hollywood blockbuster|NFL|NBA|MLB|super bowl|US senate|US congress|capitol hill|washington (DC|D\.C\.)|new york city|los angeles|chicago illinois|texas|california)\b'
+    add_tags: ['region:us', 'flag:us-centric']
+
+  # Era tags
+  - match: '\b(1990s|"the 90s"|nineties|90s music|90s movie)\b'
+    add_tags: ['era:90s']
+  - match: '\b(1980s|"the 80s"|eighties|80s movie|80s song)\b'
+    add_tags: ['era:80s']
+  - match: '\b(1970s|seventies|70s music|70s rock)\b'
+    add_tags: ['era:70s']
+  - match: '\b(1960s|sixties|60s music)\b'
+    add_tags: ['era:60s']
+  - match: '\b(2000s|noughties|early 2000s|Y2K)\b'
+    add_tags: ['era:2000s']
+  - match: '\b(2010s|early 2010s)\b'
+    add_tags: ['era:2010s']
+
+  # Quality flags
+  - match: '\b(as of (today|now|\d{4})|currently|presently|reigning|world record holder|right now)\b'
+    add_tags: ['flag:time-sensitive']
