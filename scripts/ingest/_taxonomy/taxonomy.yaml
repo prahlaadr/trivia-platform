@@ -1,0 +1,167 @@
+# Pyaar Project Trivia — canonical taxonomy.
+# Source of truth: docs/category-taxonomy.md
+# Used by: scripts/ingest/init_schema.py to seed the DB.
+# 15 categories × 50 subcategories.
+# One subcategory per category is marked is_catchall: true — that's where
+# rows from upstream sources land before keyword rules refine them.
+
+categories:
+  - slug: film-tv
+    name: Film & TV
+    sort_order: 1
+    subcategories:
+      - { slug: hollywood, name: Hollywood Movies, is_catchall: true }
+      - { slug: bollywood, name: Bollywood }
+      - { slug: world-cinema-animation, name: World Cinema & Animation }
+      - { slug: tv-shows, name: TV Shows }
+      - { slug: franchises-awards, name: Franchises & Awards }
+
+  - slug: music
+    name: Music
+    sort_order: 2
+    subcategories:
+      - { slug: rock-pop, name: Rock & Pop, is_catchall: true }
+      - { slug: hip-hop-electronic, name: Hip-Hop & Electronic }
+      - { slug: bollywood-world-music, name: Bollywood & World Music }
+      - { slug: music-trivia, name: Music Trivia }
+
+  - slug: sport
+    name: Sport
+    sort_order: 3
+    subcategories:
+      - { slug: american-sports, name: American Sports, is_catchall: true }
+      - { slug: football-soccer, name: Football / Soccer }
+      - { slug: cricket, name: Cricket }
+      - { slug: tennis-golf-olympics, name: Tennis, Golf & Olympics }
+      - { slug: motorsport-combat, name: Motorsport & Combat }
+
+  - slug: geography
+    name: Geography
+    sort_order: 4
+    subcategories:
+      - { slug: countries-capitals-flags, name: Countries, Capitals & Flags, is_catchall: true }
+      - { slug: cities-landmarks, name: Cities & Landmarks }
+      - { slug: physical-geography, name: Physical Geography }
+
+  - slug: history
+    name: History
+    sort_order: 5
+    subcategories:
+      - { slug: modern-history, name: Modern History, is_catchall: true }
+      - { slug: ancient-medieval, name: Ancient & Medieval }
+      - { slug: world-wars-cold-war, name: World Wars & Cold War }
+
+  - slug: science-nature
+    name: Science & Nature
+    sort_order: 6
+    subcategories:
+      - { slug: animals-plants-earth, name: Animals, Plants & Earth, is_catchall: true }
+      - { slug: physics-chemistry-math, name: Physics, Chemistry & Math }
+      - { slug: biology-body-medicine, name: Biology, Body & Medicine }
+      - { slug: space-scientists, name: Space & Scientists }
+
+  - slug: food-drink
+    name: Food & Drink
+    sort_order: 7
+    subcategories:
+      - { slug: world-cuisines, name: World Cuisines, is_catchall: true }
+      - { slug: drinks, name: Drinks }
+      - { slug: food-culture, name: Food Culture }
+
+  - slug: literature
+    name: Literature
+    sort_order: 8
+    subcategories:
+      - { slug: classics-poetry-theatre, name: Classics, Poetry & Theatre, is_catchall: true }
+      - { slug: genre-fiction, name: Genre Fiction }
+      - { slug: authors-characters-awards, name: Authors, Characters & Awards }
+
+  - slug: art-design
+    name: Art & Design
+    sort_order: 9
+    subcategories:
+      - { slug: art-architecture, name: Art & Architecture, is_catchall: true }
+      - { slug: fashion-logos-design, name: Fashion, Logos & Design }
+
+  - slug: games-toys
+    name: Games & Toys
+    sort_order: 10
+    subcategories:
+      - { slug: video-games, name: Video Games, is_catchall: true }
+      - { slug: analog-games-toys, name: Analog Games & Toys }
+
+  - slug: tech-internet
+    name: Tech & Internet
+    sort_order: 11
+    subcategories:
+      - { slug: companies-tech, name: Companies & Tech, is_catchall: true }
+      - { slug: internet-memes-social, name: Internet, Memes & Social }
+      - { slug: programming-ai-gadgets, name: Programming, AI & Gadgets }
+
+  - slug: politics-society
+    name: Politics & Society
+    sort_order: 12
+    subcategories:
+      - { slug: leaders-world, name: World Leaders, is_catchall: true }
+      - { slug: elections-economics, name: Elections & Economics }
+      - { slug: law-international, name: Law & International }
+
+  - slug: myth-religion
+    name: Mythology & Religion
+    sort_order: 13
+    subcategories:
+      - { slug: western-myth, name: Western Mythology, is_catchall: true }
+      - { slug: eastern-myth-religion, name: Eastern Mythology & Religion }
+      - { slug: abrahamic-folklore, name: Abrahamic Religions & Folklore }
+
+  - slug: language-words
+    name: Language & Words
+    sort_order: 14
+    subcategories:
+      - { slug: etymology-idioms-slang, name: Etymology, Idioms & Slang, is_catchall: true }
+      - { slug: wordplay-quotes-grammar, name: Wordplay, Quotes & Grammar }
+
+  - slug: pop-misc
+    name: Pop Culture & Misc
+    sort_order: 15
+    subcategories:
+      - { slug: general-knowledge, name: General Knowledge, is_catchall: true }
+      - { slug: celebrities-people, name: Celebrities & People }
+      - { slug: decades-nostalgia, name: Decades & Nostalgia }
+      - { slug: internet-culture, name: Internet Culture }
+      - { slug: weird-facts, name: Weird Facts }
+
+# Cross-cutting tags. Slug format: "{kind}:{value}".
+tags:
+  region:
+    - { slug: india, name: India }
+    - { slug: uk, name: UK }
+    - { slug: us, name: US }
+    - { slug: eu, name: Europe }
+    - { slug: latam, name: Latin America }
+    - { slug: asia, name: Asia (broad) }
+    - { slug: africa, name: Africa }
+    - { slug: oceania, name: Oceania }
+    - { slug: mena, name: Middle East & North Africa }
+    - { slug: global, name: Global }
+  era:
+    - { slug: pre-1900, name: Pre-1900 }
+    - { slug: 1900-1950, name: 1900–1950 }
+    - { slug: 60s, name: 1960s }
+    - { slug: 70s, name: 1970s }
+    - { slug: 80s, name: 1980s }
+    - { slug: 90s, name: 1990s }
+    - { slug: 2000s, name: 2000s }
+    - { slug: 2010s, name: 2010s }
+    - { slug: 2020s, name: 2020s }
+  audience:
+    - { slug: family, name: Family-friendly }
+    - { slug: adult, name: Adult }
+    - { slug: nerd, name: Nerd / specialist }
+  flag:
+    - { slug: time-sensitive, name: Time-sensitive }
+    - { slug: us-centric, name: US-centric }
+    - { slug: opinion, name: Opinion / debatable }
+    - { slug: nsfw, name: NSFW }
+    - { slug: low-confidence, name: Low confidence }
+    - { slug: requires-image, name: Requires image asset }

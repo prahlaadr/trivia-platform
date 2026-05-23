@@ -43,3 +43,8 @@ Thumbable.db
 # Lock files (keep uv.lock, bun.lockb)
 .vercel
 .env*.local
+
+# Phase B: trivia bank — only commit parquet snapshots, not the live DB or raw dumps
+data/bank/trivia.duckdb
+data/bank/raw/
+!data/bank/snapshots/
