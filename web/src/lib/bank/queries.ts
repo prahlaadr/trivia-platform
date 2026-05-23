@@ -70,11 +70,27 @@ export async function resolveTopic(topic: string): Promise<{
   categorySlug: string | null;
   subcategorySlug: string | null;
   matched: "exact-slug" | "fuzzy" | "unknown";
+  /** True when the typed topic IS a category slug/name (so we should
+   *  pull the WHOLE category, not filter by topic text). */
+  topicIsCategory?: boolean;
 }> {
   const t = topic.trim().toLowerCase();
   if (!t) return { categorySlug: null, subcategorySlug: null, matched: "unknown" };
 
+  const cats = getBank().categories;
   const subs = getBank().subcategories;
+
+  // Topic IS a category slug or name — return the whole category.
+  for (const c of cats) {
+    if (c.slug.toLowerCase() === t || c.name.toLowerCase() === t) {
+      return {
+        categorySlug: c.slug,
+        subcategorySlug: null,
+        matched: "exact-slug",
+        topicIsCategory: true,
+      };
+    }
+  }
 
   // Exact subcategory slug or name match
   for (const s of subs) {

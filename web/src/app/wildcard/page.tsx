@@ -335,12 +335,12 @@ export default function WildcardPage() {
         )}
 
         {generated && (
-          <div className="mb-8 rounded-lg border border-[#8B3530]/30 bg-[#1C2E22] p-4 sm:p-6">
+          <div className="mb-8 rounded-lg border border-[#8B3530]/30 bg-transparent p-4 sm:p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#D4A642]">Generated Game</h2>
+              <h2 className="text-lg font-bold text-[#8B3530]">Generated Game</h2>
               <button
                 onClick={() => setGenerated(null)}
-                className="rounded px-3 py-1 text-xs text-white/40 hover:bg-white/10 hover:text-white/70"
+                className="rounded px-3 py-1 text-xs text-[#3D3D3A]/60 hover:bg-[#3D3D3A]/8 hover:text-[#3D3D3A]"
               >
                 Back
               </button>
@@ -349,18 +349,20 @@ export default function WildcardPage() {
             <div className="mb-6 space-y-2">
               {generated.rounds.map((round) => (
                 <details key={round.number} className="group">
-                  <summary className="flex cursor-pointer items-center gap-3 rounded bg-white/5 px-4 py-3 transition-colors hover:bg-white/10">
-                    <span className="text-sm font-bold text-[#D4A642]/70">R{round.number}</span>
-                    <span className="font-medium text-white">{round.title}</span>
-                    <span className="ml-auto text-xs text-white/40">{round.questions.length} questions</span>
+                  <summary className="flex cursor-pointer items-center gap-3 rounded border border-[#3D3D3A]/15 bg-transparent px-4 py-3 transition-colors hover:bg-[#3D3D3A]/5">
+                    <span className="text-sm font-bold text-[#8B3530]">R{round.number}</span>
+                    <span className="font-medium text-[#3D3D3A]">{round.title}</span>
+                    <span className={`ml-auto text-xs ${round.questions.length === 0 ? "font-bold text-[#C26B3E]" : "text-[#3D3D3A]/50"}`}>
+                      {round.questions.length} questions
+                    </span>
                   </summary>
                   <div className="mt-1 space-y-1 pl-4 sm:pl-10">
                     {round.questions.map((q) => (
-                      <div key={q.number} className="flex items-start gap-2 rounded bg-white/[0.03] px-3 py-2 text-sm">
-                        <span className="mt-0.5 text-xs text-white/40">{q.number}.</span>
+                      <div key={q.number} className="flex items-start gap-2 rounded bg-[#3D3D3A]/4 px-3 py-2 text-sm">
+                        <span className="mt-0.5 text-xs text-[#3D3D3A]/50">{q.number}.</span>
                         <div className="flex-1">
-                          <p className="text-white/85">{q.text}</p>
-                          <p className="mt-0.5 text-xs text-[#D4A642]/80">{q.answer}</p>
+                          <p className="text-[#3D3D3A]">{q.text}</p>
+                          <p className="mt-0.5 text-xs font-medium text-[#8B3530]">{q.answer}</p>
                         </div>
                       </div>
                     ))}
@@ -372,13 +374,13 @@ export default function WildcardPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href={`/present/${generated.id}`}
-                className="rounded bg-[#D4A642] px-5 py-2 font-bold text-[#1C2E22] transition-all hover:bg-[#D4A642]/90"
+                className="rounded bg-[#8B3530] px-5 py-2 font-bold text-white transition-all hover:bg-[#8B3530]/90"
               >
                 Present →
               </Link>
               <button
                 onClick={handleSave}
-                className="rounded bg-[#D4A642]/20 px-5 py-2 font-bold text-[#D4A642] transition-all hover:bg-[#D4A642]/30"
+                className="rounded border-2 border-[#8B3530] bg-transparent px-5 py-2 font-bold text-[#8B3530] transition-all hover:bg-[#8B3530]/10"
               >
                 Save
               </button>

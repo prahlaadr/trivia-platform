@@ -191,7 +191,7 @@ export default function GameGenPage() {
     return (
       <div className="min-h-screen bg-[#E8DFC8] p-4 sm:p-8">
         <div className="mx-auto max-w-3xl">
-          <Link href="/" className="text-sm text-white/40 hover:text-white/60">
+          <Link href="/" className="text-sm text-[#3D3D3A]/55 hover:text-[#3D3D3A]/70">
             &larr; Back to quizzes
           </Link>
           <p className="mt-4 mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#8B3530]/50">
@@ -202,7 +202,7 @@ export default function GameGenPage() {
           </h1>
           <button
             onClick={startNew}
-            className="w-full rounded-lg border-2 border-dashed border-white/20 bg-[#1C2E22]/50 p-8 sm:p-12 text-lg sm:text-xl font-bold text-white/70 transition-all hover:border-[#8B3530]/40 hover:text-white"
+            className="w-full rounded-lg border-2 border-dashed border-[#3D3D3A]/25 bg-transparent p-8 sm:p-12 text-lg sm:text-xl font-bold text-[#3D3D3A]/75 transition-all hover:border-[#8B3530]/40 hover:text-[#3D3D3A]"
           >
             Start New Game
           </button>
@@ -221,10 +221,10 @@ export default function GameGenPage() {
                 {savedGames.map((game) => (
                   <div
                     key={game.sessionId}
-                    className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1C2E22] p-4 sm:p-5 transition-all hover:border-[#8FAA73]/40"
+                    className="flex items-center justify-between rounded-lg border border-[#3D3D3A]/20 bg-transparent p-4 sm:p-5 transition-all hover:border-[#8FAA73]/40"
                   >
                     <Link href={`/present/gen_${game.sessionId}`} className="flex-1">
-                      <h3 className="font-bold text-white">{game.date}</h3>
+                      <h3 className="font-bold text-[#3D3D3A]">{game.date}</h3>
                       <div className="mt-1 flex flex-wrap gap-1.5">
                         {game.roundTopics.map((t) => (
                           <span
@@ -259,7 +259,7 @@ export default function GameGenPage() {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-sm text-white/40 hover:text-white/60"
+            className="text-sm text-[#3D3D3A]/55 hover:text-[#3D3D3A]/70"
           >
             &larr; Back to quizzes
           </Link>
@@ -279,13 +279,13 @@ export default function GameGenPage() {
         </h1>
 
         {/* Team Registration */}
-        <div className="mb-8 rounded-lg border border-[#8B3530]/20 bg-[#1C2E22] p-4 sm:p-6">
+        <div className="mb-8 rounded-lg border border-[#8B3530]/20 bg-transparent p-4 sm:p-6">
           <h2 className="mb-4 text-lg font-bold text-[#8B3530]">
             Register Team
           </h2>
 
           <div className="mb-4">
-            <label className="mb-1 block text-sm text-white/50">
+            <label className="mb-1 block text-sm text-[#3D3D3A]/60">
               Team Name
             </label>
             <input
@@ -293,7 +293,7 @@ export default function GameGenPage() {
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
               placeholder="e.g., Quizzy McQuizface"
-              className="w-full rounded bg-white/10 px-4 py-2.5 text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#8B3530]/40"
+              className="w-full rounded bg-[#3D3D3A]/8 px-4 py-2.5 text-[#3D3D3A] placeholder-[#3D3D3A]/45 outline-none focus:ring-2 focus:ring-[#8B3530]/40"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && selectedTopics.length > 0)
                   handleAddTeam();
@@ -302,7 +302,7 @@ export default function GameGenPage() {
           </div>
 
           <div className="mb-3">
-            <label className="mb-2 block text-sm text-white/50">
+            <label className="mb-2 block text-sm text-[#3D3D3A]/60">
               Pick 3–5 topics{" "}
               <span className="text-[#8B3530]/60">
                 ({selectedTopics.length}/5 selected)
@@ -316,7 +316,7 @@ export default function GameGenPage() {
                   className={`rounded-full px-3 py-1.5 text-sm font-medium transition-all ${
                     selectedTopics.includes(topic)
                       ? "bg-[#8B3530] text-black"
-                      : "bg-white/10 text-white/60 hover:bg-white/20 hover:text-white"
+                      : "bg-[#3D3D3A]/8 text-[#3D3D3A]/70 hover:bg-white/20 hover:text-[#3D3D3A]"
                   } ${selectedTopics.length >= 5 && !selectedTopics.includes(topic) ? "opacity-30 cursor-not-allowed" : ""}`}
                   disabled={
                     selectedTopics.length >= 5 &&
@@ -335,7 +335,7 @@ export default function GameGenPage() {
               value={customTopic}
               onChange={(e) => setCustomTopic(e.target.value)}
               placeholder="Or type a custom topic..."
-              className="flex-1 rounded bg-white/10 px-4 py-2 text-sm text-white placeholder-white/30 outline-none focus:ring-2 focus:ring-[#8B3530]/40"
+              className="flex-1 rounded bg-[#3D3D3A]/8 px-4 py-2 text-sm text-[#3D3D3A] placeholder-[#3D3D3A]/45 outline-none focus:ring-2 focus:ring-[#8B3530]/40"
               onKeyDown={(e) => e.key === "Enter" && addCustomTopic()}
             />
             <button
@@ -343,7 +343,7 @@ export default function GameGenPage() {
               disabled={
                 !customTopic.trim() || selectedTopics.length >= 5
               }
-              className="rounded bg-white/10 px-4 py-2 text-sm font-medium text-white/60 hover:bg-white/20 disabled:opacity-30"
+              className="rounded bg-[#3D3D3A]/8 px-4 py-2 text-sm font-medium text-[#3D3D3A]/70 hover:bg-white/20 disabled:opacity-30"
             >
               Add
             </button>
@@ -393,15 +393,15 @@ export default function GameGenPage() {
               {session.teams.map((team) => (
                 <div
                   key={team.id}
-                  className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1C2E22] p-4"
+                  className="flex items-center justify-between rounded-lg border border-[#3D3D3A]/20 bg-transparent p-4"
                 >
                   <div>
-                    <h3 className="font-bold text-white">{team.name}</h3>
+                    <h3 className="font-bold text-[#3D3D3A]">{team.name}</h3>
                     <div className="mt-1 flex flex-wrap gap-1.5">
                       {team.topics.map((t) => (
                         <span
                           key={t}
-                          className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-white/50"
+                          className="rounded-full bg-[#3D3D3A]/8 px-2.5 py-0.5 text-xs text-[#3D3D3A]/60"
                         >
                           {t}
                         </span>
@@ -422,13 +422,13 @@ export default function GameGenPage() {
 
         {/* Topic Aggregation & Round Preview */}
         {session.teams.length >= 3 && (
-          <div className="mb-8 rounded-lg border border-[#8FAA73]/30 bg-[#1C2E22] p-4 sm:p-6">
+          <div className="mb-8 rounded-lg border border-[#8FAA73]/30 bg-transparent p-4 sm:p-6">
             <h2 className="mb-4 text-lg font-bold text-[#8FAA73]">
               Round Plan
             </h2>
 
             <div className="mb-4">
-              <p className="mb-2 text-sm text-white/50">
+              <p className="mb-2 text-sm text-[#3D3D3A]/60">
                 Topic popularity (from team picks):
               </p>
               <div className="flex flex-wrap gap-2">
@@ -448,15 +448,15 @@ export default function GameGenPage() {
               {roundTopics.map((topic, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 rounded bg-white/5 px-4 py-3"
+                  className="flex items-center gap-3 rounded bg-[#3D3D3A]/5 px-4 py-3"
                 >
                   <span className="text-sm font-bold text-[#8B3530]/60">
                     R{i + 1}
                   </span>
-                  <span className="font-medium text-white capitalize">
+                  <span className="font-medium text-[#3D3D3A] capitalize">
                     {topic}
                   </span>
-                  <span className="ml-auto text-xs text-white/30">
+                  <span className="ml-auto text-xs text-[#3D3D3A]/45">
                     6 questions
                   </span>
                 </div>
@@ -469,7 +469,7 @@ export default function GameGenPage() {
                 Copy the prompt below and run it in Claude Code to generate
                 questions:
               </p>
-              <pre className="mb-3 overflow-x-auto rounded bg-black/30 p-3 text-xs text-white/70">
+              <pre className="mb-3 overflow-x-auto rounded bg-black/30 p-3 text-xs text-[#3D3D3A]/75">
                 {buildPrompt()}
               </pre>
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -481,7 +481,7 @@ export default function GameGenPage() {
                 </button>
                 <button
                   onClick={checkForGeneratedQuiz}
-                  className="rounded bg-white/10 px-4 py-2 text-sm sm:px-5 sm:text-base font-medium text-white/60 transition-all hover:bg-white/20 hover:text-white"
+                  className="rounded bg-[#3D3D3A]/8 px-4 py-2 text-sm sm:px-5 sm:text-base font-medium text-[#3D3D3A]/70 transition-all hover:bg-white/20 hover:text-[#3D3D3A]"
                 >
                   Check for Results
                 </button>
@@ -508,7 +508,7 @@ export default function GameGenPage() {
         )}
 
         {session.teams.length > 0 && session.teams.length < 3 && (
-          <p className="text-center text-sm text-white/40">
+          <p className="text-center text-sm text-[#3D3D3A]/55">
             Register at least 3 teams to generate rounds
           </p>
         )}
@@ -527,10 +527,10 @@ export default function GameGenPage() {
               {savedGames.map((game) => (
                 <div
                   key={game.sessionId}
-                  className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1C2E22] p-4 sm:p-5 transition-all hover:border-[#8FAA73]/40"
+                  className="flex items-center justify-between rounded-lg border border-[#3D3D3A]/20 bg-transparent p-4 sm:p-5 transition-all hover:border-[#8FAA73]/40"
                 >
                   <Link href={`/present/gen_${game.sessionId}`} className="flex-1">
-                    <h3 className="font-bold text-white">{game.date}</h3>
+                    <h3 className="font-bold text-[#3D3D3A]">{game.date}</h3>
                     <div className="mt-1 flex flex-wrap gap-1.5">
                       {game.roundTopics.map((t) => (
                         <span

@@ -56,25 +56,37 @@ export async function POST(req: Request) {
     allowTimeSensitive: body.allowTimeSensitive,
   };
 
-  // Detect if the typed topic actually appears anywhere as text (so we
-  // can know whether "filter by topic text" is meaningful at all).
-  const topicLooksLikeASlug =
+  // Detect if the typed topic IS its resolved subcategory's slug or name,
+  // so we skip text filtering and just pull all questions in the subcat
+  // (e.g. "cricket" types in → subcat cricket; we don't require the word
+  // "cricket" to appear in every question).
+  const topicMatchesSub =
     resolved.matched === "exact-slug" &&
-    resolved.subcategorySlug?.replace(/-/g, " ").toLowerCase() ===
-      body.topic.trim().toLowerCase();
+    resolved.subcategorySlug !== null &&
+    (resolved.subcategorySlug.toLowerCase() === body.topic.trim().toLowerCase() ||
+      resolved.subcategorySlug.replace(/-/g, " ").toLowerCase() ===
+        body.topic.trim().toLowerCase());
 
   let questions: Awaited<ReturnType<typeof pickQuestions>> = [];
 
+  // FAST PATH: topic is a known category — pull the whole category, no
+  // text filtering. This is the random-wildcard case (page sends slugs
+  // like "science-nature" as topics).
+  if (resolved.topicIsCategory && resolved.categorySlug) {
+    questions = await pickQuestions({
+      ...base,
+      categorySlug: resolved.categorySlug,
+    });
+    if (questions.length > 0) fallbackUsed = "category-broad";
+  }
+
   // Try 1: subcategory + topic text — most precise.
-  // Skip the topic-text filter if the typed topic IS the subcategory slug
-  // (e.g. "cricket" types in → subcat "cricket"; we want all cricket Qs,
-  // not just the ones literally containing the word "cricket").
-  if (resolved.subcategorySlug) {
+  if (questions.length === 0 && resolved.subcategorySlug) {
     questions = await pickQuestions({
       ...base,
       categorySlug: resolved.categorySlug ?? undefined,
       subcategorySlug: resolved.subcategorySlug,
-      fuzzyTopic: topicLooksLikeASlug ? undefined : body.topic,
+      fuzzyTopic: topicMatchesSub ? undefined : body.topic,
     });
     if (questions.length > 0) fallbackUsed = "subcategory-with-topic";
   }
