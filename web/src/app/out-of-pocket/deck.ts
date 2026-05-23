@@ -23,6 +23,8 @@ export type Slide =
       imageSrc?: string;
       imageSrc2?: string;
       caption?: string;
+      sourceUrl?: string;
+      sourceLabel?: string;
     }
   | {
       type: "reveal";
@@ -35,6 +37,8 @@ export type Slide =
       imageSrc?: string;
       imageSrc2?: string;
       caption?: string;
+      sourceUrl?: string;
+      sourceLabel?: string;
     }
   | { type: "answers-divider"; title?: string; date?: string };
 
@@ -50,10 +54,14 @@ interface DeckQuestion {
   questionImageSrc?: string;
   questionImageSrc2?: string;
   questionCaption?: string;
+  questionSourceUrl?: string;
   /** Image shown on the reveal slide alongside the answer. */
   revealImageSrc?: string;
   revealImageSrc2?: string;
   revealCaption?: string;
+  revealSourceUrl?: string;
+  /** Label used for both question and reveal source links; defaults to "source". */
+  sourceLabel?: string;
 }
 
 interface DeckSection {
@@ -169,6 +177,7 @@ const sections: DeckSection[] = [
         points: 1,
         answer: "Seagulls",
         revealImageSrc: "/oop/img-seagulls.jpg",
+        revealSourceUrl: "https://www.youtube.com/watch?v=ppPcSaXyY4w",
       },
       {
         number: 2,
@@ -183,6 +192,10 @@ const sections: DeckSection[] = [
         answer: "Quill (porcupine)",
         questionImageSrc: "/oop/img-quill-needle.png",
         questionImageSrc2: "/oop/img-quill-barbs.png",
+        revealCaption:
+          "Many believe the natural antibiotic effect of the quill's grease is a sign of benevolence — what it really does is make it impossible for the sting victim to escape the pain through the call of death, forcing it to live through the pain as a reminder of the wrath of our lil porcupine.",
+        revealSourceUrl: "https://link.springer.com/article/10.1007/BF01016483",
+        sourceLabel: "natural antibiotic effect",
       },
       {
         number: 4,
@@ -190,6 +203,10 @@ const sections: DeckSection[] = [
         points: 1,
         answer: "Quilt",
         revealImageSrc: "/oop/img-quilt.png",
+        questionSourceUrl:
+          "https://www.guinnessworldrecords.com/world-records/largest-patchwork-quilt",
+        revealSourceUrl:
+          "https://www.guinnessworldrecords.com/world-records/largest-patchwork-quilt",
       },
       {
         number: 5,
@@ -331,6 +348,8 @@ export function buildDeck(): Slide[] {
         imageSrc: q.questionImageSrc,
         imageSrc2: q.questionImageSrc2,
         caption: q.questionCaption,
+        sourceUrl: q.questionSourceUrl,
+        sourceLabel: q.sourceLabel,
       });
     }
 
@@ -351,6 +370,8 @@ export function buildDeck(): Slide[] {
         imageSrc: q.questionImageSrc,
         imageSrc2: q.questionImageSrc2,
         caption: q.questionCaption,
+        sourceUrl: q.questionSourceUrl,
+        sourceLabel: q.sourceLabel,
       });
       slides.push({
         type: "reveal",
@@ -363,6 +384,8 @@ export function buildDeck(): Slide[] {
         imageSrc: q.revealImageSrc,
         imageSrc2: q.revealImageSrc2,
         caption: q.revealCaption,
+        sourceUrl: q.revealSourceUrl,
+        sourceLabel: q.sourceLabel,
       });
     }
   }

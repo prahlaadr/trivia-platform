@@ -34,6 +34,8 @@ function RenderSlide({ slide }: { slide: Slide }) {
           imageSrc={slide.imageSrc}
           imageSrc2={slide.imageSrc2}
           caption={slide.caption}
+          sourceUrl={slide.sourceUrl}
+          sourceLabel={slide.sourceLabel}
         />
       );
     case "reveal":
@@ -48,6 +50,8 @@ function RenderSlide({ slide }: { slide: Slide }) {
           imageSrc={slide.imageSrc}
           imageSrc2={slide.imageSrc2}
           caption={slide.caption}
+          sourceUrl={slide.sourceUrl}
+          sourceLabel={slide.sourceLabel}
         />
       );
     case "answers-divider":

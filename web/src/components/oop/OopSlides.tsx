@@ -104,6 +104,8 @@ export function OopQuestionSlide({
   imageSrc,
   imageSrc2,
   caption,
+  sourceUrl,
+  sourceLabel,
 }: {
   number: number;
   text: string;
@@ -113,6 +115,8 @@ export function OopQuestionSlide({
   imageSrc?: string;
   imageSrc2?: string;
   caption?: string;
+  sourceUrl?: string;
+  sourceLabel?: string;
 }) {
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
@@ -156,6 +160,16 @@ export function OopQuestionSlide({
         {caption && (
           <p className="mt-[1%] text-[1.2cqw] text-black/60">{caption}</p>
         )}
+        {sourceUrl && (
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-[0.5%] text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
+          >
+            {sourceLabel ?? "source"} ↗
+          </a>
+        )}
       </div>
     </div>
   );
@@ -173,6 +187,8 @@ export function OopRevealSlide({
   imageSrc2,
   caption,
   codeBlock,
+  sourceUrl,
+  sourceLabel,
 }: {
   number: number;
   text: string;
@@ -183,6 +199,8 @@ export function OopRevealSlide({
   imageSrc2?: string;
   caption?: string;
   codeBlock?: string;
+  sourceUrl?: string;
+  sourceLabel?: string;
 }) {
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
@@ -237,6 +255,16 @@ export function OopRevealSlide({
             )}
             {caption && (
               <p className="text-[1.2cqw] text-black/60">{caption}</p>
+            )}
+            {sourceUrl && (
+              <a
+                href={sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
+              >
+                {sourceLabel ?? "source"} ↗
+              </a>
             )}
           </div>
         )}
