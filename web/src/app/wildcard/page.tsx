@@ -3,35 +3,57 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getBrand } from "@/lib/branding";
-import {
-  loadQuestionBank,
-  getCategories,
-  generateWildcardGame,
-  type BankQuestion,
-  type CategoryInfo,
-} from "@/lib/question-bank";
 import { gameGenToQuiz, saveGame, getSavedGames, deleteSavedGame } from "@/lib/game-gen";
-import type { GameGenSession, SavedGameGen } from "@/lib/types";
+import type { GameGenSession, SavedGameGen, GeneratedQuestion, GeneratedRound } from "@/lib/types";
+
+interface ApiCategory {
+  id: number;
+  slug: string;
+  name: string;
+  sortOrder: number;
+  questionCount: number;
+}
+
+interface ApiQuestion {
+  id: string;
+  text: string;
+  answer: string;
+  source: string;
+  sourceUrl: string | null;
+  categorySlug: string;
+  subcategorySlug: string;
+}
+
+interface TopicResponse {
+  topic: string;
+  resolved: { categorySlug: string | null; subcategorySlug: string | null; matched: string };
+  questions: ApiQuestion[];
+  warnings: string[];
+}
+
+type Difficulty = "mixed" | "easy" | "medium" | "hard";
+
+const QUESTIONS_PER_ROUND = 8;
+const DEFAULT_ROUNDS = 6;
 
 export default function WildcardPage() {
-  const [questions, setQuestions] = useState<BankQuestion[]>([]);
-  const [categories, setCategories] = useState<CategoryInfo[]>([]);
+  const [categories, setCategories] = useState<ApiCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Game config
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [difficulty, setDifficulty] = useState<"mixed" | "easy" | "medium" | "hard">("mixed");
-  const [generatedGame, setGeneratedGame] = useState<GameGenSession | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [difficulty, setDifficulty] = useState<Difficulty>("mixed");
+  const [generated, setGenerated] = useState<GameGenSession | null>(null);
+  const [generating, setGenerating] = useState(false);
   const [savedGames, setSavedGames] = useState<SavedGameGen[]>([]);
 
   const brand = typeof window !== "undefined" ? getBrand() : { name: "" };
 
   useEffect(() => {
-    loadQuestionBank()
-      .then((qs) => {
-        setQuestions(qs);
-        setCategories(getCategories(qs));
+    fetch("/api/bank/categories")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load categories"))))
+      .then((d: { categories: ApiCategory[] }) => {
+        setCategories(d.categories.filter((c) => c.questionCount >= QUESTIONS_PER_ROUND));
         setLoading(false);
       })
       .catch((e) => {
@@ -41,67 +63,118 @@ export default function WildcardPage() {
     setSavedGames(getSavedGames().filter((g) => g.sessionId.startsWith("wildcard-")));
   }, []);
 
-  const toggleCategory = useCallback((cat: string) => {
-    setSelectedCategories((prev) => {
-      if (prev.includes(cat)) return prev.filter((c) => c !== cat);
-      if (prev.length >= 6) return prev;
-      return [...prev, cat];
-    });
+  const totalQuestions = categories.reduce((sum, c) => sum + c.questionCount, 0);
+
+  const toggleCategory = useCallback((slug: string) => {
+    setSelected((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : prev.length >= DEFAULT_ROUNDS ? prev : [...prev, slug]
+    );
   }, []);
 
-  const handleGenerate = useCallback(
-    (mode: "wildcard" | "custom") => {
-      if (mode === "custom" && selectedCategories.length < 1) return;
+  const generate = useCallback(
+    async (mode: "wildcard" | "custom") => {
+      if (mode === "custom" && selected.length === 0) return;
+      setGenerating(true);
+      setError(null);
 
-      const game = generateWildcardGame(questions, {
-        categories: mode === "custom" ? selectedCategories : undefined,
-        difficulty,
-      });
-      setGeneratedGame(game);
+      // Pick categories
+      let pickSlugs: string[];
+      if (mode === "custom") {
+        pickSlugs = selected;
+      } else {
+        const shuffled = [...categories].sort(() => Math.random() - 0.5);
+        pickSlugs = shuffled.slice(0, DEFAULT_ROUNDS).map((c) => c.slug);
+      }
 
-      // Auto-save to localStorage so presenter can access it
-      const quiz = gameGenToQuiz(game);
-      localStorage.setItem(`quiz_${game.id}`, JSON.stringify(quiz));
+      try {
+        const results = await Promise.all(
+          pickSlugs.map((slug) =>
+            fetch("/api/wildcard/topic", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                topic: slug,
+                count: QUESTIONS_PER_ROUND,
+                difficulty,
+              }),
+            }).then((r) => r.json() as Promise<TopicResponse>)
+          )
+        );
+
+        const rounds: GeneratedRound[] = results.map((res, i) => {
+          const catName = categories.find((c) => c.slug === pickSlugs[i])?.name ?? pickSlugs[i];
+          return {
+            number: i + 1,
+            title: catName,
+            topic: pickSlugs[i],
+            questions: res.questions.map(
+              (q, j): GeneratedQuestion => ({
+                number: j + 1,
+                text: q.text,
+                answer: q.answer,
+                topic: pickSlugs[i],
+                source: "bank",
+              })
+            ),
+          };
+        });
+
+        // Tiebreaker: pull one more question from the first chosen category, hard difficulty
+        const tbRes = await fetch("/api/wildcard/topic", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ topic: pickSlugs[0], count: 1, difficulty: "hard" }),
+        }).then((r) => r.json() as Promise<TopicResponse>);
+        const tb = tbRes.questions[0];
+
+        const session: GameGenSession = {
+          id: `wildcard-${crypto.randomUUID().slice(0, 8)}`,
+          createdAt: new Date().toISOString(),
+          status: "ready",
+          teams: [],
+          rounds,
+          tieBreaker: tb ? { question: tb.text, answer: tb.answer } : undefined,
+        };
+
+        setGenerated(session);
+        const quiz = gameGenToQuiz(session);
+        localStorage.setItem(`quiz_${session.id}`, JSON.stringify(quiz));
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Generation failed");
+      } finally {
+        setGenerating(false);
+      }
     },
-    [questions, selectedCategories]
+    [selected, categories, difficulty]
   );
 
   const handleSave = useCallback(() => {
-    if (!generatedGame) return;
+    if (!generated) return;
     const saved: SavedGameGen = {
-      sessionId: generatedGame.id,
-      name: generatedGame.rounds.map((r) => r.title).join(", "),
-      date: new Date().toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      }),
-      roundTopics: generatedGame.rounds.map((r) => r.title),
+      sessionId: generated.id,
+      name: generated.rounds.map((r) => r.title).join(", "),
+      date: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+      roundTopics: generated.rounds.map((r) => r.title),
       savedAt: new Date().toISOString(),
     };
     saveGame(saved);
     setSavedGames(getSavedGames().filter((g) => g.sessionId.startsWith("wildcard-")));
-  }, [generatedGame]);
+  }, [generated]);
 
-  const handleRegenerate = useCallback(() => {
-    setGeneratedGame(null);
-  }, []);
-
-  const handleDeleteSaved = useCallback((sessionId: string) => {
-    deleteSavedGame(sessionId);
-    localStorage.removeItem(`quiz_${sessionId}`);
+  const handleDelete = useCallback((sid: string) => {
+    deleteSavedGame(sid);
+    localStorage.removeItem(`quiz_${sid}`);
     setSavedGames(getSavedGames().filter((g) => g.sessionId.startsWith("wildcard-")));
   }, []);
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#E8DFC8]">
-        <p className="text-white/50">Loading question bank...</p>
+        <p className="text-[#3D3D3A]/60">Loading question bank…</p>
       </div>
     );
   }
-
-  if (error) {
+  if (error && !generated) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#E8DFC8]">
         <p className="text-[#C26B3E]">Error: {error}</p>
@@ -112,44 +185,30 @@ export default function WildcardPage() {
   return (
     <div className="min-h-screen bg-[#E8DFC8] p-4 sm:p-8">
       <div className="mx-auto max-w-4xl">
-        <Link href="/" className="text-sm text-white/40 hover:text-white/60">
+        <Link href="/" className="text-sm text-[#3D3D3A]/60 hover:text-[#3D3D3A]">
           &larr; Back to quizzes
         </Link>
 
-        <p className="mt-4 mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#8B3530]/50">
+        <p className="mt-4 mb-1 text-sm font-bold uppercase tracking-[0.3em] text-[#8B3530]/60">
           {brand.name}
         </p>
-        <h1 className="mb-2 text-3xl font-black uppercase text-[#8B3530] sm:text-4xl">
-          Wildcard
-        </h1>
-        <p className="mb-6 text-sm text-white/40">
-          {questions.length.toLocaleString()} questions across {categories.length} categories
+        <h1 className="mb-2 text-3xl font-black uppercase text-[#8B3530] sm:text-4xl">Wildcard</h1>
+        <p className="mb-6 text-sm text-[#3D3D3A]/60">
+          {totalQuestions.toLocaleString()} questions across {categories.length} categories — pick up to 6 or go random
         </p>
 
-        {/* Instructions + Random button — hidden when game is generated */}
-        {!generatedGame && (
-          <div className="mb-6">
-            <p className="mb-4 text-sm text-white/50">
-              Select 1–6 categories below and hit <span className="font-semibold text-white/70">Generate Game</span>, or go fully random:
-            </p>
-
-            {/* Difficulty selector */}
-            <div className="mb-4 flex items-center gap-2">
-              <span className="text-xs font-medium text-white/40">Difficulty:</span>
+        {!generated && (
+          <>
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-[#3D3D3A]/60">Difficulty:</span>
               {(["mixed", "easy", "medium", "hard"] as const).map((d) => (
                 <button
                   key={d}
                   onClick={() => setDifficulty(d)}
                   className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-all ${
                     difficulty === d
-                      ? d === "easy"
-                        ? "bg-green-500/20 text-green-400"
-                        : d === "medium"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : d === "hard"
-                            ? "bg-red-500/20 text-red-400"
-                            : "bg-white/15 text-white/80"
-                      : "bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/50"
+                      ? "bg-[#8B3530] text-white"
+                      : "bg-[#3D3D3A]/8 text-[#3D3D3A]/70 hover:bg-[#3D3D3A]/15"
                   }`}
                 >
                   {d}
@@ -158,56 +217,75 @@ export default function WildcardPage() {
             </div>
 
             <button
-              onClick={() => handleGenerate("wildcard")}
-              className="w-full rounded-lg bg-[#8B3530] py-3.5 text-center font-bold text-black transition-all hover:bg-[#8B3530]/90 sm:py-4"
+              onClick={() => generate("wildcard")}
+              disabled={generating}
+              className="mb-6 w-full rounded-lg bg-[#8B3530] py-3.5 text-center font-bold text-white transition-all hover:bg-[#8B3530]/90 disabled:opacity-60 sm:py-4"
             >
-              Random Wildcard Game
+              {generating ? "Generating…" : "Random Wildcard Game"}
             </button>
-            <p className="mt-1.5 text-center text-xs text-white/30">
-              6 random categories, 8 questions each
-            </p>
-          </div>
+
+            {/* Category grid for custom picking */}
+            <div className="mb-6">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-[#3D3D3A]/60">
+                Or pick categories ({selected.length}/{DEFAULT_ROUNDS})
+              </p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {categories.map((c) => {
+                  const isSel = selected.includes(c.slug);
+                  return (
+                    <button
+                      key={c.slug}
+                      onClick={() => toggleCategory(c.slug)}
+                      className={`flex items-center justify-between rounded border px-3 py-2 text-left text-sm transition-all ${
+                        isSel
+                          ? "border-[#8B3530] bg-[#8B3530]/10 text-[#8B3530]"
+                          : "border-[#3D3D3A]/20 bg-transparent text-[#3D3D3A] hover:border-[#8B3530]/40"
+                      }`}
+                    >
+                      <span className="font-medium">{c.name}</span>
+                      <span className="text-xs text-[#3D3D3A]/50">{c.questionCount.toLocaleString()}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                onClick={() => generate("custom")}
+                disabled={generating || selected.length === 0}
+                className="mt-3 w-full rounded-lg border-2 border-[#8B3530] bg-transparent py-3 font-bold text-[#8B3530] transition-all hover:bg-[#8B3530]/10 disabled:opacity-40"
+              >
+                {generating ? "Generating…" : `Generate from ${selected.length || "—"} selected`}
+              </button>
+            </div>
+          </>
         )}
 
-        {/* Generated Game Preview */}
-        {generatedGame && (
-          <div className="mb-8 rounded-lg border border-[#8FAA73]/30 bg-[#1C2E22] p-4 sm:p-6">
+        {generated && (
+          <div className="mb-8 rounded-lg border border-[#8B3530]/30 bg-[#1C2E22] p-4 sm:p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-[#8FAA73]">Generated Game</h2>
+              <h2 className="text-lg font-bold text-[#D4A642]">Generated Game</h2>
               <button
-                onClick={handleRegenerate}
-                className="rounded px-3 py-1 text-xs text-white/40 hover:bg-white/10 hover:text-white/60"
+                onClick={() => setGenerated(null)}
+                className="rounded px-3 py-1 text-xs text-white/40 hover:bg-white/10 hover:text-white/70"
               >
                 Back
               </button>
             </div>
 
             <div className="mb-6 space-y-2">
-              {generatedGame.rounds.map((round) => (
+              {generated.rounds.map((round) => (
                 <details key={round.number} className="group">
                   <summary className="flex cursor-pointer items-center gap-3 rounded bg-white/5 px-4 py-3 transition-colors hover:bg-white/10">
-                    <span className="text-sm font-bold text-[#8B3530]/60">
-                      R{round.number}
-                    </span>
+                    <span className="text-sm font-bold text-[#D4A642]/70">R{round.number}</span>
                     <span className="font-medium text-white">{round.title}</span>
-                    <span className="ml-auto text-xs text-white/30">
-                      {round.questions.length} questions
-                    </span>
+                    <span className="ml-auto text-xs text-white/40">{round.questions.length} questions</span>
                   </summary>
                   <div className="mt-1 space-y-1 pl-4 sm:pl-10">
                     {round.questions.map((q) => (
-                      <div
-                        key={q.number}
-                        className="flex items-start gap-2 rounded bg-white/[0.02] px-3 py-2 text-sm"
-                      >
-                        <span className="mt-0.5 text-xs text-white/30">
-                          {q.number}.
-                        </span>
+                      <div key={q.number} className="flex items-start gap-2 rounded bg-white/[0.03] px-3 py-2 text-sm">
+                        <span className="mt-0.5 text-xs text-white/40">{q.number}.</span>
                         <div className="flex-1">
-                          <p className="text-white/70">{q.text}</p>
-                          <p className="mt-0.5 text-xs text-[#8FAA73]/60">
-                            {q.answer}
-                          </p>
+                          <p className="text-white/85">{q.text}</p>
+                          <p className="mt-0.5 text-xs text-[#D4A642]/80">{q.answer}</p>
                         </div>
                       </div>
                     ))}
@@ -216,144 +294,42 @@ export default function WildcardPage() {
               ))}
             </div>
 
-            {generatedGame.tieBreaker && (
-              <div className="mb-4 rounded bg-white/5 px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-[#8B3530]/40">
-                  Tiebreaker
-                </p>
-                <p className="mt-1 text-sm text-white/70">
-                  {generatedGame.tieBreaker.question}
-                </p>
-                <p className="mt-0.5 text-xs text-[#8FAA73]/60">
-                  {generatedGame.tieBreaker.answer}
-                </p>
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               <Link
-                href={`/present/${generatedGame.id}`}
-                className="rounded bg-[#8FAA73] px-5 py-2 font-bold text-black transition-all hover:bg-[#8FAA73]/90"
+                href={`/present/${generated.id}`}
+                className="rounded bg-[#D4A642] px-5 py-2 font-bold text-[#1C2E22] transition-all hover:bg-[#D4A642]/90"
               >
-                Present Game
+                Present →
               </Link>
               <button
                 onClick={handleSave}
-                disabled={savedGames.some((g) => g.sessionId === generatedGame.id)}
-                className="rounded bg-[#8FAA73]/20 px-5 py-2 font-bold text-[#8FAA73] transition-all hover:bg-[#8FAA73]/30 disabled:opacity-30"
+                className="rounded bg-[#D4A642]/20 px-5 py-2 font-bold text-[#D4A642] transition-all hover:bg-[#D4A642]/30"
               >
-                {savedGames.some((g) => g.sessionId === generatedGame.id)
-                  ? "Saved"
-                  : "Save Game"}
-              </button>
-              <button
-                onClick={() => handleGenerate(selectedCategories.length > 0 ? "custom" : "wildcard")}
-                className="rounded bg-white/10 px-5 py-2 font-medium text-white/60 transition-all hover:bg-white/20 hover:text-white"
-              >
-                Shuffle Again
+                Save
               </button>
             </div>
           </div>
         )}
 
-        {/* Category Selection — shown when no game generated */}
-        {!generatedGame && (
-          <>
-            {/* Category Selection */}
-            <div className="mb-6">
-              <p className="mb-3 text-sm text-white/40">
-                Select up to 6 categories{" "}
-                <span className="text-[#8B3530]/60">
-                  ({selectedCategories.length}/6)
-                </span>
-              </p>
-
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {categories.map((cat) => (
-                  <button
-                    key={cat.name}
-                    onClick={() => toggleCategory(cat.name)}
-                    disabled={
-                      selectedCategories.length >= 6 &&
-                      !selectedCategories.includes(cat.name)
-                    }
-                    className={`flex items-center justify-between rounded-lg border px-4 py-3 text-left transition-all ${
-                      selectedCategories.includes(cat.name)
-                        ? "border-[#8B3530]/50 bg-[#8B3530]/10"
-                        : "border-white/10 bg-[#1C2E22] hover:border-white/20"
-                    } ${
-                      selectedCategories.length >= 6 &&
-                      !selectedCategories.includes(cat.name)
-                        ? "opacity-30 cursor-not-allowed"
-                        : ""
-                    }`}
-                  >
-                    <div>
-                      <span
-                        className={`font-medium ${
-                          selectedCategories.includes(cat.name)
-                            ? "text-[#8B3530]"
-                            : "text-white/70"
-                        }`}
-                      >
-                        {cat.name}
-                      </span>
-                      <span className="ml-2 text-xs text-white/30">
-                        {cat.count} questions
-                      </span>
-                    </div>
-                    <span className="text-xs text-white/20">
-                      {cat.count}
-                    </span>
-                  </button>
-                ))}
-              </div>
-
-              {selectedCategories.length > 0 && (
-                <button
-                  onClick={() => handleGenerate("custom")}
-                  className="mt-4 w-full rounded-lg bg-[#8B3530] py-3 text-center font-bold text-black transition-all hover:bg-[#8B3530]/90"
-                >
-                  Generate Game ({selectedCategories.length} rounds)
-                </button>
-              )}
-            </div>
-          </>
-        )}
-
-        {/* Saved Wildcard Games */}
         {savedGames.length > 0 && (
           <div className="mt-8">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="h-px flex-1 bg-[#8FAA73]/20" />
-              <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#8FAA73]/40">
-                {savedGames.length} saved game{savedGames.length !== 1 ? "s" : ""}
+            <div className="mb-3 flex items-center gap-3">
+              <div className="h-px flex-1 bg-[#8B3530]/30" />
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#8B3530]/60">
+                Saved games
               </p>
-              <div className="h-px flex-1 bg-[#8FAA73]/20" />
+              <div className="h-px flex-1 bg-[#8B3530]/30" />
             </div>
-            <div className="space-y-3">
-              {savedGames.map((game) => (
-                <div
-                  key={game.sessionId}
-                  className="flex items-center justify-between rounded-lg border border-white/10 bg-[#1C2E22] p-4 sm:p-5 transition-all hover:border-[#8FAA73]/40"
-                >
-                  <Link href={`/present/${game.sessionId}`} className="flex-1">
-                    <h3 className="font-bold text-white">{game.date}</h3>
-                    <div className="mt-1 flex flex-wrap gap-1.5">
-                      {game.roundTopics.map((t) => (
-                        <span
-                          key={t}
-                          className="rounded-full bg-[#8FAA73]/10 px-2.5 py-0.5 text-xs text-[#8FAA73]/70"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
+            <div className="space-y-2">
+              {savedGames.map((g) => (
+                <div key={g.sessionId} className="flex items-center justify-between rounded-lg border border-[#3D3D3A]/15 bg-transparent p-3">
+                  <Link href={`/present/${g.sessionId}`} className="flex-1">
+                    <p className="text-sm font-medium text-[#3D3D3A]">{g.name}</p>
+                    <p className="mt-0.5 text-xs text-[#3D3D3A]/50">{g.date}</p>
                   </Link>
                   <button
-                    onClick={() => handleDeleteSaved(game.sessionId)}
-                    className="ml-3 rounded px-2 py-1 text-xs text-[#C26B3E]/40 transition-colors hover:bg-[#C26B3E]/10 hover:text-[#C26B3E]"
-                    title="Remove"
+                    onClick={() => handleDelete(g.sessionId)}
+                    className="rounded px-2 py-1 text-xs text-[#C26B3E]/60 hover:bg-[#C26B3E]/10 hover:text-[#C26B3E]"
                   >
                     ×
                   </button>
