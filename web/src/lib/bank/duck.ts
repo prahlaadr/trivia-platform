@@ -1,42 +1,32 @@
 /**
- * DuckDB singleton — server-side only.
+ * Bank loader — reads a pre-exported JSON snapshot of the trivia bank.
  *
- * The bank is read-only at runtime. The file lives at web/.bank/trivia.duckdb
- * (gitignored — populated at deploy time via prebuild step from Vercel Blob).
+ * Why JSON not DuckDB at runtime: DuckDB's native binding requires
+ * libduckdb.so which isn't present in Vercel's serverless runtime.
+ * The bank is small enough (~7.6MB JSON, 18.6K questions) to load
+ * once per Lambda cold start and filter in JS.
  *
- * Uses @duckdb/node-api (modern async API) — works cleanly with Turbopack.
+ * Local ingest scripts still use Python DuckDB to edit the bank;
+ * scripts/ingest/export_json.py dumps to web/.bank/bank.json after
+ * every change.
  */
 
-import { DuckDBInstance, type DuckDBConnection } from "@duckdb/node-api";
+import fs from "node:fs";
 import path from "node:path";
+import type { BankCategory, BankSubcategory, BankQuestion } from "./types";
 
-const DB_PATH = path.join(process.cwd(), ".bank", "trivia.duckdb");
-
-let _connPromise: Promise<DuckDBConnection> | null = null;
-
-async function makeConn(): Promise<DuckDBConnection> {
-  // Read-only open via attach option
-  const instance = await DuckDBInstance.create(DB_PATH, {
-    access_mode: "READ_ONLY",
-  });
-  return instance.connect();
+interface BankSnapshot {
+  categories: BankCategory[];
+  subcategories: BankSubcategory[];
+  questions: BankQuestion[];
 }
 
-export function getConn(): Promise<DuckDBConnection> {
-  if (!_connPromise) _connPromise = makeConn();
-  return _connPromise;
-}
+let _bank: BankSnapshot | null = null;
 
-/**
- * Run a SQL query and return rows as plain JS objects.
- * All values must be inlined into the SQL (escape with sql-escape helpers
- * in queries.ts). The DuckDB Node API supports prepared statements but the
- * query layer here uses static SQL composition.
- */
-export async function query<T = Record<string, unknown>>(
-  sql: string
-): Promise<T[]> {
-  const conn = await getConn();
-  const reader = await conn.runAndReadAll(sql);
-  return reader.getRowObjects() as T[];
+export function getBank(): BankSnapshot {
+  if (_bank) return _bank;
+  const p = path.join(process.cwd(), ".bank", "bank.json");
+  const raw = fs.readFileSync(p, "utf-8");
+  _bank = JSON.parse(raw) as BankSnapshot;
+  return _bank;
 }
