@@ -72,10 +72,18 @@ export async function POST(req: Request) {
   // FAST PATH: topic is a known category — pull the whole category, no
   // text filtering. This is the random-wildcard case (page sends slugs
   // like "science-nature" as topics).
+  //
+  // EXCLUDE dirty-south (pub-quiz) source here because those questions
+  // depend on round-level context ("Heart, Death, Eyes, Fire" connection
+  // puzzles, progressive clues, etc.) which is stripped when picked
+  // individually. They stay in the bank — and remain available for
+  // typed-topic searches and the upcoming full-quiz presentation flow
+  // — but we don't surface them in random picks.
   if (resolved.topicIsCategory && resolved.categorySlug) {
     questions = await pickQuestions({
       ...base,
       categorySlug: resolved.categorySlug,
+      excludeSources: ["dirty-south"],
     });
     if (questions.length > 0) fallbackUsed = "category-broad";
   }

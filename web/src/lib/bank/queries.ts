@@ -24,6 +24,8 @@ export interface PickOptions {
   difficulty?: DifficultyFilter;
   count: number;
   excludeIds?: string[];
+  excludeSources?: string[];   // e.g. ['dirty-south'] for random Wildcard,
+                               // because those Qs depend on round context
   allowTimeSensitive?: boolean;
   fuzzyTopic?: string;
 }
@@ -42,8 +44,10 @@ export async function pickQuestions(opts: PickOptions): Promise<BankQuestion[]> 
   const excluded = new Set(opts.excludeIds ?? []);
   const fuzzyLower = opts.fuzzyTopic?.toLowerCase();
 
+  const excludedSources = new Set(opts.excludeSources ?? []);
   const candidates = all.filter((q) => {
     if (excluded.has(q.id)) return false;
+    if (excludedSources.has(q.source)) return false;
     if (!opts.allowTimeSensitive && (q as BankQuestion & { timeSensitive?: boolean }).timeSensitive) return false;
     if (opts.categorySlug && q.categorySlug !== opts.categorySlug) return false;
     if (opts.subcategorySlug && q.subcategorySlug !== opts.subcategorySlug) return false;
