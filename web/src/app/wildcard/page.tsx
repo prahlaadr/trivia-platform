@@ -22,6 +22,21 @@ interface ApiQuestion {
   sourceUrl: string | null;
   categorySlug: string;
   subcategorySlug: string;
+  questionType?: "open_ended" | "multiple_choice" | "true_false";
+}
+
+/**
+ * A statement without a question mark reads like a fact at game time.
+ * Prefix T/F questions so the host & audience know they're being asked
+ * to verdict, not finish-the-sentence.
+ *   - if API flags type as true_false → prefix
+ *   - OR if the answer is literally "True" / "False" → prefix
+ */
+function withTrueFalsePrefix(q: ApiQuestion): string {
+  if (q.text.startsWith("T/F:") || q.text.startsWith("True/False:")) return q.text;
+  const ans = q.answer.trim().toLowerCase();
+  const isTF = q.questionType === "true_false" || ans === "true" || ans === "false";
+  return isTF ? `T/F: ${q.text}` : q.text;
 }
 
 interface TopicResponse {
@@ -134,7 +149,7 @@ export default function WildcardPage() {
           questions: res.questions.map(
             (q, j): GeneratedQuestion => ({
               number: j + 1,
-              text: q.text,
+              text: withTrueFalsePrefix(q),
               answer: q.answer,
               topic: picks[i].topic,
               source: "bank",
@@ -156,7 +171,9 @@ export default function WildcardPage() {
           status: "ready",
           teams: [],
           rounds,
-          tieBreaker: tb ? { question: tb.text, answer: tb.answer } : undefined,
+          tieBreaker: tb
+            ? { question: withTrueFalsePrefix(tb), answer: tb.answer }
+            : undefined,
         };
 
         setGenerated(session);
