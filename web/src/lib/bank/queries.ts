@@ -55,14 +55,21 @@ export async function pickQuestions(opts: PickOptions): Promise<BankQuestion[]> 
     return true;
   });
 
-  // Sort by quality desc, then random within ties
+  // Rank by: quality + length-bonus (pub-quiz-style questions float up) + jitter.
+  // Length tiers: ≥150 chars +0.20, ≥80 chars +0.10, <80 chars 0.
+  // Jitter is wide enough (0.05) that within a tier we still get variety
+  // run-to-run, but tight enough not to drown out the length signal.
   const ranked = candidates
-    .map((q) => ({ q, key: q.qualityScore + Math.random() * 0.001 }))
+    .map((q) => {
+      const len = q.text.length;
+      const lengthBonus = len >= 150 ? 0.2 : len >= 80 ? 0.1 : 0;
+      return { q, key: q.qualityScore + lengthBonus + Math.random() * 0.05 };
+    })
     .sort((a, b) => b.key - a.key)
     .map(({ q }) => q);
 
-  // Take top quality but with some randomness — pick from top 2*count
-  const top = ranked.slice(0, Math.max(opts.count * 2, opts.count));
+  // Take top quality, then shuffle within the top slice for picking
+  const top = ranked.slice(0, Math.max(opts.count * 3, opts.count));
   return shuffle(top).slice(0, Math.max(1, Math.min(50, opts.count)));
 }
 
