@@ -234,12 +234,12 @@ def main() -> int:
     ).fetchone()[0]
 
     print(f"\nVerification:")
-    print(f"  active categories     : {n_cat}  (expected 15)")
-    print(f"  active subcategories  : {n_sub}  (expected 50)")
+    print(f"  active categories     : {n_cat}  (expected 16)")
+    print(f"  active subcategories  : {n_sub}  (expected 55)")
     print(f"  tags                  : {n_tag}  (expected 28)")
-    print(f"  catchall subcats      : {n_catchall}  (expected 15, one per category)")
+    print(f"  catchall subcats      : {n_catchall}  (expected 16, one per category)")
 
-    ok = n_cat == 15 and n_sub == 50 and n_tag == 28 and n_catchall == 15
+    ok = n_cat == 16 and n_sub == 55 and n_tag == 28 and n_catchall == 16
     if not ok:
         print("\nFAIL: counts don't match expected.", file=sys.stderr)
         return 1

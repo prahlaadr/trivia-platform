@@ -87,12 +87,26 @@ categories:
     name: Games & Toys
     sort_order: 10
     subcategories:
-      - { slug: video-games, name: Video Games, is_catchall: true }
-      - { slug: analog-games-toys, name: Analog Games & Toys }
+      # NOTE: video-games stays here as a soft pointer for legacy questions
+      # not yet migrated, but the canonical home for video games is the
+      # standalone "video-games" top-level category below. New rules
+      # route there, not here.
+      - { slug: video-games, name: Video Games (legacy) }
+      - { slug: analog-games-toys, name: Analog Games & Toys, is_catchall: true }
+
+  - slug: video-games
+    name: Video Games
+    sort_order: 16
+    subcategories:
+      - { slug: nintendo, name: Nintendo }
+      - { slug: playstation-xbox, name: PlayStation & Xbox }
+      - { slug: pc-indie, name: PC & Indie }
+      - { slug: retro-arcade, name: Retro & Arcade }
+      - { slug: general-video-games, name: General Video Games, is_catchall: true }
 
   - slug: tech-internet
     name: Tech & Internet
-    sort_order: 11
+    sort_order: 12
     subcategories:
       - { slug: companies-tech, name: Companies & Tech, is_catchall: true }
       - { slug: internet-memes-social, name: Internet, Memes & Social }
@@ -100,7 +114,7 @@ categories:
 
   - slug: politics-society
     name: Politics & Society
-    sort_order: 12
+    sort_order: 13
     subcategories:
       - { slug: leaders-world, name: World Leaders, is_catchall: true }
       - { slug: elections-economics, name: Elections & Economics }
@@ -108,7 +122,7 @@ categories:
 
   - slug: myth-religion
     name: Mythology & Religion
-    sort_order: 13
+    sort_order: 14
     subcategories:
       - { slug: western-myth, name: Western Mythology, is_catchall: true }
       - { slug: eastern-myth-religion, name: Eastern Mythology & Religion }
@@ -116,14 +130,14 @@ categories:
 
   - slug: language-words
     name: Language & Words
-    sort_order: 14
+    sort_order: 15
     subcategories:
       - { slug: etymology-idioms-slang, name: Etymology, Idioms & Slang, is_catchall: true }
       - { slug: wordplay-quotes-grammar, name: Wordplay, Quotes & Grammar }
 
   - slug: pop-misc
     name: Pop Culture & Misc
-    sort_order: 15
+    sort_order: 16
     subcategories:
       - { slug: general-knowledge, name: General Knowledge, is_catchall: true }
       - { slug: celebrities-people, name: Celebrities & People }

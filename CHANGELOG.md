@@ -1,6 +1,48 @@
 # Changelog
 
 ## 2026-05-24 — Snapshot
+_Split video-games into its own top-level (16 cats total); migrated 1,209 questions_
+**Snapshot:** `data/bank/snapshots/2026-05-24`
+**Total questions:** 19,101
+**Tag assignments:** 2,909 (11 distinct tags used)
+
+### By source
+| Source | Rows |
+|---|---:|
+| r-trivia | 13,454 |
+| opentdb | 5,203 |
+| dirty-south | 444 |
+
+### Catchall % per category (lower is better)
+| Category | % on catchall |
+|---|---:|
+| art-design | 96.3% |
+| film-tv | 55.2% |
+| food-drink | 76.7% |
+| games-toys | 100.0% |
+| geography | 62.5% |
+| history | 93.4% |
+| language-words | 0.0% |
+| literature | 58.7% |
+| music | 84.6% |
+| myth-religion | 81.1% |
+| politics-society | 80.9% |
+| pop-misc | 85.1% |
+| science-nature | 66.4% |
+| sport | 59.0% |
+| tech-internet | 42.4% |
+| video-games | 74.1% |
+
+### Files (rows / bytes / sha256 prefix)
+| Table | Rows | Bytes | sha256 |
+|---|---:|---:|---|
+| category | 16 | 1,252 | `2f28033910d261c6` |
+| subcategory | 55 | 2,988 | `69a4151503d075a2` |
+| tag | 28 | 1,376 | `7e5936e3150615ab` |
+| question | 19,101 | 3,315,463 | `047a6e3a6364be55` |
+| question_tag | 2,909 | 48,606 | `36adf6904c1fbeb8` |
+
+## 2026-05-24 — Snapshot
 _Ingested 14 Dirty South Pub Quiz docs (quizzes 548-602, 444 new questions, quality_score 0.85)_
 **Snapshot:** `data/bank/snapshots/2026-05-24`
 **Total questions:** 19,101

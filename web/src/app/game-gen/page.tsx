@@ -32,6 +32,7 @@ const SUGGESTED_TOPICS = [
   "Literature",
   "Art & Design",
   "Games & Toys",
+  "Video Games",
   "Tech & Internet",
   "Politics & Society",
   "Mythology & Religion",

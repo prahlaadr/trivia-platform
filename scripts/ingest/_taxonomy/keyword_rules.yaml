@@ -34,10 +34,31 @@ subcategory_rules:
   # Added 2026-05-23 after the bank audit (see CHANGELOG).
   # ─────────────────────────────────────────────────────────────
 
-  # Video game franchises stuck in film-tv / history / pop-misc
+  # Video game franchises stuck anywhere → standalone video-games top-level
   - match: '(?i)\b(in (the (game|video game)|halo|gears of war|call of duty|valorant|overwatch|assassin''s creed|uncharted|resident evil|metal gear solid|god of war|elden ring|bloodborne|dark souls|kingdom hearts|final fantasy|grand theft auto|red dead redemption|skyrim|fallout|destiny 2|warframe|league of legends|world of warcraft|fortnite|minecraft|pokemon (red|blue|gold|silver|sword|shield)|super mario|the legend of zelda|sonic the hedgehog|street fighter|mortal kombat|tekken))\b'
-    set_category: games-toys
-    set_subcategory: video-games
+    set_category: video-games
+    set_subcategory: general-video-games
+
+  # Nintendo-specific titles
+  - if_category: video-games
+    match: '(?i)\b(super mario|mario kart|mario party|the legend of zelda|breath of the wild|tears of the kingdom|metroid|donkey kong|kirby|splatoon|animal crossing|fire emblem|pokemon|super smash bros|smash bros|nintendo (switch|wii|3ds|ds|gamecube|64))\b'
+    set_subcategory: nintendo
+
+  # PlayStation / Xbox-flagship titles
+  - if_category: video-games
+    match: '(?i)\b(playstation|xbox|halo|gears of war|forza|uncharted|god of war|the last of us|horizon zero dawn|bloodborne|gran turismo|killzone|metal gear solid|red dead redemption|sony first[ -]party|microsoft (studios|game studios))\b'
+    set_subcategory: playstation-xbox
+
+  # PC / indie-leaning titles
+  - if_category: video-games
+    match: '(?i)\b(steam (deck|game)|half[ -]life|portal|counter[ -]strike|cs:?go|dota 2|world of warcraft|hearthstone|league of legends|valorant|minecraft|stardew valley|terraria|hollow knight|celeste|undertale|hades game|among us|fortnite|apex legends|destiny 2|warframe|garry''s mod|rust game)\b'
+    set_subcategory: pc-indie
+
+  # Retro / arcade
+  - if_category: video-games
+    match: '(?i)\b(pac[ -]?man|space invaders|donkey kong jr|frogger|asteroids|tetris|pong|atari (2600|7800|jaguar|lynx|st)|commodore 64|nes (game|cartridge)|snes|sega (genesis|saturn|dreamcast|master system)|arcade game|game ?boy|wii original|early video games)\b'
+    set_subcategory: retro-arcade
+
 
   # Movie / film adaptation questions stuck in literature
   - if_category: literature
