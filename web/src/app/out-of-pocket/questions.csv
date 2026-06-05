@@ -1,7 +1,7 @@
 "Phase","Phase Title","Q#","Question","Points","Answer","Notes"
 "1","Phase 1: SQL trivia!","1","What does SQL stand for?","1","Structured Query Language",""
 "1","Phase 1: SQL trivia!","2","What does the “R” stand for in the R programming language?","1","Ross (Ihaka) or Robert (Gentleman): creators of R language",""
-"1","Phase 1: SQL trivia!","3","Put these in the correct order of evaluation (all or nothing):","3","FROM → WHERE → HAVING → SELECT → LIMIT","multiple choice"
+"1","Phase 1: SQL trivia!","3","Put these in the correct order of evaluation (all or nothing):","2","FROM → WHERE → HAVING → SELECT → LIMIT","multiple choice"
 "2","Phase 2: Sequel trivia","1","Which of the following are real Avatar movie sequels?","3","Way of Water, Fire and Ash, The Tulkun Rider (correct)","multi-select (pick all)"
 "2","Phase 2: Sequel trivia","2","Who directed The Last Jedi?","1","Rian Johnson","multiple choice"
 "2","Phase 2: Sequel trivia","3","What movie was “Electric Boogaloo” originally the sequel to?","1","Breakin’","image"

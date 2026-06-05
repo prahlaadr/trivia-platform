@@ -104,7 +104,7 @@ export const sections: DeckSection[] = [
       {
         number: 3,
         text: "Put these in the correct order of evaluation (all or nothing):",
-        points: 3,
+        points: 2,
         bullets: ["SELECT", "FROM", "WHERE", "LIMIT", "HAVING"],
         answer: "FROM → WHERE → HAVING → SELECT → LIMIT",
       },
