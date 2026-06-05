@@ -77,21 +77,21 @@ export function OopSectionSlide({
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0">
-        {/* SECTION N label sits inside the tabbed-folder tab */}
-        <p className="absolute left-[15%] top-[22%] text-[1.4cqw] font-extrabold tracking-[0.3em] text-[var(--oop-cyan)]">
-          SECTION {sectionNumber}
+        {/* SECTION N + tagline, folded into the cyan folder tab. Width is
+            capped so the line wraps before the tab's diagonal notch instead
+            of spilling out of the tab. */}
+        <p className="absolute left-[14%] top-[16%] w-[27%] text-[1.7cqw] font-extrabold leading-[1.2] text-[var(--oop-cyan)]">
+          <span className="tracking-[0.22em]">SECTION {sectionNumber}</span>
+          {subtitle ? ` ${subtitle}` : ""}
         </p>
         {/* Content stacks vertically and stays clear of the baked-in black
             divider line near the bottom of the card. */}
-        <div className="absolute inset-x-[10%] top-[42%] bottom-[15%] flex flex-col gap-[1.5cqh] overflow-hidden">
-          <h2 className="text-[3.6cqw] font-extrabold leading-tight text-black">
+        <div className="absolute inset-x-[10%] top-[44%] bottom-[15%] flex flex-col gap-[1.5cqh] overflow-hidden">
+          <h2 className="text-[4cqw] font-extrabold leading-tight text-black">
             {sectionTitle}
           </h2>
-          {subtitle && (
-            <p className="text-[1.6cqw] text-black/60">{subtitle}</p>
-          )}
           {body && (
-            <p className="text-[1.3cqw] leading-snug text-black">{body}</p>
+            <p className="text-[1.5cqw] leading-snug text-black">{body}</p>
           )}
         </div>
       </div>

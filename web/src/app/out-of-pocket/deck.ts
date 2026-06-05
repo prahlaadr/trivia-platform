@@ -1,7 +1,9 @@
-/* Out of Pocket sample deck — Sep 2025 SQL Trivia full content
- * plus a new "SQL at the Movies" Section 4 contributed for Data Camp 2026.
+/* Out of Pocket — Data Camp, June 2026.
  *
- * Source: outofpocket-sql-trivia-sep-2025.pdf (the Sep 2025 OOP trivia deck).
+ * This is the SINGLE SOURCE OF TRUTH for the live /out-of-pocket deck.
+ * Edit sections/questions here; regenerate the tracking ledger with
+ * `bun run export-csv`. (Built on the Sep 2025 SQL Trivia deck, since
+ * expanded with the "SQL at the Movies" round and re-dated for Data Camp.)
  * Each question becomes a (question slide) → (reveal slide) pair via buildDeck.
  */
 
@@ -74,7 +76,7 @@ interface DeckSection {
   questions: DeckQuestion[];
 }
 
-const sections: DeckSection[] = [
+export const sections: DeckSection[] = [
   {
     number: 0,
     title: "Get into your teams + team name",
@@ -135,9 +137,10 @@ const sections: DeckSection[] = [
       },
       {
         number: 2,
-        text: "What year was The Empire Strikes Back released?",
+        text: "Who directed The Last Jedi?",
         points: 1,
-        answer: "1980",
+        bullets: ["Kathleen Kennedy", "JJ Abrams", "Rian Johnson", "Terry Gilliam"],
+        answer: "Rian Johnson",
       },
       {
         number: 3,
@@ -157,10 +160,9 @@ const sections: DeckSection[] = [
       },
       {
         number: 5,
-        text: "The Devil Wears Prada 2 is in production for a 2026 release. What does Anne Hathaway’s character Andy do for a living when the sequel opens, per the early reports?",
+        text: "The Devil Wears Prada 2 (out 2026) reportedly went by a one-word codename on its casting calls — the very color Miranda Priestly (Meryl Streep) dissects in her famous monologue about the fashion industry’s cultural reach in the first film. What’s the word?",
         points: 2,
-        answer:
-          "She’s a magazine executive (Vogue-esque) trying to land Miranda Priestly as a guest editor — “Andy is now the boss.”",
+        answer: "Cerulean",
       },
       {
         number: 6,
@@ -172,7 +174,7 @@ const sections: DeckSection[] = [
   },
   {
     number: 3,
-    title: "Phase 3: ??? trivia",
+    title: "Phase 3: “Sounds Like SQL” Trivia",
     subtitle: "Open your minds for this one",
     questions: [
       {
@@ -322,7 +324,7 @@ export function buildDeck(): Slide[] {
     type: "cover",
     title: "SQL trivia",
     subtitle: "LIMIT 100 questions",
-    date: "Sep 2025",
+    date: "Out of Pocket · Data Camp · June 2026",
   });
 
   // Each phase is self-contained: cyan section divider → questions for that
@@ -361,7 +363,7 @@ export function buildDeck(): Slide[] {
     slides.push({
       type: "answers-divider",
       title: `PHASE ${section.number} · ANSWERS`,
-      date: "Sep 2025",
+      date: "Data Camp · June 2026",
     });
 
     for (const q of section.questions) {
@@ -398,4 +400,4 @@ export function buildDeck(): Slide[] {
   return slides;
 }
 
-export const DECK_TITLE = "Sep 2025 SQL Trivia · expanded for Data Camp";
+export const DECK_TITLE = "Out of Pocket · Data Camp · June 2026";
