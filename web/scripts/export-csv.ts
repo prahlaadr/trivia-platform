@@ -5,10 +5,12 @@
  * Never hand-edit the CSV — regenerate it: `bun run export-csv`.
  */
 import { writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { sections } from "../src/app/out-of-pocket/deck";
 
-const OUT = join(import.meta.dir, "..", "src", "app", "out-of-pocket", "questions.csv");
+const HERE = dirname(fileURLToPath(import.meta.url));
+const OUT = join(HERE, "..", "src", "app", "out-of-pocket", "questions.csv");
 
 /** RFC-4180 CSV field: wrap in quotes and double any embedded quotes. */
 function csv(value: string | number): string {
