@@ -80,7 +80,7 @@ export function OopSectionSlide({
         {/* SECTION N + tagline, folded into the cyan folder tab. Width is
             capped so the line wraps before the tab's diagonal notch instead
             of spilling out of the tab. */}
-        <p className="absolute left-[14%] top-[16%] w-[27%] text-[1.7cqw] font-extrabold leading-[1.2] text-[var(--oop-cyan)]">
+        <p className="absolute left-[16%] top-[20%] w-[26%] text-[1.6cqw] font-extrabold leading-[1.2] text-[var(--oop-cyan)]">
           <span className="tracking-[0.22em]">SECTION {sectionNumber}</span>
           {subtitle ? ` ${subtitle}` : ""}
         </p>
