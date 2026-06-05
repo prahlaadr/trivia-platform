@@ -163,6 +163,8 @@ export const sections: DeckSection[] = [
         text: "The Devil Wears Prada 2 (out 2026) reportedly went by a one-word codename on its casting calls — the very color Miranda Priestly (Meryl Streep) dissects in her famous monologue about the fashion industry’s cultural reach in the first film. What’s the word?",
         points: 2,
         answer: "Cerulean",
+        revealImageSrc: "/oop/img-cerulean.png",
+        revealCaption: "Andy’s “lumpy blue sweater” — cerulean, per Miranda’s monologue.",
       },
       {
         number: 6,
