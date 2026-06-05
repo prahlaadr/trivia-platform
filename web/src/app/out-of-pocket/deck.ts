@@ -250,34 +250,18 @@ export const sections: DeckSection[] = [
         number: 2,
         text: "Identify the movie from the SQL:",
         points: 1,
-        codeBlock:
-          "BEGIN TRANSACTION;\nROLLBACK;\nBEGIN TRANSACTION;\nROLLBACK;\n-- ad infinitum",
-        answer: "Groundhog Day",
-      },
-      {
-        number: 3,
-        text: "Identify the movie from the SQL:",
-        points: 1,
         codeBlock: "UPDATE students\nSET status = 'wizard'\nWHERE age = 11;",
         answer: "Harry Potter and the Sorcerer’s Stone",
       },
       {
-        number: 4,
-        text: "Identify the movie from the SQL:",
-        points: 1,
-        codeBlock:
-          "SELECT TOP 1 *\nFROM candidates\nORDER BY kill_count DESC;",
-        answer: "John Wick",
-      },
-      {
-        number: 5,
+        number: 3,
         text: "Identify the movie from the SQL:",
         points: 1,
         codeBlock: "DROP TABLE skynet;",
         answer: "Terminator 2: Judgment Day",
       },
       {
-        number: 6,
+        number: 4,
         text: "Identify the movie from the SQL:",
         points: 1,
         codeBlock:
@@ -285,31 +269,7 @@ export const sections: DeckSection[] = [
         answer: "Back to the Future",
       },
       {
-        number: 7,
-        text: "Identify the movie from the SQL:",
-        points: 1,
-        codeBlock:
-          "SELECT name FROM fish\nWHERE parent = 'Marlin'\n  AND status = 'missing';",
-        answer: "Finding Nemo",
-      },
-      {
-        number: 8,
-        text: "Identify the movie from the SQL:",
-        points: 1,
-        codeBlock:
-          "DELETE FROM Matrix\nWHERE type = 'human'\n  AND awakened = FALSE;",
-        answer: "The Matrix",
-      },
-      {
-        number: 9,
-        text: "Identify the movie from the SQL:",
-        points: 1,
-        codeBlock:
-          "ALTER TABLE Bruce_Wayne\nADD COLUMN persona VARCHAR(10)\nDEFAULT 'Batman';",
-        answer: "Batman Begins",
-      },
-      {
-        number: 10,
+        number: 5,
         text: "Identify the movie from the SQL:",
         points: 1,
         codeBlock:
