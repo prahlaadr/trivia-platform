@@ -98,7 +98,7 @@ export const sections: DeckSection[] = [
       {
         number: 2,
         text: "What does the “R” stand for in the R programming language?",
-        points: 2,
+        points: 1,
         answer: "Ross (Ihaka) or Robert (Gentleman): creators of R language",
       },
       {
