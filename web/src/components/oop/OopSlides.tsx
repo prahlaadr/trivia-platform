@@ -77,13 +77,17 @@ export function OopSectionSlide({
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0">
-        {/* SECTION N + tagline, folded into the cyan folder tab. Width is
-            capped so the line wraps before the tab's diagonal notch instead
-            of spilling out of the tab. */}
-        <p className="absolute left-[16%] top-[20%] w-[26%] text-[1.6cqw] font-extrabold leading-[1.2] text-[var(--oop-cyan)]">
-          <span className="tracking-[0.22em]">SECTION {sectionNumber}</span>
-          {subtitle ? ` ${subtitle}` : ""}
-        </p>
+        {/* SECTION N + tagline, flex-centered inside the white folder tab.
+            The box matches the tab protrusion measured from
+            template-section-cyan.png (1920×1080): the white lobe spans
+            y 22.3%–34.4% and x 12%–43%. items-center + text-center keep the
+            (possibly 2-line) header centered in the lobe, clear of the notch. */}
+        <div className="absolute left-[12.1%] top-[22.3%] h-[12.1%] w-[31%] flex items-center justify-center text-center text-[1.5cqw] font-extrabold leading-[1.15] text-[var(--oop-cyan)]">
+          <p>
+            <span className="tracking-[0.22em]">SECTION {sectionNumber}</span>
+            {subtitle ? ` ${subtitle}` : ""}
+          </p>
+        </div>
         {/* Content stacks vertically and stays clear of the baked-in black
             divider line near the bottom of the card. */}
         <div className="absolute inset-x-[10%] top-[44%] bottom-[15%] flex flex-col gap-[1.5cqh] overflow-hidden">
