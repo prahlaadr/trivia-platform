@@ -45,7 +45,7 @@ export type Slide =
     }
   | { type: "answers-divider"; title?: string; date?: string };
 
-interface DeckQuestion {
+export interface DeckQuestion {
   number: number;
   text: string;
   points: number;
@@ -67,7 +67,7 @@ interface DeckQuestion {
   sourceLabel?: string;
 }
 
-interface DeckSection {
+export interface DeckSection {
   number: number;
   title: string;
   subtitle?: string;
@@ -76,7 +76,9 @@ interface DeckSection {
   questions: DeckQuestion[];
 }
 
-export const sections: DeckSection[] = [
+/** The baked-in deck. Used as the seed/default when no saved deck exists,
+ *  and as the "Reset to original" target. */
+export const DEFAULT_SECTIONS: DeckSection[] = [
   {
     number: 0,
     title: "Get into your teams + team name",
@@ -280,7 +282,10 @@ export const sections: DeckSection[] = [
   },
 ];
 
-export function buildDeck(): Slide[] {
+/** Backwards-compatible alias for the baked-in deck. */
+export const sections = DEFAULT_SECTIONS;
+
+export function buildDeck(deckSections: DeckSection[] = DEFAULT_SECTIONS): Slide[] {
   const slides: Slide[] = [];
   slides.push({
     type: "cover",
@@ -295,7 +300,7 @@ export function buildDeck(): Slide[] {
   // read out the round, collect answers, then reveal that round's answers
   // before moving on to the next phase. Phases with no questions (Section 0
   // / team intro) emit just the section divider.
-  for (const section of sections) {
+  for (const section of deckSections) {
     slides.push({
       type: "section",
       sectionNumber: section.number,

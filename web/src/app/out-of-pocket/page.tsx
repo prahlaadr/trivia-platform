@@ -1,180 +1,64 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  OopCoverSlide,
-  OopSectionSlide,
-  OopQuestionSlide,
-  OopRevealSlide,
-  OopAnswersDividerSlide,
-} from "@/components/oop/OopSlides";
-import { buildDeck, DECK_TITLE, type Slide } from "./deck";
+import { loadDeck } from "@/lib/oopDeck";
 
-function RenderSlide({ slide }: { slide: Slide }) {
-  switch (slide.type) {
-    case "cover":
-      return <OopCoverSlide title={slide.title} subtitle={slide.subtitle} date={slide.date} />;
-    case "section":
-      return (
-        <OopSectionSlide
-          sectionNumber={slide.sectionNumber}
-          sectionTitle={slide.sectionTitle}
-          subtitle={slide.subtitle}
-          body={slide.body}
-        />
-      );
-    case "question":
-      return (
-        <OopQuestionSlide
-          number={slide.number}
-          text={slide.text}
-          points={slide.points}
-          bullets={slide.bullets}
-          codeBlock={slide.codeBlock}
-          imageSrc={slide.imageSrc}
-          imageSrc2={slide.imageSrc2}
-          caption={slide.caption}
-          sourceUrl={slide.sourceUrl}
-          sourceLabel={slide.sourceLabel}
-        />
-      );
-    case "reveal":
-      return (
-        <OopRevealSlide
-          number={slide.number}
-          text={slide.text}
-          points={slide.points}
-          answer={slide.answer}
-          bullets={slide.bullets}
-          codeBlock={slide.codeBlock}
-          imageSrc={slide.imageSrc}
-          imageSrc2={slide.imageSrc2}
-          caption={slide.caption}
-          sourceUrl={slide.sourceUrl}
-          sourceLabel={slide.sourceLabel}
-        />
-      );
-    case "answers-divider":
-      return <OopAnswersDividerSlide title={slide.title} date={slide.date} />;
-  }
-}
-
-export default function OutOfPocketPresenter() {
-  const deck = useMemo(() => buildDeck(), []);
-  const [index, setIndex] = useState(0);
-  const total = deck.length;
-  const slide = deck[index];
-
-  const goNext = useCallback(() => {
-    setIndex((i) => Math.min(i + 1, total - 1));
-  }, [total]);
-
-  const goPrev = useCallback(() => {
-    setIndex((i) => Math.max(i - 1, 0));
-  }, []);
-
-  const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  }, []);
+export default function OutOfPocketLobby() {
+  const [title, setTitle] = useState("Out of Pocket");
+  const [stats, setStats] = useState<{ rounds: number; questions: number } | null>(
+    null
+  );
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter") {
-        e.preventDefault();
-        goNext();
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        goPrev();
-      } else if (e.key === "f" || e.key === "F") {
-        toggleFullscreen();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [goNext, goPrev, toggleFullscreen]);
+    loadDeck().then((deck) => {
+      setTitle(deck.title);
+      const rounds = deck.sections.filter((s) => s.questions.length > 0).length;
+      const questions = deck.sections.reduce(
+        (sum, s) => sum + s.questions.length,
+        0
+      );
+      setStats({ rounds, questions });
+    });
+  }, []);
 
   return (
-    <div className="oop-scope flex h-dvh flex-col">
-      {/* Top toolbar */}
-      <div className="flex items-center justify-between border-b-2 border-black px-6 py-3">
+    <div className="oop-scope flex min-h-dvh flex-col items-center justify-center px-6 py-12">
+      <div className="w-full max-w-xl text-center">
+        <img
+          src="/oop/oop-wordmark.svg"
+          alt="OUT-OF-POCKET"
+          className="mx-auto mb-10 h-8 w-auto"
+        />
+        <h1 className="text-5xl font-extrabold leading-none sm:text-6xl">{title}</h1>
+        {stats && (
+          <p className="mt-4 text-sm font-bold uppercase tracking-[0.25em] text-black/50">
+            {stats.rounds} {stats.rounds === 1 ? "round" : "rounds"} ·{" "}
+            {stats.questions} {stats.questions === 1 ? "question" : "questions"}
+          </p>
+        )}
+
+        <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:justify-center">
+          <Link
+            href="/out-of-pocket/edit"
+            className="rounded-xl border-4 border-black bg-[var(--oop-cyan)] px-8 py-5 text-xl font-extrabold uppercase tracking-wide shadow-[6px_6px_0_0_#000] transition-all hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#000] active:translate-y-0 active:shadow-[3px_3px_0_0_#000]"
+          >
+            ✎ Edit Trivia
+          </Link>
+          <Link
+            href="/out-of-pocket/present"
+            className="rounded-xl border-4 border-black bg-[var(--oop-pink)] px-8 py-5 text-xl font-extrabold uppercase tracking-wide shadow-[6px_6px_0_0_#000] transition-all hover:-translate-y-0.5 hover:shadow-[8px_8px_0_0_#000] active:translate-y-0 active:shadow-[3px_3px_0_0_#000]"
+          >
+            ▶ Present Game
+          </Link>
+        </div>
+
         <Link
           href="/"
-          className="text-sm font-bold tracking-widest underline-offset-4 hover:underline"
+          className="mt-10 inline-block text-xs font-bold uppercase tracking-widest text-black/40 underline-offset-4 hover:text-black hover:underline"
         >
-          ← BACK
+          ← All trivia
         </Link>
-        <p className="hidden text-xs font-bold uppercase tracking-[0.3em] text-black/60 sm:block">
-          Out of Pocket Mode · {DECK_TITLE}
-        </p>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={toggleFullscreen}
-            className="rounded border-2 border-black bg-white px-3 py-1 text-xs font-bold transition-all hover:bg-[var(--oop-yellow)]"
-            title="Toggle fullscreen (F)"
-          >
-            ⛶ Fullscreen
-          </button>
-          <p className="text-sm font-bold">
-            {index + 1} / {total}
-          </p>
-        </div>
-      </div>
-
-      {/* Slide viewport — a size container so the card can be sized off the
-          REAL available area (no hard-coded chrome offsets). */}
-      <div className="relative flex flex-1 items-center justify-center p-4 [container-type:size]">
-        {/* Largest 16:9 card that fits: width is the lesser of the container
-            width (100%) and what the container height allows (100cqh × 16/9),
-            so the slide fills width when the area is tall and fills height when
-            the area is wide — maximal either way, with no white-space slack. */}
-        <div
-          className="w-full"
-          style={{ maxWidth: "min(100%, calc(100cqh * 16 / 9))" }}
-        >
-          <RenderSlide slide={slide} />
-        </div>
-        {/* Tap zones — left half = prev, right half = next.
-            Source links inside slides escape via z-index. */}
-        <button
-          type="button"
-          onClick={goPrev}
-          disabled={index === 0}
-          aria-label="Previous slide"
-          className="absolute inset-y-0 left-0 z-10 w-1/2 cursor-w-resize bg-transparent disabled:cursor-default"
-        />
-        <button
-          type="button"
-          onClick={goNext}
-          disabled={index === total - 1}
-          aria-label="Next slide"
-          className="absolute inset-y-0 right-0 z-10 w-1/2 cursor-e-resize bg-transparent disabled:cursor-default"
-        />
-      </div>
-
-      {/* Bottom nav */}
-      <div className="flex items-center justify-between border-t-2 border-black px-6 py-3">
-        <button
-          onClick={goPrev}
-          disabled={index === 0}
-          className="rounded border-2 border-black bg-white px-4 py-1.5 text-sm font-bold transition-all disabled:opacity-30 enabled:hover:bg-[var(--oop-cyan)]"
-        >
-          ← Prev
-        </button>
-        <p className="text-xs uppercase tracking-widest text-black/60">
-          ← / → or Space to navigate · F for fullscreen
-        </p>
-        <button
-          onClick={goNext}
-          disabled={index === total - 1}
-          className="rounded border-2 border-black bg-white px-4 py-1.5 text-sm font-bold transition-all disabled:opacity-30 enabled:hover:bg-[var(--oop-pink)]"
-        >
-          Next →
-        </button>
       </div>
     </div>
   );
