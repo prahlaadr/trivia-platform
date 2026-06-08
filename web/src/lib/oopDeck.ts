@@ -31,6 +31,20 @@ function setAdminPin(pin: string) {
   localStorage.setItem("trivia-admin-pin", pin);
 }
 
+/** Verify a PIN against the server (no write). Open access (no ADMIN_PIN
+ *  set) returns true for any value, including "". */
+export async function verifyPin(pin: string): Promise<boolean> {
+  try {
+    const res = await fetch("/api/admin-check", {
+      method: "POST",
+      headers: { "x-admin-pin": pin },
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 /** Returns a PIN (prompting once if needed), or null if the user cancels. */
 export function ensurePin(): string | null {
   let pin = getAdminPin();

@@ -16,12 +16,21 @@ import {
   type DeckPayload,
 } from "@/lib/oopDeck";
 import { OopQuestionEditor } from "@/components/oop/OopQuestionEditor";
+import { OopAdminGate } from "@/components/oop/OopAdminGate";
 
 const fieldCls =
   "w-full rounded border-2 border-black bg-white px-2 py-1.5 text-sm text-black outline-none focus:bg-[var(--oop-yellow)]/30";
 const labelCls = "block text-[11px] font-bold uppercase tracking-wider text-black/60";
 
-export default function OutOfPocketEditor() {
+export default function OutOfPocketEditPage() {
+  return (
+    <OopAdminGate>
+      <OutOfPocketEditor />
+    </OopAdminGate>
+  );
+}
+
+function OutOfPocketEditor() {
   const router = useRouter();
   const [payload, setPayload] = useState<DeckPayload | null>(null);
   const [dirty, setDirty] = useState(false);
