@@ -99,7 +99,7 @@ export default function OutOfPocketPresenter() {
   }, [goNext, goPrev, toggleFullscreen]);
 
   return (
-    <div className="oop-scope flex min-h-screen flex-col">
+    <div className="oop-scope flex h-dvh flex-col">
       {/* Top toolbar */}
       <div className="flex items-center justify-between border-b-2 border-black px-6 py-3">
         <Link
@@ -125,15 +125,16 @@ export default function OutOfPocketPresenter() {
         </div>
       </div>
 
-      {/* Slide viewport */}
-      <div className="relative flex flex-1 items-center justify-center p-4">
-        {/* Largest 16:9 card that fits the available area: width is capped by
-            the viewport height (minus the ~132px of top/bottom chrome + padding)
-            so the slide grows to fill vertical white space on wide screens, and
-            falls back to full width on narrow/tall screens. */}
+      {/* Slide viewport — a size container so the card can be sized off the
+          REAL available area (no hard-coded chrome offsets). */}
+      <div className="relative flex flex-1 items-center justify-center p-4 [container-type:size]">
+        {/* Largest 16:9 card that fits: width is the lesser of the container
+            width (100%) and what the container height allows (100cqh × 16/9),
+            so the slide fills width when the area is tall and fills height when
+            the area is wide — maximal either way, with no white-space slack. */}
         <div
           className="w-full"
-          style={{ maxWidth: "min(100%, calc((100dvh - 132px) * 16 / 9))" }}
+          style={{ maxWidth: "min(100%, calc(100cqh * 16 / 9))" }}
         >
           <RenderSlide slide={slide} />
         </div>
