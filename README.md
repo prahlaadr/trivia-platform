@@ -4,6 +4,8 @@ A full-featured trivia hosting platform for live pub quiz nights. Upload quiz fi
 
 **Live:** [pyaar-trivia.vercel.app](https://pyaar-trivia.vercel.app)
 
+**Contributing / working with an AI agent?** Start with [`AGENTS.md`](AGENTS.md) — repo map, commands, workflow, and a guide to the self-contained Out of Pocket quiz module.
+
 ---
 
 ## What It Does

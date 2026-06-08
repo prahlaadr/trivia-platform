@@ -1,5 +1,7 @@
 # Trivia Platform — Claude Context
 
+> See also [`AGENTS.md`](AGENTS.md) — repo geography (web/ vs root Python tooling), collaboration workflow, and the self-contained **Out of Pocket** quiz module (`web/src/app/out-of-pocket/`, `components/oop/`, `lib/oopDeck.ts`, `api/oop-*`). Working inside OOP? There's a scoped `web/src/app/out-of-pocket/AGENTS.md` too.
+
 ## What This Is
 
 A trivia hosting platform for live pub quiz nights. Two modes: Vercel (deployed at pyaar-trivia.vercel.app) for presenting and scoring, and Local for generating custom games via AI.
