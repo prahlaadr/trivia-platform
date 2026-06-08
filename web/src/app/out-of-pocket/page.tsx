@@ -126,8 +126,15 @@ export default function OutOfPocketPresenter() {
       </div>
 
       {/* Slide viewport */}
-      <div className="relative flex flex-1 items-center justify-center p-6">
-        <div className="w-full max-w-6xl">
+      <div className="relative flex flex-1 items-center justify-center p-4">
+        {/* Largest 16:9 card that fits the available area: width is capped by
+            the viewport height (minus the ~132px of top/bottom chrome + padding)
+            so the slide grows to fill vertical white space on wide screens, and
+            falls back to full width on narrow/tall screens. */}
+        <div
+          className="w-full"
+          style={{ maxWidth: "min(100%, calc((100dvh - 132px) * 16 / 9))" }}
+        >
           <RenderSlide slide={slide} />
         </div>
         {/* Tap zones — left half = prev, right half = next.
