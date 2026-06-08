@@ -96,6 +96,20 @@ export default function OutOfPocketPresenter() {
     }
   }, []);
 
+  // Session timer — counts up from when the presenter opens.
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const formatElapsed = (s: number) => {
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
+  };
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter") {
@@ -134,6 +148,12 @@ export default function OutOfPocketPresenter() {
           Out of Pocket Mode · {title}
         </p>
         <div className="flex items-center gap-3">
+          <span
+            className="rounded border-2 border-black bg-[var(--oop-yellow)] px-3 py-1 text-base font-extrabold tabular-nums tracking-wide"
+            title="Session time"
+          >
+            {formatElapsed(elapsed)}
+          </span>
           <button
             onClick={toggleFullscreen}
             className="rounded border-2 border-black bg-white px-3 py-1 text-xs font-bold transition-all hover:bg-[var(--oop-yellow)]"
