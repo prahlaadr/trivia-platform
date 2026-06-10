@@ -364,7 +364,8 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         text: "Guess the data tool from its logo:",
         points: 1,
         answer: "MongoDB",
-        questionImageSrc: "/oop/logos/mongodb.svg",
+        questionImageSrc: "/oop/logos/mongodb-icon.png",
+        revealImageSrc: "/oop/logos/mongodb.svg",
         revealCaption: "Document store — a natural fit for FHIR / JSON clinical data.",
       },
       {
@@ -372,7 +373,8 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         text: "Guess the data tool from its logo:",
         points: 1,
         answer: "Snowflake",
-        questionImageSrc: "/oop/logos/snowflake.svg",
+        questionImageSrc: "/oop/logos/snowflake-icon.png",
+        revealImageSrc: "/oop/logos/snowflake.svg",
         revealCaption: "Cloud data warehouse powering population-health analytics.",
       },
       {
@@ -380,7 +382,8 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         text: "Guess the data tool from its logo:",
         points: 1,
         answer: "Databricks",
-        questionImageSrc: "/oop/logos/databricks.png",
+        questionImageSrc: "/oop/logos/databricks-icon.png",
+        revealImageSrc: "/oop/logos/databricks.png",
         revealCaption: "Lakehouse for large-scale clinical & genomic ML.",
       },
       {
