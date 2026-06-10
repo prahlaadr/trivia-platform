@@ -300,15 +300,14 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
   },
 
   // ─────────────────────────────────────────────────────────────────
-  // OPTIONAL ROUNDS — loaded but `enabled: false`. Flip them on in the
-  // editor (or here) to swap in for returning players. Drafts: refine the
-  // questions/answers in the editor; the Logo round needs images uploaded.
+  // EXTRA ROUNDS — all ON by default. Toggle a round (or question) OFF in
+  // the editor to drop it from a given event; set `enabled: false` here to
+  // bench one by default. Refine drafts in the editor as needed.
   // ─────────────────────────────────────────────────────────────────
   {
     number: 5,
     title: "Phase 5: Guess the Data Logo",
     subtitle: "you've stared at these all day",
-    enabled: false,
     questions: [
       // 10 healthcare-data heavyweights. Logos fetched from Wikimedia Commons.
       {
@@ -400,7 +399,6 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     number: 6,
     title: "Phase 6: A Brief History of the Spreadsheet",
     subtitle: "before Sheets, before Excel",
-    enabled: false,
     questions: [
       {
         number: 1,
@@ -444,7 +442,6 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     number: 7,
     title: "Phase 7: X Marks the Spot",
     subtitle: "every answer starts with X",
-    enabled: false,
     questions: [
       {
         // Matching question: question slide shows both columns (terms +
@@ -504,7 +501,6 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     number: 8,
     title: "Phase 8: Famous Healthcare Peeps",
     subtitle: "the real who's who?",
-    enabled: false,
     questions: [
       {
         number: 1,
@@ -557,7 +553,6 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     number: 9,
     title: "Phase 9: Reverse Spelling Bee",
     subtitle: "you know you know these",
-    enabled: false,
     questions: [
       { number: 1, text: "HIPAA", points: 1, answer: "Health Insurance Portability and Accountability Act" },
       { number: 2, text: "HEDIS", points: 1, answer: "Healthcare Effectiveness Data and Information Set" },
@@ -573,7 +568,6 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     number: 10,
     title: "Phase 10: Guess the Zoomed-in Thing",
     subtitle: "too close for comfort",
-    enabled: false,
     questions: [
       {
         number: 1,
@@ -645,7 +639,6 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     number: 11,
     title: "Phase 11: Prior-Auth Denials",
     subtitle: "name the Halloween character from the denial",
-    enabled: false,
     questions: [
       {
         number: 1,
@@ -683,7 +676,6 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     number: 12,
     title: "Phase 12: Monster or Med?",
     subtitle: "horror villain, or prescription?",
-    enabled: false,
     questions: [
       { number: 1, text: "Biollante (bye-oh-LAN-tay)", points: 1, answer: "Monster — Godzilla's plant/rose kaiju", bullets: ["Monster", "Med"] },
       { number: 2, text: "Krazati (krah-ZAH-tee)", points: 1, answer: "Med — adagrasib, a KRAS-G12C lung-cancer drug", bullets: ["Monster", "Med"] },
@@ -698,7 +690,6 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     number: 13,
     title: "Phase 13: Name the A",
     subtitle: "it's gonna B A — name the company from its logo",
-    enabled: false,
     questions: [
       { number: 1, text: "Name that A", points: 1, answer: "Abridge", questionImageSrc: "/oop/tot/a-abridge-crop.png", revealImageSrc: "/oop/tot/a-abridge-full.png" },
       { number: 2, text: "Name that A", points: 1, answer: "Ascension", questionImageSrc: "/oop/tot/a-ascension-crop.png", revealImageSrc: "/oop/tot/a-ascension-full.png" },
