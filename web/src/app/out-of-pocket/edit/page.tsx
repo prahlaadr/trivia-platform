@@ -162,6 +162,12 @@ function OutOfPocketEditor() {
       0
     );
 
+  const allCollapsed = sections.length > 0 && sections.every((_, i) => collapsed[i]);
+  const toggleAll = () =>
+    setCollapsed(
+      allCollapsed ? {} : Object.fromEntries(sections.map((_, i) => [i, true]))
+    );
+
   return (
     <div className="oop-scope min-h-dvh pb-24">
       {/* Sticky action bar */}
@@ -176,6 +182,13 @@ function OutOfPocketEditor() {
           <p className="hidden text-xs font-bold uppercase tracking-[0.2em] text-black/50 sm:block">
             Edit Trivia · {liveQuestions} live questions
           </p>
+          <button
+            onClick={toggleAll}
+            className="rounded border-2 border-black bg-white px-3 py-1.5 text-xs font-bold hover:bg-[var(--oop-cyan)]/30"
+            title={allCollapsed ? "Expand all rounds" : "Collapse all rounds"}
+          >
+            {allCollapsed ? "⊕ Expand all" : "⊖ Collapse all"}
+          </button>
           <div className="flex-1" />
           {msg && (
             <span className="text-xs font-bold text-black/70">{msg}</span>
