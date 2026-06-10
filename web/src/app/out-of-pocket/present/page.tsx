@@ -32,6 +32,7 @@ function RenderSlide({ slide }: { slide: Slide }) {
           text={slide.text}
           points={slide.points}
           bullets={slide.bullets}
+          matchPairs={slide.matchPairs}
           codeBlock={slide.codeBlock}
           imageSrc={slide.imageSrc}
           imageSrc2={slide.imageSrc2}
@@ -48,6 +49,7 @@ function RenderSlide({ slide }: { slide: Slide }) {
           points={slide.points}
           answer={slide.answer}
           bullets={slide.bullets}
+          matchPairs={slide.matchPairs}
           codeBlock={slide.codeBlock}
           imageSrc={slide.imageSrc}
           imageSrc2={slide.imageSrc2}

@@ -103,6 +103,80 @@ export function OopSectionSlide({
   );
 }
 
+// ── Matching layout (shared by question + reveal) ──────────────────
+
+type MatchPair = { term: string; definition: string };
+
+/** Stable shuffle of definitions (sorted by text) so they don't line up with
+ *  their terms and don't reshuffle on every render. */
+function shuffledDefs(pairs: MatchPair[]) {
+  return pairs
+    .map((p, i) => ({ ...p, n: i + 1 }))
+    .slice()
+    .sort((a, b) => a.definition.localeCompare(b.definition));
+}
+
+function MatchHeading({ number, text, points }: { number: number; text: string; points: number }) {
+  return (
+    <p className="mb-[1.2cqh] shrink-0 text-center text-[2.1cqw] font-extrabold leading-snug text-black">
+      {number}. {text}{" "}
+      <span className="font-bold text-black/60">({points} pt{points === 1 ? "" : "s"})</span>
+    </p>
+  );
+}
+
+// Question: both columns — numbered terms (left) + lettered, shuffled defs (right).
+function OopMatchQuestion({ number, text, points, pairs }: { number: number; text: string; points: number; pairs: MatchPair[] }) {
+  const defs = shuffledDefs(pairs);
+  return (
+    <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
+      <img src="/oop/template-question.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-x-[8%] top-[9%] bottom-[8%] flex flex-col overflow-hidden">
+        <MatchHeading number={number} text={text} points={points} />
+        <div className="flex flex-1 gap-[3cqw] overflow-hidden">
+          <ul className="w-[30%] shrink-0 space-y-[1cqh] text-[1.5cqw] font-extrabold leading-tight text-black">
+            {pairs.map((p, i) => (
+              <li key={i}>
+                <span className="text-[var(--oop-navy)]">{i + 1}.</span> {p.term}
+              </li>
+            ))}
+          </ul>
+          <ul className="flex-1 space-y-[0.9cqh] text-[1.2cqw] leading-tight text-black">
+            {defs.map((d, i) => (
+              <li key={i} className="flex gap-[0.6cqw]">
+                <span className="font-extrabold text-[var(--oop-navy)]">{String.fromCharCode(65 + i)}.</span>
+                <span>{d.definition}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Reveal: each term beside its correct definition, in order.
+function OopMatchReveal({ number, text, points, pairs }: { number: number; text: string; points: number; pairs: MatchPair[] }) {
+  return (
+    <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
+      <img src="/oop/template-question.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-x-[8%] top-[9%] bottom-[8%] flex flex-col overflow-hidden">
+        <MatchHeading number={number} text={text} points={points} />
+        <ul className="flex flex-1 flex-col justify-center space-y-[0.9cqh] text-[1.3cqw] leading-tight text-black">
+          {pairs.map((p, i) => (
+            <li key={i} className="flex gap-[0.8cqw]">
+              <span className="w-[22%] shrink-0 font-extrabold text-[var(--oop-navy)]">
+                {i + 1}. {p.term}
+              </span>
+              <span className="flex-1">{p.definition}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 // ── Question ───────────────────────────────────────────────────────
 
 export function OopQuestionSlide({
@@ -110,6 +184,7 @@ export function OopQuestionSlide({
   text,
   points,
   bullets,
+  matchPairs,
   codeBlock,
   imageSrc,
   imageSrc2,
@@ -121,6 +196,7 @@ export function OopQuestionSlide({
   text: string;
   points: number;
   bullets?: string[];
+  matchPairs?: MatchPair[];
   codeBlock?: string;
   imageSrc?: string;
   imageSrc2?: string;
@@ -128,6 +204,9 @@ export function OopQuestionSlide({
   sourceUrl?: string;
   sourceLabel?: string;
 }) {
+  if (matchPairs && matchPairs.length > 0) {
+    return <OopMatchQuestion number={number} text={text} points={points} pairs={matchPairs} />;
+  }
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
       <img
@@ -193,6 +272,7 @@ export function OopRevealSlide({
   points,
   answer,
   bullets,
+  matchPairs,
   imageSrc,
   imageSrc2,
   caption,
@@ -205,6 +285,7 @@ export function OopRevealSlide({
   points: number;
   answer: string;
   bullets?: { text: string; correct?: boolean }[];
+  matchPairs?: MatchPair[];
   imageSrc?: string;
   imageSrc2?: string;
   caption?: string;
@@ -212,6 +293,9 @@ export function OopRevealSlide({
   sourceUrl?: string;
   sourceLabel?: string;
 }) {
+  if (matchPairs && matchPairs.length > 0) {
+    return <OopMatchReveal number={number} text={text} points={points} pairs={matchPairs} />;
+  }
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
       <img

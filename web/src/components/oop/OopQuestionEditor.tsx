@@ -126,6 +126,11 @@ export function OopQuestionEditor({
   const setRevealBullets = (next: { text: string; correct?: boolean }[]) =>
     set({ revealBullets: next.length ? next : undefined });
 
+  // Matching pairs (term ↔ definition). When present, this is a matching question.
+  const matchPairs = question.matchPairs ?? [];
+  const setMatchPairs = (next: { term: string; definition: string }[]) =>
+    set({ matchPairs: next.length ? next : undefined });
+
   return (
     <div
       className={`rounded-xl border-2 border-black shadow-[3px_3px_0_0_#000] ${
@@ -227,6 +232,60 @@ export function OopQuestionEditor({
               value={question.codeBlock ?? ""}
               onChange={(e) => set({ codeBlock: e.target.value || undefined })}
             />
+          </div>
+
+          {/* Matching pairs */}
+          <div className={sectionCls}>
+            <p className={groupTitleCls}>
+              Matching pairs (term ↔ definition)
+            </p>
+            <p className="mb-2 text-[11px] text-black/50">
+              Adding pairs makes this a matching question: the slide shows terms +
+              shuffled definitions; the reveal pairs each term with its match.
+            </p>
+            <div className="space-y-2">
+              {matchPairs.map((p, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-5 shrink-0 text-right text-xs font-bold text-black/50">
+                    {i + 1}.
+                  </span>
+                  <input
+                    className={`${inputCls} w-[34%] shrink-0`}
+                    placeholder="Term (e.g. ASC X12)"
+                    value={p.term}
+                    onChange={(e) => {
+                      const next = [...matchPairs];
+                      next[i] = { ...p, term: e.target.value };
+                      setMatchPairs(next);
+                    }}
+                  />
+                  <textarea
+                    className={`${inputCls} min-h-[38px] flex-1 resize-y`}
+                    placeholder="Definition"
+                    value={p.definition}
+                    onChange={(e) => {
+                      const next = [...matchPairs];
+                      next[i] = { ...p, definition: e.target.value };
+                      setMatchPairs(next);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMatchPairs(matchPairs.filter((_, j) => j !== i))}
+                    className="mt-1 rounded border-2 border-black bg-white px-1.5 py-0.5 text-xs font-bold hover:bg-red-500 hover:text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setMatchPairs([...matchPairs, { term: "", definition: "" }])}
+              className="mt-2 rounded border-2 border-black bg-[var(--oop-yellow)] px-2 py-1 text-xs font-bold"
+            >
+              + Add pair
+            </button>
           </div>
 
           {/* Question choices */}
@@ -438,6 +497,7 @@ export function OopQuestionEditor({
                   text={question.text}
                   points={question.points}
                   bullets={question.bullets}
+                  matchPairs={question.matchPairs}
                   codeBlock={question.codeBlock}
                   imageSrc={question.questionImageSrc}
                   imageSrc2={question.questionImageSrc2}
@@ -455,6 +515,7 @@ export function OopQuestionEditor({
                   points={question.points}
                   answer={question.answer}
                   bullets={question.revealBullets}
+                  matchPairs={question.matchPairs}
                   codeBlock={question.codeBlock}
                   imageSrc={question.revealImageSrc}
                   imageSrc2={question.revealImageSrc2}

@@ -22,6 +22,7 @@ export type Slide =
       text: string;
       points: number;
       bullets?: string[];
+      matchPairs?: { term: string; definition: string }[];
       codeBlock?: string;
       imageSrc?: string;
       imageSrc2?: string;
@@ -36,6 +37,7 @@ export type Slide =
       points: number;
       answer: string;
       bullets?: { text: string; correct?: boolean }[];
+      matchPairs?: { term: string; definition: string }[];
       codeBlock?: string;
       imageSrc?: string;
       imageSrc2?: string;
@@ -56,6 +58,9 @@ export interface DeckQuestion {
   answer: string;
   bullets?: string[];
   revealBullets?: { text: string; correct?: boolean }[];
+  /** A matching question: question slide shows terms + shuffled definitions
+   *  (both columns); reveal shows each term next to its correct definition. */
+  matchPairs?: { term: string; definition: string }[];
   codeBlock?: string;
   /** Image shown on the question slide (e.g. the porcupine quill SEM). */
   questionImageSrc?: string;
@@ -435,35 +440,57 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
   {
     number: 7,
     title: "Phase 7: X Marks the Spot",
-    subtitle: "X-[number], all over the place",
+    subtitle: "every answer starts with X",
     enabled: false,
     questions: [
       {
+        // Matching question: question slide shows both columns (terms +
+        // shuffled definitions); reveal shows each term beside its match.
+        // 8 of 10 — two more TBD.
         number: 1,
-        text: "Match each X-[number] to what it refers to. (Options: BMW SUV · Wolverine’s clone · EDI claims standard · Apple’s 2017 phone · rocket plane)",
-        points: 5,
+        text: "Match each X-term to its definition:",
+        points: 8,
         answer: "",
-        bullets: ["X12", "X-23", "X7", "iPhone X", "X-15"],
-        revealBullets: [
-          { text: "X12 → ASC X12 — the EDI standard behind 837/835 healthcare claims" },
-          { text: "X-23 → Laura Kinney, Wolverine’s clone (X-Men / Logan)" },
-          { text: "X7 → BMW’s full-size luxury SUV" },
-          { text: "iPhone X → Apple’s 2017 10th-anniversary phone" },
-          { text: "X-15 → the North American X-15, fastest crewed rocket plane" },
-        ],
-      },
-      {
-        number: 2,
-        text: "Match each “X” to what it is. (Options: gradient-boosting ML library · Apple’s OS “ten” · graphics API · the social platform · X11 on Mac)",
-        points: 5,
-        answer: "",
-        bullets: ["XGBoost", "macOS X", "DirectX", "X (the app)", "XQuartz"],
-        revealBullets: [
-          { text: "XGBoost → the gradient-boosting ML library" },
-          { text: "macOS X → Apple’s operating system “ten” (2001–2020)" },
-          { text: "DirectX → Microsoft’s graphics / gaming API" },
-          { text: "X (the app) → Twitter, rebranded in 2023" },
-          { text: "XQuartz → the X11 windowing system on macOS" },
+        matchPairs: [
+          {
+            term: "ASC X12",
+            definition:
+              "The bread-and-butter data format — if you deal with healthcare billing, you've had nightmares parsing an X12 EDI file.",
+          },
+          {
+            term: "X.509",
+            definition:
+              "The foundational standard for public-key certificates — what keeps PHI locked down across connected devices and SaMD.",
+          },
+          {
+            term: "χ² (Chi-Square)",
+            definition:
+              "Spelled “Chi,” written as X-squared — the stats test for comparing categorical variables in clinical data.",
+          },
+          {
+            term: "X-23",
+            definition:
+              "Laura Kinney — the mutant clone and adopted daughter of Wolverine (X-Men comics, the movie Logan).",
+          },
+          {
+            term: "X Æ A-12",
+            definition:
+              "Elon Musk and Grimes' famously unpronounceable kid — broke a few birth-certificate databases with its special characters.",
+          },
+          {
+            term: "BMW X7",
+            definition: "BMW's flagship full-size luxury SUV.",
+          },
+          {
+            term: "XGBoost",
+            definition:
+              "The gradient-boosting library quietly powering a huge share of clinical risk-prediction and tabular-ML models.",
+          },
+          {
+            term: "XML",
+            definition:
+              "The markup behind HL7 CDA / C-CDA clinical documents — the verbose ancestor before everyone moved to FHIR + JSON.",
+          },
         ],
       },
     ],
@@ -722,6 +749,7 @@ export function buildDeck(deckSections: DeckSection[] = DEFAULT_SECTIONS): Slide
         text: q.text,
         points: q.points,
         bullets: q.bullets,
+        matchPairs: q.matchPairs,
         codeBlock: q.codeBlock,
         imageSrc: q.questionImageSrc,
         imageSrc2: q.questionImageSrc2,
@@ -744,6 +772,7 @@ export function buildDeck(deckSections: DeckSection[] = DEFAULT_SECTIONS): Slide
         text: q.text,
         points: q.points,
         bullets: q.bullets,
+        matchPairs: q.matchPairs,
         codeBlock: q.codeBlock,
         imageSrc: q.questionImageSrc,
         imageSrc2: q.questionImageSrc2,
@@ -758,6 +787,7 @@ export function buildDeck(deckSections: DeckSection[] = DEFAULT_SECTIONS): Slide
         points: q.points,
         answer: q.answer,
         bullets: q.revealBullets,
+        matchPairs: q.matchPairs,
         codeBlock: q.codeBlock,
         imageSrc: q.revealImageSrc,
         imageSrc2: q.revealImageSrc2,
