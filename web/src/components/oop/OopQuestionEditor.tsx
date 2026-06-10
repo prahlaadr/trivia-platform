@@ -421,12 +421,15 @@ export function OopQuestionEditor({
               </p>
               <div className="space-y-2">
                 {matchPairs.map((p, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <span className="mt-1.5 w-5 shrink-0 text-right text-xs font-bold text-black/50">
+                  <div
+                    key={i}
+                    className="grid grid-cols-[1.25rem_minmax(0,36%)_minmax(0,1fr)_auto] items-start gap-2"
+                  >
+                    <span className="mt-2 text-right text-xs font-bold text-black/50">
                       {i + 1}.
                     </span>
                     <input
-                      className={`${inputCls} w-[34%] shrink-0`}
+                      className={inputCls}
                       placeholder="Term (e.g. ASC X12)"
                       value={p.term}
                       onChange={(e) => {
@@ -436,7 +439,7 @@ export function OopQuestionEditor({
                       }}
                     />
                     <textarea
-                      className={`${inputCls} min-h-[38px] flex-1 resize-y`}
+                      className={`${inputCls} min-h-[38px] resize-y`}
                       placeholder="Definition"
                       value={p.definition}
                       onChange={(e) => {
