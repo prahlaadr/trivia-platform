@@ -226,6 +226,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         text: "This 90s action star was in movies like Hard to Kill, Above the Law, Out for Justice, Under Siege, and other combinations of [Preposition] [Noun]",
         points: 1,
         answer: "Steven Seagal",
+        revealImageSrc: "/oop/img-seagal-seagull.png",
       },
       {
         number: 3,
