@@ -47,12 +47,18 @@ export type Slide =
     }
   | { type: "answers-divider"; title?: string; date?: string };
 
+/** The "shape" of a question — drives which fields the editor shows and which
+ *  mechanic the slides render. Inferred from populated fields when absent. */
+export type QuestionKind = "standard" | "choices" | "code" | "matching" | "ordering";
+
 export interface DeckQuestion {
   number: number;
   /** Questions default to included. Set false to keep a question "on the
    *  bench" — skipped by buildDeck and not counted, but still editable and
    *  toggleable per event. Mirrors DeckSection.enabled. */
   enabled?: boolean;
+  /** Question shape. If omitted, inferred via inferKind(). */
+  kind?: QuestionKind;
   text: string;
   points: number;
   answer: string;
@@ -87,6 +93,19 @@ export interface DeckSection {
    *  can be flipped on per event (e.g. swap rounds for returning players). */
   enabled?: boolean;
   questions: DeckQuestion[];
+}
+
+/** Infer a question's kind from its populated fields (for legacy questions
+ *  without an explicit `kind`). */
+export function inferKind(q: DeckQuestion): QuestionKind {
+  if (q.kind) return q.kind;
+  if (q.matchPairs && q.matchPairs.length) return "matching";
+  if (q.codeBlock) return "code";
+  if (q.revealBullets && q.revealBullets.length) return "choices";
+  if (q.bullets && q.bullets.length) {
+    return /→|->|order/i.test(q.answer || "") ? "ordering" : "choices";
+  }
+  return "standard";
 }
 
 /** The baked-in deck. Used as the seed/default when no saved deck exists,
@@ -736,21 +755,28 @@ export function buildDeck(deckSections: DeckSection[] = DEFAULT_SECTIONS): Slide
     const activeQuestions = section.questions.filter((q) => q.enabled !== false);
     if (activeQuestions.length === 0) continue;
 
-    for (const q of activeQuestions) {
-      slides.push({
+    // Render only the mechanic the question's kind uses (media stays universal),
+    // so the slides stay consistent even if old fields linger after a type switch.
+    const questionSlide = (q: DeckQuestion): Slide => {
+      const k = inferKind(q);
+      return {
         type: "question",
         number: q.number,
         text: q.text,
         points: q.points,
-        bullets: q.bullets,
-        matchPairs: q.matchPairs,
-        codeBlock: q.codeBlock,
+        bullets: k === "choices" || k === "ordering" ? q.bullets : undefined,
+        matchPairs: k === "matching" ? q.matchPairs : undefined,
+        codeBlock: k === "code" ? q.codeBlock : undefined,
         imageSrc: q.questionImageSrc,
         imageSrc2: q.questionImageSrc2,
         caption: q.questionCaption,
         sourceUrl: q.questionSourceUrl,
         sourceLabel: q.sourceLabel,
-      });
+      };
+    };
+
+    for (const q of activeQuestions) {
+      slides.push(questionSlide(q));
     }
 
     slides.push({
@@ -760,29 +786,17 @@ export function buildDeck(deckSections: DeckSection[] = DEFAULT_SECTIONS): Slide
     });
 
     for (const q of activeQuestions) {
-      slides.push({
-        type: "question",
-        number: q.number,
-        text: q.text,
-        points: q.points,
-        bullets: q.bullets,
-        matchPairs: q.matchPairs,
-        codeBlock: q.codeBlock,
-        imageSrc: q.questionImageSrc,
-        imageSrc2: q.questionImageSrc2,
-        caption: q.questionCaption,
-        sourceUrl: q.questionSourceUrl,
-        sourceLabel: q.sourceLabel,
-      });
+      const k = inferKind(q);
+      slides.push(questionSlide(q));
       slides.push({
         type: "reveal",
         number: q.number,
         text: q.text,
         points: q.points,
         answer: q.answer,
-        bullets: q.revealBullets,
-        matchPairs: q.matchPairs,
-        codeBlock: q.codeBlock,
+        bullets: k === "choices" ? q.revealBullets : undefined,
+        matchPairs: k === "matching" ? q.matchPairs : undefined,
+        codeBlock: k === "code" ? q.codeBlock : undefined,
         imageSrc: q.revealImageSrc,
         imageSrc2: q.revealImageSrc2,
         caption: q.revealCaption,

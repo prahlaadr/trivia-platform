@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { DeckSection, DeckQuestion } from "../deck";
+import { inferKind, type DeckSection, type DeckQuestion } from "../deck";
 import {
   loadDeck,
   saveDeck,
@@ -95,7 +95,11 @@ function OutOfPocketEditor() {
 
   const addQuestion = (secIdx: number) => {
     const s = sections[secIdx];
-    setQuestions(secIdx, [...s.questions, newQuestion(nextQuestionNumber(s))]);
+    // Inherit the round's prevailing type (rounds are usually homogeneous).
+    const last = s.questions[s.questions.length - 1];
+    const q = newQuestion(nextQuestionNumber(s));
+    if (last) q.kind = inferKind(last);
+    setQuestions(secIdx, [...s.questions, q]);
   };
 
   const changeQuestion = (secIdx: number, qIdx: number, q: DeckQuestion) =>
