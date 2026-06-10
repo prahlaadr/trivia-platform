@@ -255,6 +255,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         points: 1,
         codeBlock: "SELECT * FROM Earth\nWHERE population = population / 2;",
         answer: "Avengers: Infinity War",
+        revealImageSrc: "/oop/movies/infinity-war.png",
       },
       {
         number: 2,
@@ -262,6 +263,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         points: 1,
         codeBlock: "UPDATE students\nSET status = 'wizard'\nWHERE age = 11;",
         answer: "Harry Potter and the Sorcerer’s Stone",
+        revealImageSrc: "/oop/movies/sorcerers-stone.png",
       },
       {
         number: 3,
@@ -269,6 +271,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         points: 1,
         codeBlock: "DROP TABLE skynet;",
         answer: "Terminator 2: Judgment Day",
+        revealImageSrc: "/oop/movies/terminator2.png",
       },
       {
         number: 4,
@@ -277,6 +280,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         codeBlock:
           "INSERT INTO DeLorean (destination_year)\nVALUES (1955);",
         answer: "Back to the Future",
+        revealImageSrc: "/oop/movies/back-to-the-future.png",
       },
       {
         number: 5,
@@ -285,6 +289,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         codeBlock:
           "MERGE INTO Corleone_Family\nUSING rivals\nON conflict = TRUE\nWHEN MATCHED THEN DELETE;",
         answer: "The Godfather Part II",
+        revealImageSrc: "/oop/movies/godfather2.png",
       },
     ],
   },
@@ -300,20 +305,21 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     subtitle: "you've stared at these all day",
     enabled: false,
     questions: [
-      // 10 healthcare-data heavyweights. Upload each logo on the QUESTION
-      // slide via the editor before going live (trademarked — not committed).
+      // 10 healthcare-data heavyweights. Logos fetched from Wikimedia Commons.
       {
         number: 1,
         text: "Guess the data tool from its logo:",
         points: 1,
         answer: "R",
+        questionImageSrc: "/oop/logos/r.svg",
         revealCaption: "The lingua franca of biostatistics & clinical-trial analysis (see Bioconductor).",
       },
       {
         number: 2,
-        text: "Guess the data tool from its logo (two interlocking snakes):",
+        text: "Guess the data tool from its logo:",
         points: 1,
         answer: "Python",
+        questionImageSrc: "/oop/logos/python.svg",
         revealCaption: "Workhorse for health data science & ML.",
       },
       {
@@ -321,6 +327,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         text: "Guess the data tool from its logo:",
         points: 1,
         answer: "MATLAB",
+        questionImageSrc: "/oop/logos/matlab.png",
         revealCaption: "Medical imaging and biosignal (ECG/EEG) processing.",
       },
       {
@@ -328,48 +335,55 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         text: "Guess the data tool from its logo:",
         points: 1,
         answer: "Google Sheets",
+        questionImageSrc: "/oop/logos/google-sheets.svg",
         revealCaption: "The universal clinical-ops spreadsheet, for better or worse.",
       },
       {
         number: 5,
-        text: "Guess the data tool from its logo (the elephant):",
+        text: "Guess the data tool from its logo:",
         points: 1,
         answer: "PostgreSQL",
+        questionImageSrc: "/oop/logos/postgresql.svg",
         revealCaption: "Common open-source backend for EHR & analytics warehouses.",
       },
       {
         number: 6,
-        text: "Guess the data tool from its logo (a happy dolphin named Sakila):",
+        text: "Guess the data tool from its logo:",
         points: 1,
         answer: "MySQL",
+        questionImageSrc: "/oop/logos/mysql.svg",
         revealCaption: "Ubiquitous relational DB behind countless health apps.",
       },
       {
         number: 7,
-        text: "Guess the data tool from its logo (a green leaf):",
+        text: "Guess the data tool from its logo:",
         points: 1,
         answer: "MongoDB",
+        questionImageSrc: "/oop/logos/mongodb.svg",
         revealCaption: "Document store — a natural fit for FHIR / JSON clinical data.",
       },
       {
         number: 8,
-        text: "Guess the data tool from its logo (a light-blue snowflake):",
+        text: "Guess the data tool from its logo:",
         points: 1,
         answer: "Snowflake",
+        questionImageSrc: "/oop/logos/snowflake.svg",
         revealCaption: "Cloud data warehouse powering population-health analytics.",
       },
       {
         number: 9,
-        text: "Guess the data tool from its logo (red angular steps):",
+        text: "Guess the data tool from its logo:",
         points: 1,
         answer: "Databricks",
+        questionImageSrc: "/oop/logos/databricks.png",
         revealCaption: "Lakehouse for large-scale clinical & genomic ML.",
       },
       {
         number: 10,
-        text: "Guess the data tool from its logo (ascending gold bars):",
+        text: "Guess the data tool from its logo:",
         points: 1,
         answer: "Microsoft Power BI",
+        questionImageSrc: "/oop/logos/powerbi.svg",
         revealCaption: "Dashboards across payers, providers & hospital ops.",
       },
     ],
