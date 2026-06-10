@@ -444,18 +444,6 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         points: 1,
         answer: "Vertical",
       },
-      {
-        number: 5,
-        text: "Which three-key combo entered a legacy “array formula” in older versions of Excel?",
-        points: 1,
-        answer: "Ctrl + Shift + Enter",
-      },
-      {
-        number: 6,
-        text: "The word “spreadsheet” comes from accountants laying numbers out how, across a ledger?",
-        points: 1,
-        answer: "Spread across two facing pages (a “spread” sheet)",
-      },
     ],
   },
   {
