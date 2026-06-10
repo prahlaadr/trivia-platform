@@ -13,11 +13,13 @@ export default function OutOfPocketLobby() {
   useEffect(() => {
     loadDeck().then((deck) => {
       setTitle(deck.title);
-      const rounds = deck.sections.filter((s) => s.questions.length > 0).length;
-      const questions = deck.sections.reduce(
-        (sum, s) => sum + s.questions.length,
-        0
-      );
+      // Count what will actually present: enabled rounds, included questions.
+      const active = deck.sections
+        .filter((s) => s.enabled !== false)
+        .map((s) => s.questions.filter((q) => q.enabled !== false).length)
+        .filter((n) => n > 0);
+      const rounds = active.length;
+      const questions = active.reduce((sum, n) => sum + n, 0);
       setStats({ rounds, questions });
     });
   }, []);

@@ -114,6 +114,7 @@ export function OopQuestionEditor({
   const [preview, setPreview] = useState<"none" | "question" | "reveal">("none");
 
   const set = (partial: Partial<DeckQuestion>) => onChange({ ...question, ...partial });
+  const isIncluded = question.enabled !== false;
 
   // Question-slide choices (string[])
   const bullets = question.bullets ?? [];
@@ -126,12 +127,26 @@ export function OopQuestionEditor({
     set({ revealBullets: next.length ? next : undefined });
 
   return (
-    <div className="rounded-xl border-2 border-black bg-white shadow-[3px_3px_0_0_#000]">
+    <div
+      className={`rounded-xl border-2 border-black shadow-[3px_3px_0_0_#000] ${
+        isIncluded ? "bg-white" : "bg-black/[0.04] opacity-70"
+      }`}
+    >
       {/* Header row */}
       <div className="flex items-center gap-2 border-b-2 border-black/10 px-3 py-2">
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-black text-sm font-extrabold">
           {question.number}
         </span>
+        <button
+          type="button"
+          onClick={() => set({ enabled: !isIncluded })}
+          className={`shrink-0 rounded-full border-2 border-black px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide ${
+            isIncluded ? "bg-[var(--oop-cyan)]" : "bg-white text-black/50"
+          }`}
+          title={isIncluded ? "Included — click to bench" : "Benched — click to include"}
+        >
+          {isIncluded ? "In" : "Out"}
+        </button>
         <button
           type="button"
           onClick={() => setCollapsed((c) => !c)}

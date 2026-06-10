@@ -154,7 +154,13 @@ function OutOfPocketEditor() {
     router.push("/out-of-pocket/present");
   };
 
-  const totalQuestions = sections.reduce((sum, s) => sum + s.questions.length, 0);
+  // "Live" = what will actually present: included questions in enabled rounds.
+  const liveQuestions = sections
+    .filter((s) => s.enabled !== false)
+    .reduce(
+      (sum, s) => sum + s.questions.filter((q) => q.enabled !== false).length,
+      0
+    );
 
   return (
     <div className="oop-scope min-h-dvh pb-24">
@@ -168,7 +174,7 @@ function OutOfPocketEditor() {
             ← BACK
           </Link>
           <p className="hidden text-xs font-bold uppercase tracking-[0.2em] text-black/50 sm:block">
-            Edit Trivia · {totalQuestions} questions
+            Edit Trivia · {liveQuestions} live questions
           </p>
           <div className="flex-1" />
           {msg && (
@@ -204,10 +210,13 @@ function OutOfPocketEditor() {
       <div className="mx-auto max-w-4xl space-y-5 px-4 py-6">
         {sections.map((section, secIdx) => {
           const isCollapsed = collapsed[secIdx];
+          const isEnabled = section.enabled !== false;
           return (
             <div
               key={secIdx}
-              className="rounded-2xl border-4 border-black bg-[var(--oop-cyan)]/20 shadow-[4px_4px_0_0_#000]"
+              className={`rounded-2xl border-4 border-black shadow-[4px_4px_0_0_#000] ${
+                isEnabled ? "bg-[var(--oop-cyan)]/20" : "bg-black/[0.04] opacity-70"
+              }`}
             >
               {/* Round header */}
               <div className="flex flex-wrap items-center gap-2 border-b-4 border-black px-4 py-3">
@@ -220,6 +229,16 @@ function OutOfPocketEditor() {
                   title={isCollapsed ? "Expand round" : "Collapse round"}
                 >
                   {isCollapsed ? "▸" : "▾"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSection(secIdx, { enabled: !isEnabled })}
+                  className={`rounded-full border-2 border-black px-2.5 py-0.5 text-xs font-extrabold uppercase tracking-wide ${
+                    isEnabled ? "bg-[var(--oop-cyan)]" : "bg-white text-black/50"
+                  }`}
+                  title={isEnabled ? "Round is ON — click to turn off" : "Round is OFF — click to turn on"}
+                >
+                  {isEnabled ? "On" : "Off"}
                 </button>
                 <input
                   type="number"
@@ -236,8 +255,12 @@ function OutOfPocketEditor() {
                   placeholder="Round title"
                   onChange={(e) => setSection(secIdx, { title: e.target.value })}
                 />
-                <span className="rounded-full border-2 border-black bg-white px-2 py-0.5 text-xs font-bold">
-                  {section.questions.length} Q
+                <span
+                  className="rounded-full border-2 border-black bg-white px-2 py-0.5 text-xs font-bold"
+                  title="included / total questions"
+                >
+                  {section.questions.filter((q) => q.enabled !== false).length}
+                  /{section.questions.length} Q
                 </span>
                 <div className="flex items-center gap-1">
                   <button

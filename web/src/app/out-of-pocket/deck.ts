@@ -47,6 +47,10 @@ export type Slide =
 
 export interface DeckQuestion {
   number: number;
+  /** Questions default to included. Set false to keep a question "on the
+   *  bench" — skipped by buildDeck and not counted, but still editable and
+   *  toggleable per event. Mirrors DeckSection.enabled. */
+  enabled?: boolean;
   text: string;
   points: number;
   answer: string;
@@ -73,6 +77,10 @@ export interface DeckSection {
   subtitle?: string;
   /** Long-form body text rendered on the section divider (e.g. Section 0 team intro). */
   body?: string;
+  /** Optional rounds default to enabled. Set false to keep a round "loaded but
+   *  off" — it's skipped by buildDeck and not counted, but stays editable and
+   *  can be flipped on per event (e.g. swap rounds for returning players). */
+  enabled?: boolean;
   questions: DeckQuestion[];
 }
 
@@ -280,6 +288,241 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
       },
     ],
   },
+
+  // ─────────────────────────────────────────────────────────────────
+  // OPTIONAL ROUNDS — loaded but `enabled: false`. Flip them on in the
+  // editor (or here) to swap in for returning players. Drafts: refine the
+  // questions/answers in the editor; the Logo round needs images uploaded.
+  // ─────────────────────────────────────────────────────────────────
+  {
+    number: 5,
+    title: "Phase 5: Guess the Data Logo",
+    subtitle: "you've stared at these all day",
+    enabled: false,
+    questions: [
+      // Upload each logo on the question slide via the editor before going live.
+      {
+        number: 1,
+        text: "Guess the data tool from its logo:",
+        points: 1,
+        answer: "R",
+      },
+      {
+        number: 2,
+        text: "Guess the data tool from its logo:",
+        points: 1,
+        answer: "Tableau",
+      },
+      {
+        number: 3,
+        text: "Guess the data tool from its logo:",
+        points: 1,
+        answer: "MATLAB",
+      },
+      {
+        number: 4,
+        text: "Guess the data tool from its logo:",
+        points: 1,
+        answer: "Jupyter",
+      },
+      {
+        number: 5,
+        text: "Guess the data tool from its logo:",
+        points: 1,
+        answer: "DuckDB",
+      },
+      {
+        number: 6,
+        text: "Guess the data tool from its logo (the elephant):",
+        points: 1,
+        answer: "PostgreSQL",
+      },
+    ],
+  },
+  {
+    number: 6,
+    title: "Phase 6: A Brief History of the Spreadsheet",
+    subtitle: "before Sheets, before Excel",
+    enabled: false,
+    questions: [
+      {
+        number: 1,
+        text: "Released in 1979 for the Apple II, what program is widely considered the first spreadsheet — the original “killer app” that sold computers?",
+        points: 1,
+        answer: "VisiCalc",
+      },
+      {
+        number: 2,
+        text: "Which spreadsheet dominated the 1980s PC market on MS-DOS, before Excel eventually took the crown?",
+        points: 1,
+        answer: "Lotus 1-2-3",
+      },
+      {
+        number: 3,
+        text: "Microsoft Excel first shipped in 1985 — on which platform, two years before a Windows version existed?",
+        points: 1,
+        answer: "The Apple Macintosh",
+      },
+      {
+        number: 4,
+        text: "In the function name VLOOKUP, what does the “V” stand for?",
+        points: 1,
+        answer: "Vertical",
+      },
+      {
+        number: 5,
+        text: "Which three-key combo entered a legacy “array formula” in older versions of Excel?",
+        points: 1,
+        answer: "Ctrl + Shift + Enter",
+      },
+      {
+        number: 6,
+        text: "The word “spreadsheet” comes from accountants laying numbers out how, across a ledger?",
+        points: 1,
+        answer: "Spread across two facing pages (a “spread” sheet)",
+      },
+    ],
+  },
+  {
+    number: 7,
+    title: "Phase 7: X Marks the Spot",
+    subtitle: "X-[number], all over the place",
+    enabled: false,
+    questions: [
+      {
+        number: 1,
+        text: "Match each X-[number] to what it refers to. (Options: BMW SUV · Wolverine’s clone · EDI claims standard · Apple’s 2017 phone · rocket plane)",
+        points: 5,
+        answer: "",
+        bullets: ["X12", "X-23", "X7", "iPhone X", "X-15"],
+        revealBullets: [
+          { text: "X12 → ASC X12 — the EDI standard behind 837/835 healthcare claims" },
+          { text: "X-23 → Laura Kinney, Wolverine’s clone (X-Men / Logan)" },
+          { text: "X7 → BMW’s full-size luxury SUV" },
+          { text: "iPhone X → Apple’s 2017 10th-anniversary phone" },
+          { text: "X-15 → the North American X-15, fastest crewed rocket plane" },
+        ],
+      },
+      {
+        number: 2,
+        text: "Match each “X” to what it is. (Options: gradient-boosting ML library · Apple’s OS “ten” · graphics API · the social platform · X11 on Mac)",
+        points: 5,
+        answer: "",
+        bullets: ["XGBoost", "macOS X", "DirectX", "X (the app)", "XQuartz"],
+        revealBullets: [
+          { text: "XGBoost → the gradient-boosting ML library" },
+          { text: "macOS X → Apple’s operating system “ten” (2001–2020)" },
+          { text: "DirectX → Microsoft’s graphics / gaming API" },
+          { text: "X (the app) → Twitter, rebranded in 2023" },
+          { text: "XQuartz → the X11 windowing system on macOS" },
+        ],
+      },
+    ],
+  },
+
+  // Image round — upload each photo on the question slide via the editor.
+  {
+    number: 8,
+    title: "Phase 8: Famous Healthcare Peeps",
+    subtitle: "the real who's who?",
+    enabled: false,
+    questions: [
+      { number: 1, text: "Who's this?", points: 1, answer: "Henrietta Lacks (HeLa cells)" },
+      { number: 2, text: "Who's this?", points: 1, answer: "Florence Nightingale" },
+      { number: 3, text: "Who's this?", points: 1, answer: "Atul Gawande" },
+      { number: 4, text: "Who's this?", points: 1, answer: "George Clooney (Dr. Doug Ross on ER)" },
+      { number: 5, text: "Who's this?", points: 1, answer: "Alexander Fleming (penicillin)" },
+    ],
+  },
+  {
+    number: 9,
+    title: "Phase 9: Reverse Spelling Bee",
+    subtitle: "you know you know these",
+    enabled: false,
+    questions: [
+      { number: 1, text: "HIPAA", points: 1, answer: "Health Insurance Portability and Accountability Act" },
+      { number: 2, text: "HEDIS", points: 1, answer: "Healthcare Effectiveness Data and Information Set" },
+      { number: 3, text: "FHIR", points: 1, answer: "Fast Healthcare Interoperability Resources" },
+      { number: 4, text: "FQHC", points: 1, answer: "Federally Qualified Health Center" },
+      { number: 5, text: "HCC", points: 1, answer: "Hierarchical Condition Category" },
+      { number: 6, text: "CMS", points: 1, answer: "Centers for Medicare & Medicaid Services" },
+      { number: 7, text: "LTSS", points: 1, answer: "Long-Term Services and Supports" },
+    ],
+  },
+  // Image round — upload a tightly cropped photo on each question slide.
+  {
+    number: 10,
+    title: "Phase 10: Guess the Zoomed-in Thing",
+    subtitle: "too close for comfort (drafts — swap in real crops)",
+    enabled: false,
+    questions: [
+      { number: 1, text: "Guess the zoomed-in thing:", points: 1, answer: "Blood pressure gauge (sphygmomanometer)" },
+      { number: 2, text: "Guess the zoomed-in thing:", points: 1, answer: "EpiPen" },
+      { number: 3, text: "Guess the zoomed-in thing:", points: 1, answer: "Stethoscope chestpiece" },
+      { number: 4, text: "Guess the zoomed-in thing:", points: 1, answer: "Pill blister pack" },
+      { number: 5, text: "Guess the zoomed-in thing:", points: 1, answer: "Otoscope" },
+    ],
+  },
+  {
+    number: 11,
+    title: "Phase 11: Prior-Auth Denials",
+    subtitle: "real denial reason, or did we make it up?",
+    // Drafts — swap in real OOP-sourced denial stories. Each slide offers
+    // the same two choices; the reveal states which it is.
+    enabled: false,
+    questions: [
+      {
+        number: 1,
+        text: "“Step therapy: the member must try and fail two cheaper drugs before we'll cover the one the doctor actually prescribed.”",
+        points: 1,
+        answer: "Real — step therapy / “fail first” is a common PA tactic.",
+        bullets: ["Real", "Made up"],
+      },
+      {
+        number: 2,
+        text: "“Denied: prior auth was approved, but the approval expired before the surgery could be scheduled.”",
+        points: 1,
+        answer: "Real — expiring authorizations are a real headache.",
+        bullets: ["Real", "Made up"],
+      },
+      {
+        number: 3,
+        text: "“Denied because the diagnosis and procedure codes were submitted in alphabetical order instead of numerical.”",
+        points: 1,
+        answer: "Made up (… probably).",
+        bullets: ["Real", "Made up"],
+      },
+    ],
+  },
+  {
+    number: 12,
+    title: "Phase 12: Monster or Med",
+    subtitle: "Pokémon, or prescription?",
+    enabled: false,
+    questions: [
+      { number: 1, text: "Latuda", points: 1, answer: "Med — lurasidone (antipsychotic)", bullets: ["Monster", "Med"] },
+      { number: 2, text: "Lunala", points: 1, answer: "Monster — Legendary Pokémon (Gen 7)", bullets: ["Monster", "Med"] },
+      { number: 3, text: "Abilify", points: 1, answer: "Med — aripiprazole (antipsychotic)", bullets: ["Monster", "Med"] },
+      { number: 4, text: "Absol", points: 1, answer: "Monster — Pokémon (the disaster one)", bullets: ["Monster", "Med"] },
+      { number: 5, text: "Xeljanz", points: 1, answer: "Med — tofacitinib (RA/JAK inhibitor)", bullets: ["Monster", "Med"] },
+      { number: 6, text: "Girafarig", points: 1, answer: "Monster — Pokémon (and a palindrome!)", bullets: ["Monster", "Med"] },
+    ],
+  },
+  // Image round — upload the cropped “A” from each company's logo.
+  {
+    number: 13,
+    title: "Phase 13: Name the A",
+    subtitle: "guess the company from the A in its logo",
+    enabled: false,
+    questions: [
+      { number: 1, text: "Name the company from the “A” in its logo:", points: 1, answer: "Aetna" },
+      { number: 2, text: "Name the company from the “A” in its logo:", points: 1, answer: "Anthem (now Elevance Health)" },
+      { number: 3, text: "Name the company from the “A” in its logo:", points: 1, answer: "Athenahealth" },
+      { number: 4, text: "Name the company from the “A” in its logo:", points: 1, answer: "Aledade" },
+      { number: 5, text: "Name the company from the “A” in its logo:", points: 1, answer: "AbbVie" },
+      { number: 6, text: "Name the company from the “A” in its logo:", points: 1, answer: "Amgen" },
+    ],
+  },
 ];
 
 /** Backwards-compatible alias for the baked-in deck. */
@@ -301,6 +544,7 @@ export function buildDeck(deckSections: DeckSection[] = DEFAULT_SECTIONS): Slide
   // before moving on to the next phase. Phases with no questions (Section 0
   // / team intro) emit just the section divider.
   for (const section of deckSections) {
+    if (section.enabled === false) continue; // optional round toggled off
     slides.push({
       type: "section",
       sectionNumber: section.number,
@@ -309,9 +553,12 @@ export function buildDeck(deckSections: DeckSection[] = DEFAULT_SECTIONS): Slide
       body: section.body,
     });
 
-    if (section.questions.length === 0) continue;
+    // Only included questions present (and get a reveal). A round whose
+    // questions are all benched emits just its divider, like the team intro.
+    const activeQuestions = section.questions.filter((q) => q.enabled !== false);
+    if (activeQuestions.length === 0) continue;
 
-    for (const q of section.questions) {
+    for (const q of activeQuestions) {
       slides.push({
         type: "question",
         number: q.number,
@@ -333,7 +580,7 @@ export function buildDeck(deckSections: DeckSection[] = DEFAULT_SECTIONS): Slide
       date: "Data Camp · June 2026",
     });
 
-    for (const q of section.questions) {
+    for (const q of activeQuestions) {
       slides.push({
         type: "question",
         number: q.number,
