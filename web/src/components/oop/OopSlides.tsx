@@ -133,8 +133,11 @@ function OopMatchQuestion({ number, text, points, pairs }: { number: number; tex
       <img src="/oop/template-question.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-x-[8%] top-[9%] bottom-[8%] flex flex-col overflow-hidden">
         <MatchHeading number={number} text={text} points={points} />
-        <div className="flex flex-1 gap-[3cqw] overflow-hidden">
-          <ul className="w-[30%] shrink-0 space-y-[1cqh] text-[1.5cqw] font-extrabold leading-tight text-black">
+        {/* pl clears the decorative quote mark baked into the template's
+            top-left corner; defs stay full-height (they end well above the
+            bottom-right quote). */}
+        <div className="flex flex-1 gap-[3cqw] overflow-hidden pl-[6%]">
+          <ul className="w-[28%] shrink-0 space-y-[1cqh] text-[1.5cqw] font-extrabold leading-tight text-black">
             {pairs.map((p, i) => (
               <li key={i}>
                 <span className="text-[var(--oop-navy)]">{i + 1}.</span> {p.term}
@@ -162,10 +165,12 @@ function OopMatchReveal({ number, text, points, pairs }: { number: number; text:
       <img src="/oop/template-question.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-x-[8%] top-[9%] bottom-[8%] flex flex-col overflow-hidden">
         <MatchHeading number={number} text={text} points={points} />
-        <ul className="flex flex-1 flex-col justify-center space-y-[0.9cqh] text-[1.3cqw] leading-tight text-black">
+        {/* pl clears the template's top-left quote; pr keeps the definition
+            text clear of the bottom-right quote on the lower rows. */}
+        <ul className="flex flex-1 flex-col justify-center space-y-[0.9cqh] pl-[6%] pr-[6%] text-[1.3cqw] leading-tight text-black">
           {pairs.map((p, i) => (
             <li key={i} className="flex gap-[0.8cqw]">
-              <span className="w-[22%] shrink-0 font-extrabold text-[var(--oop-navy)]">
+              <span className="w-[24%] shrink-0 font-extrabold text-[var(--oop-navy)]">
                 {i + 1}. {p.term}
               </span>
               <span className="flex-1">{p.definition}</span>

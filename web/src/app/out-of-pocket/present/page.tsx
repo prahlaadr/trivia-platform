@@ -67,6 +67,7 @@ export default function OutOfPocketPresenter() {
   const [sections, setSections] = useState<DeckSection[] | null>(null);
   const [title, setTitle] = useState("");
   const [index, setIndex] = useState(0);
+  const [jumpOpen, setJumpOpen] = useState(false);
 
   useEffect(() => {
     loadDeck().then((deck) => {
@@ -81,6 +82,43 @@ export default function OutOfPocketPresenter() {
   );
   const total = deck.length;
   const slide = deck[index];
+
+  // Phase index for the "jump to" menu — scan the built deck so it stays in
+  // sync with any edits. Each phase's questions start at its `section` divider;
+  // its answers start at the `answers-divider` slide (absent for the team
+  // intro, which has no questions).
+  const phases = useMemo(() => {
+    const list: {
+      number: number;
+      title: string;
+      qIndex: number;
+      aIndex?: number;
+    }[] = [];
+    deck.forEach((s, i) => {
+      if (s.type === "section") {
+        list.push({ number: s.sectionNumber, title: s.sectionTitle, qIndex: i });
+      } else if (s.type === "answers-divider") {
+        const last = list[list.length - 1];
+        if (last) last.aIndex = i;
+      }
+    });
+    return list;
+  }, [deck]);
+
+  // Which phase the current slide belongs to (last phase whose Q-block started
+  // at or before the current index) — used to highlight the active row.
+  const activePhase = useMemo(() => {
+    let active = -1;
+    phases.forEach((p, i) => {
+      if (index >= p.qIndex) active = i;
+    });
+    return active;
+  }, [phases, index]);
+
+  const jumpTo = useCallback((i: number) => {
+    setIndex(i);
+    setJumpOpen(false);
+  }, []);
 
   const goNext = useCallback(() => {
     setIndex((i) => Math.min(i + 1, total - 1));
@@ -114,6 +152,12 @@ export default function OutOfPocketPresenter() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // While the jump menu is open, only Escape (closes it) is handled — let
+      // arrow keys scroll the menu instead of advancing slides underneath.
+      if (jumpOpen) {
+        if (e.key === "Escape") setJumpOpen(false);
+        return;
+      }
       if (e.key === "ArrowRight" || e.key === " " || e.key === "Enter") {
         e.preventDefault();
         goNext();
@@ -122,11 +166,13 @@ export default function OutOfPocketPresenter() {
         goPrev();
       } else if (e.key === "f" || e.key === "F") {
         toggleFullscreen();
+      } else if (e.key === "j" || e.key === "J") {
+        setJumpOpen(true);
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [goNext, goPrev, toggleFullscreen]);
+  }, [goNext, goPrev, toggleFullscreen, jumpOpen]);
 
   if (!slide) {
     return (
@@ -206,16 +252,83 @@ export default function OutOfPocketPresenter() {
         >
           ← Prev
         </button>
-        <p className="text-xs uppercase tracking-widest text-black/60">
-          ← / → or Space to navigate · F for fullscreen
+        <p className="hidden text-xs uppercase tracking-widest text-black/60 md:block">
+          ← / → or Space to navigate · F for fullscreen · J to jump
         </p>
-        <button
-          onClick={goNext}
-          disabled={index === total - 1}
-          className="rounded border-2 border-black bg-white px-4 py-1.5 text-sm font-bold transition-all disabled:opacity-30 enabled:hover:bg-[var(--oop-pink)]"
-        >
-          Next →
-        </button>
+        <div className="relative flex items-center gap-2">
+          {/* Jump-to-phase menu */}
+          {jumpOpen && (
+            <button
+              type="button"
+              aria-label="Close jump menu"
+              onClick={() => setJumpOpen(false)}
+              className="fixed inset-0 z-30 cursor-default bg-black/10"
+            />
+          )}
+          {jumpOpen && (
+            <div className="absolute bottom-full right-0 z-40 mb-3 max-h-[65vh] w-72 overflow-y-auto rounded-xl border-4 border-black bg-white p-2 shadow-[6px_6px_0_0_#000]">
+              <p className="px-1 pb-2 pt-1 text-[11px] font-extrabold uppercase tracking-[0.2em] text-black/50">
+                Jump to phase
+              </p>
+              <div className="space-y-1">
+                {phases.map((p, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${
+                      i === activePhase ? "bg-[var(--oop-cyan)]/30" : ""
+                    }`}
+                  >
+                    <span
+                      className="w-5 shrink-0 text-center text-xs font-extrabold tabular-nums text-black/50"
+                      title={`Phase ${p.number}`}
+                    >
+                      {p.number}
+                    </span>
+                    <span
+                      className="flex-1 truncate text-xs font-bold"
+                      title={p.title}
+                    >
+                      {p.title}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => jumpTo(p.qIndex)}
+                      className="shrink-0 rounded border-2 border-black bg-white px-2 py-0.5 text-[11px] font-extrabold transition-all hover:bg-[var(--oop-cyan)]"
+                      title="Jump to this phase's questions"
+                    >
+                      Q
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => p.aIndex !== undefined && jumpTo(p.aIndex)}
+                      disabled={p.aIndex === undefined}
+                      className="shrink-0 rounded border-2 border-black bg-white px-2 py-0.5 text-[11px] font-extrabold transition-all enabled:hover:bg-[var(--oop-pink)] disabled:opacity-25"
+                      title="Jump to this phase's answers"
+                    >
+                      Ans
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          <button
+            onClick={() => setJumpOpen((v) => !v)}
+            className={`rounded border-2 border-black px-4 py-1.5 text-sm font-bold transition-all hover:bg-[var(--oop-yellow)] ${
+              jumpOpen ? "bg-[var(--oop-yellow)]" : "bg-white"
+            }`}
+            title="Jump to a phase (J)"
+          >
+            ☰ Jump
+          </button>
+          <button
+            onClick={goNext}
+            disabled={index === total - 1}
+            className="rounded border-2 border-black bg-white px-4 py-1.5 text-sm font-bold transition-all disabled:opacity-30 enabled:hover:bg-[var(--oop-pink)]"
+          >
+            Next →
+          </button>
+        </div>
       </div>
     </div>
   );

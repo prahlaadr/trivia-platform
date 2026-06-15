@@ -198,7 +198,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         points: 2,
         answer: "Cerulean",
         revealImageSrc: "/oop/img-cerulean.png",
-        revealCaption: "Andy’s “lumpy blue sweater” — cerulean, per Miranda’s monologue.",
+        revealCaption: "Andy’s “lumpy blue sweater”: cerulean, per Miranda’s monologue.",
       },
       {
         number: 6,
@@ -236,7 +236,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         questionImageSrc: "/oop/img-quill-needle.png",
         questionImageSrc2: "/oop/img-quill-barbs.png",
         revealCaption:
-          "Many believe the natural antibiotic effect of the quill's grease is a sign of benevolence — what it really does is make it impossible for the sting victim to escape the pain through the call of death, forcing it to live through the pain as a reminder of the wrath of our lil porcupine.",
+          "Many believe the natural antibiotic effect of the quill's grease is a sign of benevolence: what it really does is make it impossible for the sting victim to escape the pain through the call of death, forcing it to live through the pain as a reminder of the wrath of our lil porcupine.",
         revealSourceUrl: "https://link.springer.com/article/10.1007/BF01016483",
         sourceLabel: "natural antibiotic effect",
       },
@@ -385,7 +385,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         answer: "MongoDB",
         questionImageSrc: "/oop/logos/mongodb-icon.png",
         revealImageSrc: "/oop/logos/mongodb.svg",
-        revealCaption: "Document store — a natural fit for FHIR / JSON clinical data.",
+        revealCaption: "Document store: a natural fit for FHIR / JSON clinical data.",
       },
       {
         number: 8,
@@ -463,30 +463,30 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
           {
             term: "ASC X12",
             definition:
-              "The bread-and-butter data format — if you deal with healthcare billing, you've had nightmares parsing an X12 EDI file.",
+              "The bread-and-butter data format, if you deal with healthcare billing, you've had nightmares parsing an X12 EDI file.",
           },
           {
             term: "X.509",
             definition:
-              "The foundational standard for public-key certificates — what keeps PHI locked down across connected devices and SaMD.",
+              "The foundational standard for public-key certificates, what keeps PHI locked down across connected devices and SaMD.",
           },
           {
             term: "χ² (Chi-Square)",
             definition:
-              "Spelled “Chi,” written as X-squared — the stats test for comparing categorical variables in clinical data.",
+              "Spelled “Chi,” written as X-squared, the stats test for comparing categorical variables in clinical data.",
           },
           {
             term: "X-23",
             definition:
-              "Laura Kinney — the mutant clone and adopted daughter of Wolverine (X-Men comics, the movie Logan).",
+              "Laura Kinney, the mutant clone and adopted daughter of Wolverine (X-Men comics, the movie Logan).",
           },
           {
             term: "X Æ A-12",
             definition:
-              "Elon Musk and Grimes' famously unpronounceable kid — broke a few birth-certificate databases with its special characters.",
+              "Elon Musk and Grimes' famously unpronounceable kid, broke a few birth-certificate databases with its special characters.",
           },
           {
-            term: "BMW X7",
+            term: "X7",
             definition: "BMW's flagship full-size luxury SUV.",
           },
           {
@@ -497,7 +497,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
           {
             term: "XML",
             definition:
-              "The markup behind HL7 CDA / C-CDA clinical documents — the verbose ancestor before everyone moved to FHIR + JSON.",
+              "The markup behind HL7 CDA / C-CDA clinical documents, the verbose ancestor before everyone moved to FHIR + JSON.",
           },
         ],
       },
@@ -544,7 +544,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         answer: "Dr. Doug Ross (George Clooney on ER)",
         questionImageSrc: "/oop/tot/peep-dougross.png",
         revealImageSrc: "/oop/tot/peep-dougross.png",
-        revealCaption: "Trick question — George Clooney's character on the TV series ER.",
+        revealCaption: "Trick question: George Clooney's character on the TV series ER.",
       },
       {
         number: 5,
@@ -553,7 +553,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         answer: "Alexander Fleming",
         questionImageSrc: "/oop/tot/peep-fleming.png",
         revealImageSrc: "/oop/tot/peep-fleming.png",
-        revealCaption: "Discovered the mold Penicillium rubens — later made into penicillin.",
+        revealCaption: "Discovered the mold Penicillium rubens, later made into penicillin.",
       },
     ],
   },
@@ -629,7 +629,7 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
         number: 7,
         text: "Guess the thing",
         points: 1,
-        answer: "Eye exam — autorefractor (“focus on the balloon!”)",
+        answer: "Eye exam: autorefractor (“focus on the balloon!”)",
         questionImageSrc: "/oop/tot/zoom-7.png",
         revealImageSrc: "/oop/tot/zoom-autorefractor-full.png",
       },
@@ -685,12 +685,12 @@ export const DEFAULT_SECTIONS: DeckSection[] = [
     title: "Phase 12: Monster or Med?",
     subtitle: "horror villain, or prescription?",
     questions: [
-      { number: 1, text: "Biollante (bye-oh-LAN-tay)", points: 1, answer: "Monster — Godzilla's plant/rose kaiju", bullets: ["Monster", "Med"] },
-      { number: 2, text: "Krazati (krah-ZAH-tee)", points: 1, answer: "Med — adagrasib, a KRAS-G12C lung-cancer drug", bullets: ["Monster", "Med"] },
-      { number: 3, text: "Vecna (VEK-nah)", points: 1, answer: "Monster — D&D lich / Stranger Things villain", bullets: ["Monster", "Med"] },
-      { number: 4, text: "Cenobite (SEH-noh-byte)", points: 1, answer: "Monster — the Hellraiser creatures", bullets: ["Monster", "Med"] },
-      { number: 5, text: "Orgovyx (OR-go-viks)", points: 1, answer: "Med — relugolix, for advanced prostate cancer", bullets: ["Monster", "Med"] },
-      { number: 6, text: "Krystexxa (KRIS-tek-sə)", points: 1, answer: "Med — pegloticase, for chronic gout", bullets: ["Monster", "Med"] },
+      { number: 1, text: "Biollante (bye-oh-LAN-tay)", points: 1, answer: "Monster: Godzilla's plant/rose kaiju", bullets: ["Monster", "Med"] },
+      { number: 2, text: "Krazati (krah-ZAH-tee)", points: 1, answer: "Med: adagrasib, a KRAS-G12C lung-cancer drug", bullets: ["Monster", "Med"] },
+      { number: 3, text: "Vecna (VEK-nah)", points: 1, answer: "Monster: D&D lich / Stranger Things villain", bullets: ["Monster", "Med"] },
+      { number: 4, text: "Cenobite (SEH-noh-byte)", points: 1, answer: "Monster: the Hellraiser creatures", bullets: ["Monster", "Med"] },
+      { number: 5, text: "Orgovyx (OR-go-viks)", points: 1, answer: "Med: relugolix, for advanced prostate cancer", bullets: ["Monster", "Med"] },
+      { number: 6, text: "Krystexxa (KRIS-tek-sə)", points: 1, answer: "Med: pegloticase, for chronic gout", bullets: ["Monster", "Med"] },
     ],
   },
   // Photo round — "A" crops + full logos ripped from the "Trick or Treatment" deck.
