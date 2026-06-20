@@ -12,8 +12,9 @@ export default function PresentPage() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    // Check localStorage first (wildcard games are stored there)
-    if (quizId.startsWith("wildcard-")) {
+    // Check localStorage first — wildcard and game-gen games are stored
+    // there (game-gen ids are prefixed "gen_").
+    if (quizId.startsWith("wildcard-") || quizId.startsWith("gen_")) {
       const stored = localStorage.getItem(`quiz_${quizId}`);
       if (stored) {
         setQuiz(JSON.parse(stored));

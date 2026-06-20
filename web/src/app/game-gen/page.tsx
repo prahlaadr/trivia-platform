@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getBrand } from "@/lib/branding";
-import type { GameGenSession, GameGenTeam, SavedGameGen } from "@/lib/types";
+import type {
+  GameGenSession,
+  GeneratedQuestion,
+  GeneratedRound,
+  SavedGameGen,
+} from "@/lib/types";
 import {
   getGameGenSession,
   createGameGenSession,
@@ -13,6 +18,7 @@ import {
   removeTeam,
   aggregateTopics,
   buildRoundTopics,
+  gameGenToQuiz,
   getSavedGames,
   saveGame,
   deleteSavedGame,
@@ -40,13 +46,71 @@ const SUGGESTED_TOPICS = [
   "Pop Culture & Misc",
 ];
 
+// Game Gen pulls real questions from the same bundled bank that powers
+// Wildcard (/api/wildcard/topic), so a host can start a game on the
+// deployed site without running the local /game-gen Claude Code skill.
+const QUESTIONS_PER_ROUND = 6;
+
+interface BankApiQuestion {
+  id: string;
+  text: string;
+  answer: string;
+  questionType?: "open_ended" | "multiple_choice" | "true_false";
+}
+
+interface TopicResponse {
+  topic: string;
+  questions: BankApiQuestion[];
+  warnings: string[];
+}
+
+interface ApiCategory {
+  slug: string;
+  name: string;
+  questionCount: number;
+}
+
+type Difficulty = "mixed" | "easy" | "medium" | "hard";
+const DIFFICULTIES: Difficulty[] = ["mixed", "easy", "medium", "hard"];
+
+// A statement without a question mark reads like a fact at game time;
+// flag T/F questions so the host knows they're a verdict, not a fill-in.
+function withTrueFalsePrefix(q: BankApiQuestion): string {
+  if (q.text.startsWith("T/F:") || q.text.startsWith("True/False:")) return q.text;
+  const ans = q.answer.trim().toLowerCase();
+  const isTF = q.questionType === "true_false" || ans === "true" || ans === "false";
+  return isTF ? `T/F: ${q.text}` : q.text;
+}
+
+// "film & tv" → "Film & TV" for round titles.
+function titleCase(topic: string): string {
+  return topic.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+async function pullTopic(
+  topic: string,
+  count: number,
+  difficulty: Difficulty
+): Promise<TopicResponse> {
+  const res = await fetch("/api/wildcard/topic", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ topic, count, difficulty }),
+  });
+  if (!res.ok) throw new Error(`Topic "${topic}" failed (${res.status})`);
+  return res.json() as Promise<TopicResponse>;
+}
+
 export default function GameGenPage() {
   const [session, setSession] = useState<GameGenSession | null>(null);
   const [teamName, setTeamName] = useState("");
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [customTopic, setCustomTopic] = useState("");
-  const [generatedQuiz, setGeneratedQuiz] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [generated, setGenerated] = useState<GameGenSession | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
+  const [bankCategories, setBankCategories] = useState<ApiCategory[]>([]);
+  const [difficulty, setDifficulty] = useState<Difficulty>("mixed");
   const [savedGames, setSavedGames] = useState<SavedGameGen[]>([]);
 
   useEffect(() => {
@@ -76,6 +140,15 @@ export default function GameGenPage() {
       }
     }
     setSavedGames(getSavedGames());
+
+    // Bank categories let us swap any "random" padding round for a real
+    // category so every round gets on-topic questions.
+    fetch("/api/bank/categories")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { categories: ApiCategory[] } | null) => {
+        if (d?.categories) setBankCategories(d.categories);
+      })
+      .catch(() => {});
   }, []);
 
   const startNew = useCallback(() => {
@@ -123,65 +196,112 @@ export default function GameGenPage() {
     if (!confirm("Clear this game and start over?")) return;
     clearGameGenSession();
     setSession(null);
-    setGeneratedQuiz(null);
+    setGenerated(null);
+    setGenError(null);
   }, []);
 
-  const checkForGeneratedQuiz = useCallback(async () => {
-    if (!session) return;
+  // Build a real, playable quiz from the bundled question bank — the same
+  // /api/wildcard/topic endpoint Wildcard uses — and stash it in
+  // localStorage under the gen_<id> key the presenter reads.
+  const handleGenerate = useCallback(async () => {
+    if (!session || session.teams.length < 3) return;
+    setGenerating(true);
+    setGenError(null);
     try {
-      const res = await fetch(`/api/quiz?id=gen_${session.id}`);
-      if (res.ok) {
-        setGeneratedQuiz(`gen_${session.id}`);
-      }
-    } catch {
-      // not generated yet
-    }
-  }, [session]);
+      const topics = buildRoundTopics(session.teams); // 6 lowercased topics
+      const used = new Set(topics.filter((t) => t !== "random"));
+      // Categories not already chosen, to fill any "random" padding rounds.
+      const fillers = bankCategories.filter(
+        (c) => !used.has(c.name.toLowerCase()) && c.questionCount >= QUESTIONS_PER_ROUND
+      );
+      let fillerIdx = 0;
+      const picks = topics.map((t) => {
+        if (t === "random" && fillers.length) {
+          const c = fillers[fillerIdx % fillers.length];
+          fillerIdx++;
+          return { topic: c.slug, label: c.name };
+        }
+        return { topic: t, label: titleCase(t) };
+      });
 
-  const handleSaveGame = useCallback(async () => {
-    if (!session || !generatedQuiz) return;
-    try {
-      const res = await fetch(`/api/quiz?id=gen_${session.id}`);
-      if (!res.ok) return;
-      const quiz = await res.json();
-      const roundTopics = (quiz.rounds || []).map((r: { title: string }) => r.title);
-      const game: SavedGameGen = {
-        sessionId: session.id,
-        name: roundTopics.join(", "),
-        date: quiz.date || new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
-        roundTopics,
-        savedAt: new Date().toISOString(),
+      const results = await Promise.all(
+        picks.map((p) => pullTopic(p.topic, QUESTIONS_PER_ROUND, difficulty))
+      );
+
+      const rounds: GeneratedRound[] = results.map((res, i) => ({
+        number: i + 1,
+        title: picks[i].label,
+        topic: picks[i].topic,
+        questions: (res.questions || []).map(
+          (q, j): GeneratedQuestion => ({
+            number: j + 1,
+            text: withTrueFalsePrefix(q),
+            answer: q.answer,
+            topic: picks[i].topic,
+            source: "bank",
+          })
+        ),
+      }));
+
+      const empty = rounds.filter((r) => r.questions.length === 0).map((r) => r.title);
+
+      // Tiebreaker: one hard question from the first round's topic.
+      let tieBreaker: GameGenSession["tieBreaker"];
+      try {
+        const tbRes = await pullTopic(picks[0].topic, 1, "hard");
+        const tb = tbRes.questions?.[0];
+        if (tb) tieBreaker = { question: withTrueFalsePrefix(tb), answer: tb.answer };
+      } catch {
+        // tiebreaker is optional
+      }
+
+      const genSession: GameGenSession = {
+        id: session.id,
+        createdAt: new Date().toISOString(),
+        status: "ready",
+        teams: session.teams,
+        rounds,
+        tieBreaker,
       };
-      saveGame(game);
-      setSavedGames(getSavedGames());
-    } catch {
-      // ignore
+
+      const quiz = gameGenToQuiz(genSession);
+      localStorage.setItem(`quiz_gen_${session.id}`, JSON.stringify(quiz));
+      setGenerated(genSession);
+      if (empty.length) {
+        setGenError(
+          `No bank questions found for: ${empty.join(", ")}. Those rounds came back empty — try different topics.`
+        );
+      }
+    } catch (e) {
+      setGenError(e instanceof Error ? e.message : "Generation failed");
+    } finally {
+      setGenerating(false);
     }
-  }, [session, generatedQuiz]);
+  }, [session, bankCategories, difficulty]);
+
+  const handleSaveGame = useCallback(() => {
+    if (!generated) return;
+    const roundTopics = generated.rounds.map((r) => r.title);
+    const game: SavedGameGen = {
+      sessionId: generated.id,
+      name: roundTopics.join(", "),
+      date: new Date().toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }),
+      roundTopics,
+      savedAt: new Date().toISOString(),
+    };
+    saveGame(game);
+    setSavedGames(getSavedGames());
+  }, [generated]);
 
   const handleDeleteSaved = useCallback((sessionId: string) => {
     deleteSavedGame(sessionId);
+    localStorage.removeItem(`quiz_gen_${sessionId}`);
     setSavedGames(getSavedGames());
   }, []);
-
-  // Build the prompt for Claude Code
-  const buildPrompt = useCallback(() => {
-    if (!session || session.teams.length < 3) return "";
-    const roundTopics = buildRoundTopics(session.teams);
-    const topicSummary = aggregateTopics(session.teams);
-    const teamList = session.teams
-      .map((t) => `  ${t.name}: ${t.topics.join(", ")}`)
-      .join("\n");
-    return `/game-gen ${session.id}\nTeams:\n${teamList}\nRound topics: ${roundTopics.join(", ")}\nAll topics ranked: ${topicSummary.map((t) => `${t.topic} (${t.count})`).join(", ")}`;
-  }, [session]);
-
-  const copyPrompt = useCallback(() => {
-    const prompt = buildPrompt();
-    if (!prompt) return;
-    navigator.clipboard.writeText(prompt);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [buildPrompt]);
 
   const brand = typeof window !== "undefined" ? getBrand() : { name: "", tagline: "" };
   const roundTopics = session && session.teams.length >= 3 ? buildRoundTopics(session.teams) : [];
@@ -466,27 +586,44 @@ export default function GameGenPage() {
 
             {/* Generate Section */}
             <div className="rounded-lg border border-dashed border-[#8B3530]/30 bg-[#8B3530]/5 p-4">
-              <p className="mb-3 text-sm text-[#8B3530]/70">
-                Copy the prompt below and run it in Claude Code to generate
-                questions:
-              </p>
-              <pre className="mb-3 overflow-x-auto rounded bg-black/30 p-3 text-xs text-[#3D3D3A]/75">
-                {buildPrompt()}
-              </pre>
+              <div className="mb-4">
+                <p className="mb-2 text-sm text-[#3D3D3A]/60">Difficulty</p>
+                <div className="flex flex-wrap gap-2">
+                  {DIFFICULTIES.map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => setDifficulty(d)}
+                      className={`rounded-full px-3 py-1.5 text-sm font-medium capitalize transition-all ${
+                        difficulty === d
+                          ? "bg-[#8B3530] text-black"
+                          : "bg-[#3D3D3A]/8 text-[#3D3D3A]/70 hover:bg-white/20 hover:text-[#3D3D3A]"
+                      }`}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {genError && (
+                <p className="mb-3 rounded bg-[#C26B3E]/10 px-3 py-2 text-sm text-[#C26B3E]">
+                  {genError}
+                </p>
+              )}
+
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <button
-                  onClick={copyPrompt}
-                  className="rounded bg-[#8B3530] px-4 py-2 text-sm sm:px-5 sm:text-base font-bold text-black transition-all hover:bg-[#8B3530]/90"
+                  onClick={handleGenerate}
+                  disabled={generating}
+                  className="rounded bg-[#8B3530] px-4 py-2 text-sm sm:px-5 sm:text-base font-bold text-black transition-all hover:bg-[#8B3530]/90 disabled:opacity-40"
                 >
-                  {copied ? "Copied!" : "Copy Prompt"}
+                  {generating
+                    ? "Generating…"
+                    : generated
+                      ? "Regenerate"
+                      : "Generate Game"}
                 </button>
-                <button
-                  onClick={checkForGeneratedQuiz}
-                  className="rounded bg-[#3D3D3A]/8 px-4 py-2 text-sm sm:px-5 sm:text-base font-medium text-[#3D3D3A]/70 transition-all hover:bg-white/20 hover:text-[#3D3D3A]"
-                >
-                  Check for Results
-                </button>
-                {generatedQuiz && (
+                {generated && (
                   <>
                     <button
                       onClick={handleSaveGame}
@@ -496,7 +633,7 @@ export default function GameGenPage() {
                       {savedGames.some((g) => g.sessionId === session.id) ? "Saved" : "Save Game"}
                     </button>
                     <Link
-                      href={`/present/${generatedQuiz}`}
+                      href={`/present/gen_${session.id}`}
                       className="rounded bg-[#8FAA73] px-4 py-2 text-sm sm:px-5 sm:text-base font-bold text-black transition-all hover:bg-[#8FAA73]/90"
                     >
                       Present Game →
@@ -505,6 +642,64 @@ export default function GameGenPage() {
                 )}
               </div>
             </div>
+
+            {/* Question / Answer audit — verify each round pulled real Q&A */}
+            {generated && (
+              <div className="mt-6 space-y-4">
+                <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8FAA73]/60">
+                  Audit · {generated.rounds.reduce((n, r) => n + r.questions.length, 0)} questions
+                  {generated.tieBreaker ? " + tiebreaker" : ""}
+                </p>
+                {generated.rounds.map((round) => (
+                  <div
+                    key={round.number}
+                    className="rounded-lg border border-[#3D3D3A]/15 bg-[#3D3D3A]/[0.03] p-4"
+                  >
+                    <div className="mb-3 flex items-center gap-2">
+                      <span className="text-sm font-bold text-[#8B3530]/60">R{round.number}</span>
+                      <span className="font-bold text-[#3D3D3A]">{round.title}</span>
+                      <span
+                        className={`ml-auto rounded-full px-2 py-0.5 text-xs ${
+                          round.questions.length === QUESTIONS_PER_ROUND
+                            ? "bg-[#8FAA73]/15 text-[#8FAA73]"
+                            : "bg-[#C26B3E]/15 text-[#C26B3E]"
+                        }`}
+                      >
+                        {round.questions.length}/{QUESTIONS_PER_ROUND} questions
+                      </span>
+                    </div>
+                    {round.questions.length === 0 ? (
+                      <p className="text-sm italic text-[#C26B3E]/80">
+                        No questions returned for this topic.
+                      </p>
+                    ) : (
+                      <ol className="space-y-2">
+                        {round.questions.map((q) => (
+                          <li key={q.number} className="text-sm">
+                            <span className="text-[#3D3D3A]">
+                              <span className="text-[#3D3D3A]/40">{q.number}. </span>
+                              {q.text}
+                            </span>
+                            <span className="mt-0.5 block text-[#8FAA73]">
+                              → {q.answer || (
+                                <span className="italic text-[#C26B3E]">missing answer</span>
+                              )}
+                            </span>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </div>
+                ))}
+                {generated.tieBreaker && (
+                  <div className="rounded-lg border border-[#8B3530]/20 bg-[#8B3530]/[0.04] p-4 text-sm">
+                    <span className="font-bold text-[#8B3530]/70">Tiebreaker: </span>
+                    <span className="text-[#3D3D3A]">{generated.tieBreaker.question}</span>
+                    <span className="mt-0.5 block text-[#8FAA73]">→ {generated.tieBreaker.answer}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
