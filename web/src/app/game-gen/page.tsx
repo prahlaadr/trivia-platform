@@ -3,12 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getBrand } from "@/lib/branding";
-import type {
-  GameGenSession,
-  GeneratedQuestion,
-  GeneratedRound,
-  SavedGameGen,
-} from "@/lib/types";
+import type { GameGenSession, SavedGameGen } from "@/lib/types";
+import { buildRounds, type BankDifficulty } from "@/lib/bank-generate";
 import {
   getGameGenSession,
   createGameGenSession,
@@ -47,22 +43,8 @@ const SUGGESTED_TOPICS = [
 ];
 
 // Game Gen pulls real questions from the same bundled bank that powers
-// Wildcard (/api/wildcard/topic), so a host can start a game on the
-// deployed site without running the local /game-gen Claude Code skill.
+// Wildcard, via the shared bank-generate engine.
 const QUESTIONS_PER_ROUND = 6;
-
-interface BankApiQuestion {
-  id: string;
-  text: string;
-  answer: string;
-  questionType?: "open_ended" | "multiple_choice" | "true_false";
-}
-
-interface TopicResponse {
-  topic: string;
-  questions: BankApiQuestion[];
-  warnings: string[];
-}
 
 interface ApiCategory {
   slug: string;
@@ -70,35 +52,12 @@ interface ApiCategory {
   questionCount: number;
 }
 
-type Difficulty = "mixed" | "easy" | "medium" | "hard";
+type Difficulty = BankDifficulty;
 const DIFFICULTIES: Difficulty[] = ["mixed", "easy", "medium", "hard"];
-
-// A statement without a question mark reads like a fact at game time;
-// flag T/F questions so the host knows they're a verdict, not a fill-in.
-function withTrueFalsePrefix(q: BankApiQuestion): string {
-  if (q.text.startsWith("T/F:") || q.text.startsWith("True/False:")) return q.text;
-  const ans = q.answer.trim().toLowerCase();
-  const isTF = q.questionType === "true_false" || ans === "true" || ans === "false";
-  return isTF ? `T/F: ${q.text}` : q.text;
-}
 
 // "film & tv" → "Film & TV" for round titles.
 function titleCase(topic: string): string {
   return topic.replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-async function pullTopic(
-  topic: string,
-  count: number,
-  difficulty: Difficulty
-): Promise<TopicResponse> {
-  const res = await fetch("/api/wildcard/topic", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ topic, count, difficulty }),
-  });
-  if (!res.ok) throw new Error(`Topic "${topic}" failed (${res.status})`);
-  return res.json() as Promise<TopicResponse>;
 }
 
 export default function GameGenPage() {
@@ -224,36 +183,12 @@ export default function GameGenPage() {
         return { topic: t, label: titleCase(t) };
       });
 
-      const results = await Promise.all(
-        picks.map((p) => pullTopic(p.topic, QUESTIONS_PER_ROUND, difficulty))
-      );
-
-      const rounds: GeneratedRound[] = results.map((res, i) => ({
-        number: i + 1,
-        title: picks[i].label,
-        topic: picks[i].topic,
-        questions: (res.questions || []).map(
-          (q, j): GeneratedQuestion => ({
-            number: j + 1,
-            text: withTrueFalsePrefix(q),
-            answer: q.answer,
-            topic: picks[i].topic,
-            source: "bank",
-          })
-        ),
-      }));
+      const { rounds, tieBreaker } = await buildRounds(picks, {
+        perRound: QUESTIONS_PER_ROUND,
+        difficulty,
+      });
 
       const empty = rounds.filter((r) => r.questions.length === 0).map((r) => r.title);
-
-      // Tiebreaker: one hard question from the first round's topic.
-      let tieBreaker: GameGenSession["tieBreaker"];
-      try {
-        const tbRes = await pullTopic(picks[0].topic, 1, "hard");
-        const tb = tbRes.questions?.[0];
-        if (tb) tieBreaker = { question: withTrueFalsePrefix(tb), answer: tb.answer };
-      } catch {
-        // tiebreaker is optional
-      }
 
       const genSession: GameGenSession = {
         id: session.id,

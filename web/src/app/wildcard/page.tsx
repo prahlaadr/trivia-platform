@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getBrand } from "@/lib/branding";
 import { gameGenToQuiz, saveGame, getSavedGames, deleteSavedGame } from "@/lib/game-gen";
-import type { GameGenSession, SavedGameGen, GeneratedQuestion, GeneratedRound } from "@/lib/types";
+import type { GameGenSession, SavedGameGen } from "@/lib/types";
+import { buildRounds, type BankDifficulty, type RoundPick } from "@/lib/bank-generate";
 
 interface ApiCategory {
   id: number;
@@ -14,39 +15,7 @@ interface ApiCategory {
   questionCount: number;
 }
 
-interface ApiQuestion {
-  id: string;
-  text: string;
-  answer: string;
-  source: string;
-  sourceUrl: string | null;
-  categorySlug: string;
-  subcategorySlug: string;
-  questionType?: "open_ended" | "multiple_choice" | "true_false";
-}
-
-/**
- * A statement without a question mark reads like a fact at game time.
- * Prefix T/F questions so the host & audience know they're being asked
- * to verdict, not finish-the-sentence.
- *   - if API flags type as true_false → prefix
- *   - OR if the answer is literally "True" / "False" → prefix
- */
-function withTrueFalsePrefix(q: ApiQuestion): string {
-  if (q.text.startsWith("T/F:") || q.text.startsWith("True/False:")) return q.text;
-  const ans = q.answer.trim().toLowerCase();
-  const isTF = q.questionType === "true_false" || ans === "true" || ans === "false";
-  return isTF ? `T/F: ${q.text}` : q.text;
-}
-
-interface TopicResponse {
-  topic: string;
-  resolved: { categorySlug: string | null; subcategorySlug: string | null; matched: string };
-  questions: ApiQuestion[];
-  warnings: string[];
-}
-
-type Difficulty = "mixed" | "easy" | "medium" | "hard";
+type Difficulty = BankDifficulty;
 
 const QUESTIONS_PER_ROUND = 8;
 const DEFAULT_ROUNDS = 6;
@@ -120,50 +89,23 @@ export default function WildcardPage() {
       // Build the list of round picks. Either:
       //   "wildcard" → 6 random categories
       //   "custom"   → host's selected mix of categories + audience-yelled topics
-      type RoundPick = { topic: string; label: string };
-      let picks: RoundPick[];
-      if (mode === "custom") {
-        picks = selected.map((p) =>
-          p.kind === "category" ? { topic: p.slug, label: p.label } : { topic: p.topic, label: p.topic }
-        );
-      } else {
-        const shuffled = [...categories].sort(() => Math.random() - 0.5);
-        picks = shuffled.slice(0, DEFAULT_ROUNDS).map((c) => ({ topic: c.slug, label: c.name }));
-      }
+      const picks: RoundPick[] =
+        mode === "custom"
+          ? selected.map((p) =>
+              p.kind === "category"
+                ? { topic: p.slug, label: p.label }
+                : { topic: p.topic, label: p.topic }
+            )
+          : [...categories]
+              .sort(() => Math.random() - 0.5)
+              .slice(0, DEFAULT_ROUNDS)
+              .map((c) => ({ topic: c.slug, label: c.name }));
 
       try {
-        const results = await Promise.all(
-          picks.map((p) =>
-            fetch("/api/wildcard/topic", {
-              method: "POST",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({ topic: p.topic, count: QUESTIONS_PER_ROUND, difficulty }),
-            }).then((r) => r.json() as Promise<TopicResponse>)
-          )
-        );
-
-        const rounds: GeneratedRound[] = results.map((res, i) => ({
-          number: i + 1,
-          title: picks[i].label,
-          topic: picks[i].topic,
-          questions: res.questions.map(
-            (q, j): GeneratedQuestion => ({
-              number: j + 1,
-              text: withTrueFalsePrefix(q),
-              answer: q.answer,
-              topic: picks[i].topic,
-              source: "bank",
-            })
-          ),
-        }));
-
-        // Tiebreaker: pull a hard question from the first pick
-        const tbRes = await fetch("/api/wildcard/topic", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ topic: picks[0].topic, count: 1, difficulty: "hard" }),
-        }).then((r) => r.json() as Promise<TopicResponse>);
-        const tb = tbRes.questions[0];
+        const { rounds, tieBreaker } = await buildRounds(picks, {
+          perRound: QUESTIONS_PER_ROUND,
+          difficulty,
+        });
 
         const session: GameGenSession = {
           id: `wildcard-${crypto.randomUUID().slice(0, 8)}`,
@@ -171,9 +113,7 @@ export default function WildcardPage() {
           status: "ready",
           teams: [],
           rounds,
-          tieBreaker: tb
-            ? { question: withTrueFalsePrefix(tb), answer: tb.answer }
-            : undefined,
+          tieBreaker,
         };
 
         setGenerated(session);
