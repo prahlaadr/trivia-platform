@@ -49,3 +49,10 @@ Thumbable.db
 data/bank/trivia.duckdb
 data/bank/raw/
 !data/bank/snapshots/
+
+# Local scratch exports (not part of the app)
+web/out-of-pocket-answers.*
+
+# ...but DO commit the example env file
+!web/.env.example
+!.env.example

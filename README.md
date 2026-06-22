@@ -114,6 +114,22 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) — drag & drop `.docx` or `.pdf` quiz files, or click **Game Gen** to start building a custom game.
 
+The 19K-question bank ships as `web/.bank/bank.json` (committed), so **Wildcard
+and Game Gen work immediately from a clean clone** — no database or API keys
+needed. Environment variables are all optional locally; see `web/.env.example`.
+
+### Rebuild the question-bank database (optional)
+
+The canonical DuckDB (`data/bank/trivia.duckdb`, ~23MB) is git-ignored — only
+the exported `bank.json` is committed. To work with the Python
+ingest/reclassify pipeline, reconstruct the DB from the committed bank:
+
+```bash
+uv run python -m scripts.ingest.init_schema        # seed taxonomy (idempotent)
+uv run python -m scripts.build_duckdb_from_bank     # rebuild questions from bank.json
+uv run python scripts/validate_bank.py              # check the bank for defects
+```
+
 ### Vercel Deployment
 
 Auto-deploys from `main` via GitHub integration. Requires:
