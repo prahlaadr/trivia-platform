@@ -187,7 +187,7 @@ function OutOfPocketEditor() {
     <div className="oop-scope min-h-dvh pb-24">
       {/* Sticky action bar */}
       <div className="sticky top-0 z-30 border-b-2 border-black bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center gap-2 px-4 py-3">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3">
           <Link
             href="/out-of-pocket"
             className="text-sm font-bold tracking-widest underline-offset-4 hover:underline"
@@ -204,7 +204,6 @@ function OutOfPocketEditor() {
           >
             {allCollapsed ? "⊕ Expand all" : "⊖ Collapse all"}
           </button>
-          <div className="flex-1" />
           {/* Download fallbacks — browser print / Save as PDF from the live deck */}
           <div className="flex items-center gap-1.5" title="Printable backups of the live deck (browser → Save as PDF)">
             <span className="hidden text-[10px] font-bold uppercase tracking-wider text-black/40 lg:inline">
@@ -232,6 +231,7 @@ function OutOfPocketEditor() {
               Answer sheet
             </button>
           </div>
+          <div className="flex-1" />
           {msg && (
             <span className="text-xs font-bold text-black/70">{msg}</span>
           )}
