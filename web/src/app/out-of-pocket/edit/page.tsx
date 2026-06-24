@@ -187,27 +187,62 @@ function OutOfPocketEditor() {
     <div className="oop-scope min-h-dvh pb-24">
       {/* Sticky action bar */}
       <div className="sticky top-0 z-30 border-b-2 border-black bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3">
-          <Link
-            href="/out-of-pocket"
-            className="text-sm font-bold tracking-widest underline-offset-4 hover:underline"
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-2.5">
+          {/* Row 1 — navigation + primary actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/out-of-pocket"
+              className="text-sm font-bold tracking-widest underline-offset-4 hover:underline"
+            >
+              ← BACK
+            </Link>
+            <p className="hidden text-xs font-bold uppercase tracking-[0.2em] text-black/50 sm:block">
+              Edit Trivia · {liveQuestions} live questions
+            </p>
+            <button
+              onClick={toggleAll}
+              className="rounded border-2 border-black bg-white px-3 py-1.5 text-xs font-bold hover:bg-[var(--oop-cyan)]/30"
+              title={allCollapsed ? "Expand all rounds" : "Collapse all rounds"}
+            >
+              {allCollapsed ? "⊕ Expand all" : "⊖ Collapse all"}
+            </button>
+            <div className="flex-1" />
+            {msg && (
+              <span className="text-xs font-bold text-black/70">{msg}</span>
+            )}
+            {dirty && !msg && (
+              <span className="text-xs font-bold text-[var(--oop-pink)]">● Unsaved</span>
+            )}
+            <button
+              onClick={handleReset}
+              disabled={busy}
+              className="rounded border-2 border-black bg-white px-3 py-1.5 text-xs font-bold disabled:opacity-50"
+            >
+              Reset
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={busy || !dirty}
+              className="rounded border-2 border-black bg-[var(--oop-yellow)] px-3 py-1.5 text-xs font-bold disabled:opacity-50"
+            >
+              {busy ? "Saving…" : "Save"}
+            </button>
+            <button
+              onClick={handlePresent}
+              disabled={busy}
+              className="rounded border-2 border-black bg-[var(--oop-pink)] px-3 py-1.5 text-xs font-bold disabled:opacity-50"
+            >
+              ▶ Present
+            </button>
+          </div>
+
+          {/* Row 2 — PDF download fallbacks, right-aligned under Reset/Save/Present */}
+          <div
+            className="flex flex-wrap items-center justify-end gap-1.5"
+            title="Printable backups of the live deck (browser → Save as PDF)"
           >
-            ← BACK
-          </Link>
-          <p className="hidden text-xs font-bold uppercase tracking-[0.2em] text-black/50 sm:block">
-            Edit Trivia · {liveQuestions} live questions
-          </p>
-          <button
-            onClick={toggleAll}
-            className="rounded border-2 border-black bg-white px-3 py-1.5 text-xs font-bold hover:bg-[var(--oop-cyan)]/30"
-            title={allCollapsed ? "Expand all rounds" : "Collapse all rounds"}
-          >
-            {allCollapsed ? "⊕ Expand all" : "⊖ Collapse all"}
-          </button>
-          {/* Download fallbacks — browser print / Save as PDF from the live deck */}
-          <div className="flex items-center gap-1.5" title="Printable backups of the live deck (browser → Save as PDF)">
-            <span className="hidden text-[10px] font-bold uppercase tracking-wider text-black/40 lg:inline">
-              ⤓ PDF
+            <span className="mr-auto text-[10px] font-bold uppercase tracking-wider text-black/40 sm:mr-0">
+              ⤓ Download PDF
             </span>
             <button
               onClick={() => openPrint("key")}
@@ -231,34 +266,6 @@ function OutOfPocketEditor() {
               Answer sheet
             </button>
           </div>
-          <div className="flex-1" />
-          {msg && (
-            <span className="text-xs font-bold text-black/70">{msg}</span>
-          )}
-          {dirty && !msg && (
-            <span className="text-xs font-bold text-[var(--oop-pink)]">● Unsaved</span>
-          )}
-          <button
-            onClick={handleReset}
-            disabled={busy}
-            className="rounded border-2 border-black bg-white px-3 py-1.5 text-xs font-bold disabled:opacity-50"
-          >
-            Reset
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={busy || !dirty}
-            className="rounded border-2 border-black bg-[var(--oop-yellow)] px-3 py-1.5 text-xs font-bold disabled:opacity-50"
-          >
-            {busy ? "Saving…" : "Save"}
-          </button>
-          <button
-            onClick={handlePresent}
-            disabled={busy}
-            className="rounded border-2 border-black bg-[var(--oop-pink)] px-3 py-1.5 text-xs font-bold disabled:opacity-50"
-          >
-            ▶ Present
-          </button>
         </div>
       </div>
 
