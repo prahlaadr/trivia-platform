@@ -1,0 +1,265 @@
+{
+  "version": 1,
+  "title": "Out of Pocket · Data Camp · June 2026",
+  "sections": [
+    {
+      "number": 0,
+      "title": "Get into your teams + team name",
+      "subtitle": "(we’re all zero-indexed, right?)",
+      "body": "You should have gotten your team number assigned at the start. If not or you forgot, introduce yourself to a team! Also, think of a team name. Some ideas to get you started: Drop table like it’s hot; dude, where’s my data; null pointer sisters; smells like updag in here",
+      "questions": []
+    },
+    {
+      "number": 1,
+      "title": "Phase 1: Movies and SQL",
+      "subtitle": "your queries betray you",
+      "questions": [
+        {
+          "number": 1,
+          "text": "Identify the movie from the SQL:",
+          "points": 1,
+          "codeBlock": "SELECT * FROM Earth\nWHERE population = population / 2;",
+          "answer": "Avengers: Infinity War",
+          "revealImageSrc": "/oop/movies/infinity-war.png"
+        },
+        {
+          "number": 2,
+          "text": "Identify the movie from the SQL:",
+          "points": 1,
+          "answer": "Interstellar",
+          "kind": "code",
+          "codeBlock": "SELECT CASE WHEN gravity = 'extreme'\n            THEN '7 years' ELSE '1 hour' END AS time_passed\nFROM endurance;",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/interstellar-1781620674043.jpg"
+        },
+        {
+          "number": 3,
+          "text": "Identify the movie from the SQL:",
+          "points": 1,
+          "answer": "Inception",
+          "kind": "code",
+          "codeBlock": "SELECT * FROM reality\nWHERE dream_id IN (\n        SELECT dream_id FROM dream\n        WHERE level_id IN (\n                SELECT level_id FROM level\n                WHERE deeper_id IN (\n                        SELECT deeper_id FROM deeper\n                        WHERE limbo_id IN (\n                                SELECT limbo_id FROM limbo))));",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/16inceptioncap-articlelarge-1781620176880.webp",
+          "revealCaption": "yo dawg heard you like subqueries"
+        },
+        {
+          "number": 4,
+          "text": "Identify the movie from the SQL:",
+          "points": 1,
+          "answer": "10 Things I Hate About You",
+          "kind": "code",
+          "codeBlock": "SELECT * FROM feelings\nWHERE target = 'you'\nORDER BY hatred DESC\nLIMIT 10;",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/fd332b5a-0b2c-42d3-9663-6b28f66eeefe-1200x675-1781620849346.jpg",
+          "revealCaption": "11: your insistence on using semicolons"
+        },
+        {
+          "number": 5,
+          "text": "Identify the movie (or musical!) from the SQL:",
+          "points": 1,
+          "answer": "Les Misérables",
+          "kind": "code",
+          "codeBlock": "SELECT * FROM prisoners\nWHERE prisoner_id = 24601;",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/81e1npaqjml-ac-uf1000-1000-ql80-1781621000751.jpg"
+        },
+        {
+          "number": 6,
+          "text": "Identify the movie from the SQL:",
+          "points": 1,
+          "answer": "Groundhog Day",
+          "kind": "code",
+          "codeBlock": "DECLARE @day INT\nSET @day = 1\nWHILE (@day <= 10)\nBEGIN\n    PRINT 'Feb 2'\nEND"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Phase 2: Oh you're a data fan? Name every data",
+      "subtitle": "you know you know these",
+      "questions": [
+        {
+          "number": 1,
+          "text": "Guess the data tool from its logo:",
+          "points": 1,
+          "answer": "R",
+          "questionImageSrc": "/oop/logos/r.svg",
+          "revealCaption": "okay that was an easy one"
+        },
+        {
+          "number": 2,
+          "text": "Guess the data tool from its logo:",
+          "points": 1,
+          "answer": "Google Sheets",
+          "questionImageSrc": "/oop/logos/google-sheets.svg",
+          "revealCaption": "The universal clinical-ops spreadsheet, for better or worse."
+        },
+        {
+          "number": 3,
+          "text": "Guess the data tool from its logo:",
+          "points": 1,
+          "answer": "Python",
+          "questionImageSrc": "/oop/logos/python.svg",
+          "revealCaption": "Workhorse for health data science & ML."
+        },
+        {
+          "number": 4,
+          "text": "Guess the data tool from its logo:",
+          "points": 1,
+          "answer": "Databricks",
+          "questionImageSrc": "/oop/logos/databricks-icon.png",
+          "revealImageSrc": "/oop/logos/databricks.png",
+          "revealCaption": "Lakehouse for large-scale clinical & genomic ML."
+        },
+        {
+          "number": 5,
+          "text": "Guess the data tool from its logo:",
+          "points": 1,
+          "answer": "MATLAB",
+          "questionImageSrc": "/oop/logos/matlab.png",
+          "revealCaption": "Medical imaging and biosignal (ECG/EEG) processing."
+        },
+        {
+          "number": 6,
+          "text": "Guess the data tool from its logo:",
+          "points": 1,
+          "answer": "Microsoft Power BI",
+          "questionImageSrc": "/oop/logos/powerbi.svg",
+          "revealCaption": "Dashboards across payers, providers & hospital ops."
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Phase 3: X Marks the Spot",
+      "subtitle": "every answer starts with X",
+      "questions": [
+        {
+          "number": 1,
+          "text": "Match each X-term to its definition:",
+          "points": 8,
+          "answer": "",
+          "matchPairs": [
+            {
+              "term": "X12",
+              "definition": "The bread-and-butter data format — if you deal with healthcare billing, you've had nightmares parsing an X12 EDI file."
+            },
+            {
+              "term": "χ² ",
+              "definition": "Chi-Square: The stats test for comparing categorical variables in clinical data."
+            },
+            {
+              "term": "X-23",
+              "definition": "Laura Kinney — the mutant clone and adopted daughter of Wolverine (X-Men comics, the movie Logan)."
+            },
+            {
+              "term": "X Æ A-12",
+              "definition": "Elon Musk and Grimes' famously unpronounceable kid — broke a few birth-certificate databases with its special characters."
+            },
+            {
+              "term": "X7",
+              "definition": "BMW's flagship full-size luxury SUV."
+            },
+            {
+              "term": "XGBoost",
+              "definition": "The gradient-boosting library quietly powering a huge share of clinical risk-prediction and tabular-ML models."
+            },
+            {
+              "term": "XML",
+              "definition": "The markup behind HL7 CDA / C-CDA clinical documents — the verbose ancestor before everyone moved to FHIR + JSON."
+            }
+          ]
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "number": 4,
+      "title": "Phase 4: Charts about 🎵🎵charts🎵🎵",
+      "subtitle": "The answer to these will be a musician or band",
+      "questions": [
+        {
+          "number": 1,
+          "text": "Which musician does this chart represent?",
+          "points": 1,
+          "answer": "Taylor Swift",
+          "questionImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-neli-1781808764032.png",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-neli-1781808787743.png"
+        },
+        {
+          "number": 2,
+          "text": "Which band does this chart represent?",
+          "points": 1,
+          "answer": "Fleetwood Mac",
+          "kind": "standard",
+          "questionImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-nacu-1781808799169.png",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-nacu-1781808812546.png",
+          "revealCaption": "they never stopped thinking about tomorrow"
+        },
+        {
+          "number": 3,
+          "text": "Which musician does this chart represent?",
+          "points": 1,
+          "answer": "Mariah Carey (I will also accept Michael Bublé, although his spikes in 2022 should be lower",
+          "kind": "standard",
+          "questionImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-neag-1781808952588.png",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-neag-1781808955398.png"
+        },
+        {
+          "number": 4,
+          "text": "Which musician does this chart represent? ",
+          "points": 1,
+          "answer": "Adele",
+          "kind": "standard",
+          "questionImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-ngjn-1781809010954.png",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-ngjn-1781809015009.png"
+        },
+        {
+          "number": 5,
+          "text": "Which musician does this chart represent?",
+          "points": 1,
+          "answer": "Mr Worldwide himself, Pitbull",
+          "kind": "standard",
+          "questionImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-ngmp-1781809045801.png",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/scr-20260618-ngmp-1781809047693.png"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Tiebreakers!",
+      "subtitle": "The answer to all of these will be a pun on a musician or band",
+      "questions": [
+        {
+          "number": 1,
+          "text": "Example! \n\nWhat do you call it when Jimmy Fallon's House Band decides to measure the average size of the error between a model’s predictions and the real data?",
+          "points": 1,
+          "answer": "The Roots Mean Square",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/the-roots-02-1782246664730.jpg"
+        },
+        {
+          "number": 2,
+          "text": "Tiebreaker 1: where the singer of \"brat\" puts the independent variable on a chart",
+          "points": 1,
+          "answer": "Charlie XCX-axis",
+          "kind": "standard",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/brat-font-1782246772091.png"
+        },
+        {
+          "number": 3,
+          "text": "Tiebreaker 2: this famous soulful crooner + pianist always includes a key that maps each color to the data it represents when he makes charts",
+          "points": 1,
+          "answer": "John Legend",
+          "kind": "standard",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/gettyimages-1058976308-1782247186431.jpg"
+        },
+        {
+          "number": 4,
+          "text": "Tiebreaker 3: this chanteuse WILL write a Love Song to this standard chart that depicts data with stacked rectangles ",
+          "points": 1,
+          "answer": "Sara Bar-Chart-eilles",
+          "kind": "standard",
+          "revealImageSrc": "https://5hr43axeywo90xkd.public.blob.vercel-storage.com/oop/uploads/ab67616d0000b273402ee46c35743e5b515a7fd8-1782247188650.jpeg"
+        }
+      ],
+      "body": "Get thee to a punnery"
+    }
+  ]
+}
