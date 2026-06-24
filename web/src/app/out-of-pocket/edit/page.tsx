@@ -146,6 +146,17 @@ function OutOfPocketEditor() {
     setBusy(false);
   };
 
+  // Stash the on-screen deck so the print view reflects even unsaved edits,
+  // then open the chosen document in a new tab for browser print / Save-as-PDF.
+  const openPrint = (doc: "key" | "questions" | "answers") => {
+    try {
+      localStorage.setItem("oop-print-payload", JSON.stringify(payload));
+    } catch {
+      /* fall back to the saved deck if stashing fails */
+    }
+    window.open(`/out-of-pocket/print?doc=${doc}`, "_blank");
+  };
+
   const handlePresent = async () => {
     if (dirty) {
       const res = await saveDeck(payload);
@@ -194,6 +205,33 @@ function OutOfPocketEditor() {
             {allCollapsed ? "⊕ Expand all" : "⊖ Collapse all"}
           </button>
           <div className="flex-1" />
+          {/* Download fallbacks — browser print / Save as PDF from the live deck */}
+          <div className="flex items-center gap-1.5" title="Printable backups of the live deck (browser → Save as PDF)">
+            <span className="hidden text-[10px] font-bold uppercase tracking-wider text-black/40 lg:inline">
+              ⤓ PDF
+            </span>
+            <button
+              onClick={() => openPrint("key")}
+              className="rounded border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold hover:bg-[var(--oop-yellow)]/40"
+              title="Presenter answer key — questions + answers"
+            >
+              Answer key
+            </button>
+            <button
+              onClick={() => openPrint("questions")}
+              className="rounded border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold hover:bg-[var(--oop-cyan)]/40"
+              title="Crowd question sheet — questions only, no answers"
+            >
+              Questions
+            </button>
+            <button
+              onClick={() => openPrint("answers")}
+              className="rounded border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold hover:bg-[var(--oop-cyan)]/40"
+              title="Team answer sheet — numbered blanks to write on"
+            >
+              Answer sheet
+            </button>
+          </div>
           {msg && (
             <span className="text-xs font-bold text-black/70">{msg}</span>
           )}
