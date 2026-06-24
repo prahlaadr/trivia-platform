@@ -16,6 +16,19 @@ import { FitBox } from "./FitBox";
 
 const ASPECT = "aspect-[16/9] [container-type:size]";
 
+/**
+ * Content safe area inside template-question.png's white card.
+ *
+ * The pink frame, the black card border, and the decorative corner quote marks
+ * are all baked into the 1920×1080 PNG, so overlaid content must stay within the
+ * card's interior. Measured from the PNG: card interior spans x 7.6–92.4%,
+ * y 13.6–86.4%; the corner quotes intrude only to x≈10% (top-left, y 18–28%) and
+ * x≈90% (bottom-right, y 72–82%). This box clears the border and both quotes with
+ * margin — top is 15% so a top-anchored heading sits below the border line, not
+ * on it.
+ */
+const CARD_SAFE = "absolute inset-x-[12%] top-[15%] bottom-[15%]";
+
 // ── Cover ──────────────────────────────────────────────────────────
 
 export function OopCoverSlide({
@@ -135,7 +148,7 @@ function OopMatchQuestion({ number, text, points, pairs }: { number: number; tex
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
       <img src="/oop/template-question.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-x-[9%] top-[9%] bottom-[9%]">
+      <div className={CARD_SAFE}>
         <FitBox align="top" designWidth={1240} refitKey={`mq-${number}-${text}`}>
           <div className="flex w-full flex-col gap-[28px]">
             <MatchHeading number={number} text={text} points={points} />
@@ -168,7 +181,7 @@ function OopMatchReveal({ number, text, points, pairs }: { number: number; text:
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
       <img src="/oop/template-question.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-x-[9%] top-[9%] bottom-[9%]">
+      <div className={CARD_SAFE}>
         <FitBox align="center" designWidth={1240} refitKey={`mr-${number}-${text}`}>
           <div className="flex w-full flex-col gap-[26px]">
             <MatchHeading number={number} text={text} points={points} />
@@ -228,7 +241,7 @@ export function OopQuestionSlide({
       />
       {/* Heading pinned to the top, body grown to fill — the whole group is
           scaled by FitBox to use the full card (readable in large rooms). */}
-      <div className="absolute inset-x-[8%] top-[10%] bottom-[10%]">
+      <div className={CARD_SAFE}>
         <FitBox align="top" designWidth={900} refitKey={`q-${number}-${text}`}>
           <div className="flex flex-col items-center gap-[22px] text-center">
             <p className="text-[40px] font-extrabold leading-snug text-black">
@@ -277,7 +290,7 @@ export function OopQuestionSlide({
           href={sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-[4%] right-[9%] z-20 text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
+          className="absolute bottom-[4%] right-[5%] z-20 text-[1.2cqw] text-[var(--oop-navy)] underline decoration-2 underline-offset-2 hover:text-black"
         >
           {sourceLabel ?? "source"} ↗
         </a>
@@ -328,7 +341,7 @@ export function OopRevealSlide({
       {/* Reveal holds more (question + answer + support), so the same FitBox
           naturally settles a touch smaller than the question — parity without
           separate tuning. */}
-      <div className="absolute inset-x-[8%] top-[10%] bottom-[10%]">
+      <div className={CARD_SAFE}>
         <FitBox align="top" designWidth={900} refitKey={`r-${number}-${text}`}>
           <div className="flex flex-col items-center gap-[18px] text-center">
             <p className="text-[34px] font-extrabold leading-snug text-black">
@@ -385,7 +398,7 @@ export function OopRevealSlide({
           href={sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute bottom-[4%] right-[9%] z-20 text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
+          className="absolute bottom-[4%] right-[5%] z-20 text-[1.2cqw] text-[var(--oop-navy)] underline decoration-2 underline-offset-2 hover:text-black"
         >
           {sourceLabel ?? "source"} ↗
         </a>
