@@ -73,6 +73,8 @@ export async function POST(request: NextRequest) {
         access: "public",
         contentType: "application/json",
         addRandomSuffix: false,
+        allowOverwrite: true,
+        cacheControlMaxAge: 60,
       });
     } else {
       try {
