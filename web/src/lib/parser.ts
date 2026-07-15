@@ -43,7 +43,7 @@ export function parseQuizText(rawText: string): Quiz {
   let date = "";
   for (const p of paragraphs) {
     // Match "Pub Quiz N – Date" or just "Quiz N – Date"
-    const m = p.match(/^(?:Pub\s+)?Quiz\s+(\d+)\s*[–\-]\s*(.+)/i);
+    const m = p.match(/^(?:Pub\s+)?Quiz\s+(\d+)\s*[–—\-]\s*(.+)/i);
     if (m) {
       quizNumber = parseInt(m[1]);
       date = m[2].trim();
@@ -71,7 +71,7 @@ export function parseQuizText(rawText: string): Quiz {
 
   for (let i = 0; i < paragraphs.length; i++) {
     const p = paragraphs[i];
-    const rm = p.match(/^Round\s+(\d+)\s*[–\-]\s*(.+)/);
+    const rm = p.match(/^Round\s+(\d+)\s*[–—\-]\s*(.+)/);
     if (rm) {
       sections.push(["round", i, parseInt(rm[1]), rm[2].trim()]);
     } else if (/^Mini Game \d+/i.test(p)) {

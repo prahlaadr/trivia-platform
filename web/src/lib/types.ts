@@ -4,6 +4,8 @@ export interface Question {
   answer: string;
   choices: string[];
   is_internet_only: boolean;
+  host_hints?: string[]; // host-only prompts to say with the question (no giveaway)
+  fun_facts?: string[]; // host-only color to say when revealing the answer
 }
 
 export interface Round {

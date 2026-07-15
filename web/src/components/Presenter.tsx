@@ -24,6 +24,7 @@ export function Presenter({ quiz }: PresenterProps) {
   const [scoreSession, setScoreSession] = useState<GameSession | null>(null);
   const [showFlagMenu, setShowFlagMenu] = useState(false);
   const [flagToast, setFlagToast] = useState<string | null>(null);
+  const [showNotes, setShowNotes] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Load latest scoring session for leaderboard
@@ -108,6 +109,8 @@ export function Presenter({ quiz }: PresenterProps) {
         goPrev();
       } else if (e.key === "f" || e.key === "F") {
         toggleFullscreen();
+      } else if (e.key === "n" || e.key === "N") {
+        setShowNotes((v) => !v);
       } else if (e.key === "Home") {
         setCurrentSlide(0);
       } else if (e.key === "End") {
@@ -135,6 +138,25 @@ export function Presenter({ quiz }: PresenterProps) {
   const flaggable = slide?.question
     ? { text: slide.question.text, answer: slide.question.answer }
     : null;
+
+  // Host-only notes for the current slide: hints on question slides, fun facts
+  // on answer slides. Video answers slide shows every city's fact.
+  const hostNotes = useMemo<{ title: string; items: string[] } | null>(() => {
+    if (!slide) return null;
+    if (slide.type === "answer" && slide.question) {
+      return { title: "Fun facts", items: slide.question.fun_facts ?? [] };
+    }
+    if ((slide.type === "question" || slide.type === "internet-question") && slide.question) {
+      return { title: "Host hints — no giveaways", items: slide.question.host_hints ?? [] };
+    }
+    if (slide.type === "video-answers" && slide.round) {
+      const items = slide.round.questions.flatMap((q) =>
+        (q.fun_facts ?? []).map((f) => `${q.answer || q.text}: ${f}`)
+      );
+      return { title: "Fun facts", items };
+    }
+    return null;
+  }, [slide]);
 
   const submitFlag = useCallback(
     (verdict: FeedbackVerdict) => {
@@ -333,6 +355,19 @@ export function Presenter({ quiz }: PresenterProps) {
           >
             {isFullscreen ? "Exit FS" : "Fullscreen"}
           </button>
+          {hostNotes && hostNotes.items.length > 0 && (
+            <button
+              onClick={() => setShowNotes((v) => !v)}
+              className={`rounded px-2 py-1 text-xs sm:px-3 sm:text-sm font-bold transition-all ${
+                showNotes
+                  ? "bg-[#D4A642] text-black"
+                  : "bg-[#D4A642]/20 text-[#D4A642] hover:bg-[#D4A642]/30"
+              }`}
+              title="Toggle host notes (N)"
+            >
+              Notes
+            </button>
+          )}
           {flaggable && (
             <div className="relative">
               <button
@@ -644,6 +679,32 @@ export function Presenter({ quiz }: PresenterProps) {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Host notes — toggle with N or the Notes button. Hidden by default so
+          the projected screen stays clean; host peeks when they want. */}
+      {showNotes && hostNotes && hostNotes.items.length > 0 && (
+        <div className="absolute bottom-16 left-3 z-40 max-h-[55vh] w-[min(30rem,80vw)] overflow-y-auto rounded-lg border border-[#D4A642]/40 bg-[#1C2E22]/95 p-4 shadow-2xl backdrop-blur">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#D4A642]">
+              {hostNotes.title}
+            </p>
+            <button
+              onClick={() => setShowNotes(false)}
+              className="text-xs text-white/40 hover:text-white/80"
+            >
+              hide (N)
+            </button>
+          </div>
+          <ul className="space-y-2">
+            {hostNotes.items.map((item, i) => (
+              <li key={i} className="flex gap-2 text-sm leading-snug text-white/85">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#D4A642]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
