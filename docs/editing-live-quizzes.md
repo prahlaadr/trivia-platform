@@ -32,6 +32,29 @@ node scripts/quiz-blob.mjs push /tmp/quiz_618.json
 # reload https://trivia.pyaarproject.org/present/618
 ```
 
+## Generating host notes (Gemini + Google Search)
+
+`web/scripts/gen-host-notes.mjs` fills `host_hints` + `fun_facts` on demand, at any
+granularity, grounded in live Google Search (facts retrieved, not recalled). It is
+**preview-first**: writes `/tmp/quiz_<N>_notes.json` and prints everything for review;
+publishes only with `--push`.
+
+```bash
+cd web
+node scripts/gen-host-notes.mjs --quiz 618                 # whole quiz, only Qs missing notes
+node scripts/gen-host-notes.mjs --quiz 618 --round 2       # one round
+node scripts/gen-host-notes.mjs --quiz 618 --round 2 --q 3,5   # specific questions
+   # --overwrite  redo Qs that already have notes
+   # --push       publish to Blob (needs /tmp/trivia.env from `vercel env pull`)
+   # --model      Gemini model (default gemini-2.5-flash, free tier)
+```
+
+- Key: `GEMINI_API_KEY` from env or `~/Projects/.secrets/secrets.env`.
+- Skips internet-only + progressive rounds; video rounds get fun_facts only (no hints).
+- Leak-guard: rejects/retries any hint that contains the answer, and flags `⚠ possible
+  answer leak` in the preview if one slips through. Always eyeball the preview before `--push`.
+- House rule enforced: em dashes are stripped from generated text.
+
 ## Question shape
 
 Each `rounds[].questions[]` item:
