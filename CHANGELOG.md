@@ -1,5 +1,46 @@
 # Changelog
 
+## 2026-07-16 — Snapshot
+**Snapshot:** `data/bank/snapshots/2026-07-16`
+**Total questions:** 19,334
+**Tag assignments:** 3,439 (11 distinct tags used)
+
+### By source
+| Source | Rows |
+|---|---:|
+| r-trivia | 13,194 |
+| opentdb | 5,193 |
+| dirty-south | 947 |
+
+### Catchall % per category (lower is better)
+| Category | % on catchall |
+|---|---:|
+| art-design | 93.9% |
+| film-tv | 58.3% |
+| food-drink | 74.4% |
+| games-toys | 100.0% |
+| geography | 60.2% |
+| history | 89.6% |
+| language-words | 33.6% |
+| literature | 65.5% |
+| music | 84.3% |
+| myth-religion | 76.2% |
+| politics-society | 79.5% |
+| pop-misc | 93.2% |
+| science-nature | 68.2% |
+| sport | 58.5% |
+| tech-internet | 51.7% |
+| video-games | 72.5% |
+
+### Files (rows / bytes / sha256 prefix)
+| Table | Rows | Bytes | sha256 |
+|---|---:|---:|---|
+| category | 16 | 1,252 | `2f28033910d261c6` |
+| subcategory | 55 | 2,988 | `69a4151503d075a2` |
+| tag | 28 | 1,376 | `7e5936e3150615ab` |
+| question | 19,334 | 3,186,824 | `9da5dedb6a83361d` |
+| question_tag | 3,439 | 57,344 | `934c8e25f3e31dd6` |
+
 ## 2026-05-24 — Snapshot
 _Split video-games into its own top-level (16 cats total); migrated 1,209 questions_
 **Snapshot:** `data/bank/snapshots/2026-05-24`
