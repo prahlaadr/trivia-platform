@@ -14,7 +14,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { pickQuestions, resolveTopic } from "@/lib/bank/queries";
+import { pickQuestions, resolveTopic, salientTopic } from "@/lib/bank/queries";
 import type { DifficultyFilter } from "@/lib/bank/types";
 
 export const runtime = "nodejs";
@@ -39,7 +39,10 @@ export async function POST(req: Request) {
   }
 
   const count = body.count ?? 8;
-  const resolved = await resolveTopic(body.topic);
+  // Match on the distinctive term ("Marvel movies" -> "marvel") so filler words
+  // don't sink an otherwise-coverable topic. Original kept for warning copy.
+  const searchTopic = salientTopic(body.topic);
+  const resolved = await resolveTopic(searchTopic);
   const warnings: string[] = [];
   let fallbackUsed:
     | "subcategory-with-topic"
@@ -71,19 +74,13 @@ export async function POST(req: Request) {
 
   // FAST PATH: topic is a known category — pull the whole category, no
   // text filtering. This is the random-wildcard case (page sends slugs
-  // like "science-nature" as topics).
-  //
-  // EXCLUDE dirty-south (pub-quiz) source here because those questions
-  // depend on round-level context ("Heart, Death, Eyes, Fire" connection
-  // puzzles, progressive clues, etc.) which is stripped when picked
-  // individually. They stay in the bank — and remain available for
-  // typed-topic searches and the upcoming full-quiz presentation flow
-  // — but we don't surface them in random picks.
+  // like "science-nature" as topics). dirty-south is included: the
+  // reusable-only ingest already dropped context-dependent pub-quiz
+  // rounds, so what remains are standalone Q:A safe to pick individually.
   if (resolved.topicIsCategory && resolved.categorySlug) {
     questions = await pickQuestions({
       ...base,
       categorySlug: resolved.categorySlug,
-      excludeSources: ["dirty-south"],
     });
     if (questions.length > 0) fallbackUsed = "category-broad";
   }
@@ -94,7 +91,7 @@ export async function POST(req: Request) {
       ...base,
       categorySlug: resolved.categorySlug ?? undefined,
       subcategorySlug: resolved.subcategorySlug,
-      fuzzyTopic: topicMatchesSub ? undefined : body.topic,
+      fuzzyTopic: topicMatchesSub ? undefined : searchTopic,
     });
     if (questions.length > 0) fallbackUsed = "subcategory-with-topic";
   }
@@ -104,7 +101,7 @@ export async function POST(req: Request) {
     questions = await pickQuestions({
       ...base,
       categorySlug: resolved.categorySlug,
-      fuzzyTopic: body.topic,
+      fuzzyTopic: searchTopic,
     });
     if (questions.length > 0) {
       fallbackUsed = "category-with-topic";
@@ -145,7 +142,7 @@ export async function POST(req: Request) {
 
   // Try 5: fuzzy across the whole bank
   if (questions.length === 0) {
-    questions = await pickQuestions({ ...base, fuzzyTopic: body.topic });
+    questions = await pickQuestions({ ...base, fuzzyTopic: searchTopic });
     if (questions.length > 0) {
       fallbackUsed = "fuzzy";
       warnings.push(

@@ -39,6 +39,13 @@ function shuffle<T>(arr: T[]): T[] {
   return out;
 }
 
+// Whole-word match so a topic doesn't match a longer word ("office" must not
+// hit "officer", "star" must not hit "starch").
+const escRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function wordHit(hay: string, term: string): boolean {
+  return new RegExp(`\\b${escRe(term)}\\b`, "i").test(hay);
+}
+
 export async function pickQuestions(opts: PickOptions): Promise<BankQuestion[]> {
   const all = getBank().questions;
   const excluded = new Set(opts.excludeIds ?? []);
@@ -54,7 +61,7 @@ export async function pickQuestions(opts: PickOptions): Promise<BankQuestion[]> 
     if (opts.difficulty && opts.difficulty !== "mixed" && q.difficulty !== opts.difficulty) return false;
     if (fuzzyLower) {
       const hay = (q.text + " " + q.answer).toLowerCase();
-      if (!hay.includes(fuzzyLower)) return false;
+      if (!wordHit(hay, fuzzyLower)) return false;
     }
     return true;
   });
@@ -75,6 +82,27 @@ export async function pickQuestions(opts: PickOptions): Promise<BankQuestion[]> 
   // Take top quality, then shuffle within the top slice for picking
   const top = ranked.slice(0, Math.max(opts.count * 3, opts.count));
   return shuffle(top).slice(0, Math.max(1, Math.min(50, opts.count)));
+}
+
+// Generic words a crowd tacks onto a real topic ("Marvel movies", "Beyonce
+// songs", "the Simpsons"). Stripping them leaves the distinctive term to match
+// on, since bank questions say "Marvel", not "Marvel movies".
+const TOPIC_FILLER = new Set([
+  "movies", "movie", "film", "films", "cinema", "songs", "song", "music",
+  "album", "albums", "tv", "television", "show", "shows", "series", "episode",
+  "episodes", "trivia", "question", "questions", "stuff", "things", "thing",
+  "the", "a", "an", "about", "my", "our", "your", "kid", "kids", "watches",
+  "watching", "related", "general", "and", "of",
+]);
+
+/** Distinctive core of a topic, or the original if nothing meaningful remains. */
+export function salientTopic(topic: string): string {
+  const kept = topic
+    .toLowerCase()
+    .split(/[\s,]+/)
+    .filter((w) => w.length >= 2 && !TOPIC_FILLER.has(w));
+  const joined = kept.join(" ").trim();
+  return joined.length >= 2 ? joined : topic.trim();
 }
 
 export async function resolveTopic(topic: string): Promise<{
@@ -121,7 +149,11 @@ export async function resolveTopic(topic: string): Promise<{
         best = { sub: s, score };
       }
     }
-    if (best) {
+    // Only trust a name-token match when it's strong: a multi-word topic must
+    // hit >=2 tokens, else a single common word ("wars" in "star wars") maps to
+    // an unrelated subcategory (world-wars-cold-war). Weak matches fall through
+    // to the content-based fuzzy match below, which is actually on-topic.
+    if (best && (best.score >= 2 || tokens.length === 1)) {
       return {
         categorySlug: best.sub.categorySlug,
         subcategorySlug: best.sub.slug,
@@ -135,7 +167,7 @@ export async function resolveTopic(topic: string): Promise<{
   const counts = new Map<string, { cat: string; sub: string; n: number }>();
   for (const q of questions) {
     const hay = (q.text + " " + q.answer).toLowerCase();
-    if (hay.includes(t)) {
+    if (wordHit(hay, t)) {
       const key = q.categorySlug + "/" + q.subcategorySlug;
       const cur = counts.get(key);
       if (cur) cur.n++;
