@@ -1,5 +1,46 @@
 # Changelog
 
+## 2026-07-19 — Snapshot
+**Snapshot:** `data/bank/snapshots/2026-07-19`
+**Total questions:** 19,334
+**Tag assignments:** 3,439 (11 distinct tags used)
+
+### By source
+| Source | Rows |
+|---|---:|
+| r-trivia | 13,194 |
+| opentdb | 5,193 |
+| dirty-south | 947 |
+
+### Catchall % per category (lower is better)
+| Category | % on catchall |
+|---|---:|
+| art-design | 91.1% |
+| film-tv | 57.0% |
+| food-drink | 72.3% |
+| games-toys | 100.0% |
+| geography | 60.0% |
+| history | 89.5% |
+| language-words | 34.2% |
+| literature | 64.6% |
+| music | 83.7% |
+| myth-religion | 76.2% |
+| politics-society | 78.0% |
+| pop-misc | 87.9% |
+| science-nature | 67.6% |
+| sport | 58.5% |
+| tech-internet | 51.9% |
+| video-games | 72.1% |
+
+### Files (rows / bytes / sha256 prefix)
+| Table | Rows | Bytes | sha256 |
+|---|---:|---:|---|
+| category | 16 | 1,252 | `2f28033910d261c6` |
+| subcategory | 55 | 2,988 | `69a4151503d075a2` |
+| tag | 28 | 1,376 | `7e5936e3150615ab` |
+| question | 19,334 | 3,189,422 | `20f65c51d380b830` |
+| question_tag | 3,439 | 57,344 | `934c8e25f3e31dd6` |
+
 ## 2026-07-16 — Snapshot
 **Snapshot:** `data/bank/snapshots/2026-07-16`
 **Total questions:** 19,334
