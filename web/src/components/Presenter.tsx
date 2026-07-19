@@ -141,13 +141,19 @@ export function Presenter({ quiz }: PresenterProps) {
 
   // Host-only notes for the current slide: hints on question slides, fun facts
   // on answer slides. Video answers slide shows every city's fact.
-  const hostNotes = useMemo<{ title: string; items: string[] } | null>(() => {
+  // kind/q* drive the on-demand Generate button (single-question slides only).
+  const hostNotes = useMemo<{
+    title: string; items: string[];
+    kind?: "hints" | "facts"; qText?: string; qAnswer?: string;
+  } | null>(() => {
     if (!slide) return null;
     if (slide.type === "answer" && slide.question) {
-      return { title: "Fun facts", items: slide.question.fun_facts ?? [] };
+      return { title: "Fun facts", items: slide.question.fun_facts ?? [],
+        kind: "facts", qText: slide.question.text, qAnswer: slide.question.answer };
     }
     if ((slide.type === "question" || slide.type === "internet-question") && slide.question) {
-      return { title: "Host hints — no giveaways", items: slide.question.host_hints ?? [] };
+      return { title: "Host hints — no giveaways", items: slide.question.host_hints ?? [],
+        kind: "hints", qText: slide.question.text, qAnswer: slide.question.answer };
     }
     if (slide.type === "video-answers" && slide.round) {
       const items = slide.round.questions.flatMap((q) =>
@@ -157,6 +163,36 @@ export function Presenter({ quiz }: PresenterProps) {
     }
     return null;
   }, [slide]);
+
+  // On-demand generation: cache by question+kind so switching slides keeps results.
+  const [genCache, setGenCache] = useState<Record<string, string[]>>({});
+  const [genBusy, setGenBusy] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
+  const genKey = hostNotes?.kind && hostNotes.qText ? `${hostNotes.kind}:${hostNotes.qText}` : null;
+  const generated = genKey ? genCache[genKey] : undefined;
+
+  const generateNote = useCallback(async () => {
+    if (!hostNotes?.kind || !hostNotes.qText || !genKey) return;
+    setGenBusy(true);
+    setGenError(null);
+    try {
+      const res = await fetch("/api/host-note", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: hostNotes.qText, answer: hostNotes.qAnswer, kind: hostNotes.kind }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.items?.length) {
+        setGenError(res.status === 429 ? "Rate limited, try again in a moment" : (data.error || "No result"));
+      } else {
+        setGenCache((c) => ({ ...c, [genKey]: data.items }));
+      }
+    } catch {
+      setGenError("Network error");
+    } finally {
+      setGenBusy(false);
+    }
+  }, [hostNotes, genKey]);
 
   const submitFlag = useCallback(
     (verdict: FeedbackVerdict) => {
@@ -355,7 +391,7 @@ export function Presenter({ quiz }: PresenterProps) {
           >
             {isFullscreen ? "Exit FS" : "Fullscreen"}
           </button>
-          {hostNotes && hostNotes.items.length > 0 && (
+          {hostNotes && (hostNotes.items.length > 0 || hostNotes.kind) && (
             <button
               onClick={() => setShowNotes((v) => !v)}
               className={`rounded px-2 py-1 text-xs sm:px-3 sm:text-sm font-bold transition-all ${
@@ -684,7 +720,7 @@ export function Presenter({ quiz }: PresenterProps) {
 
       {/* Host notes — toggle with N or the Notes button. Hidden by default so
           the projected screen stays clean; host peeks when they want. */}
-      {showNotes && hostNotes && hostNotes.items.length > 0 && (
+      {showNotes && hostNotes && (hostNotes.items.length > 0 || hostNotes.kind) && (
         <div className="absolute bottom-16 left-3 z-40 max-h-[55vh] w-[min(30rem,80vw)] overflow-y-auto rounded-lg border border-[#D4A642]/40 bg-[#1C2E22]/95 p-4 shadow-2xl backdrop-blur">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-xs font-black uppercase tracking-[0.2em] text-[#D4A642]">
@@ -698,13 +734,32 @@ export function Presenter({ quiz }: PresenterProps) {
             </button>
           </div>
           <ul className="space-y-2">
-            {hostNotes.items.map((item, i) => (
+            {[...hostNotes.items, ...(generated ?? [])].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm leading-snug text-white/85">
                 <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#D4A642]" />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
+          {hostNotes.items.length === 0 && !generated && !genBusy && (
+            <p className="mb-2 text-xs italic text-white/40">
+              No pre-loaded {hostNotes.kind}. Generate on demand:
+            </p>
+          )}
+          {hostNotes.kind && (
+            <button
+              onClick={generateNote}
+              disabled={genBusy}
+              className="mt-3 w-full rounded bg-[#D4A642]/20 px-3 py-1.5 text-xs font-bold text-[#D4A642] transition-all hover:bg-[#D4A642]/30 disabled:opacity-50"
+            >
+              {genBusy
+                ? "Generating…"
+                : generated
+                  ? `↻ Regenerate ${hostNotes.kind}`
+                  : `✨ Generate ${hostNotes.kind} (grounded)`}
+            </button>
+          )}
+          {genError && <p className="mt-2 text-xs text-[#C26B3E]">{genError}</p>}
         </div>
       )}
 
