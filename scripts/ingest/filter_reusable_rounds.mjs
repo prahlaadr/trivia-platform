@@ -51,6 +51,17 @@ function classify(round) {
   if (qs.length >= 5 && heads.size <= 3)
     return { keep: false, reason: `classification (${heads.size} distinct answers over ${qs.length})` };
 
+  // Matching/connection/list round: most "questions" are bare entities (team
+  // names, word lists like "Heart, Death, Eyes, Fire") that only make sense with
+  // the round's framing ("match each team to its conference"). Catches many-label
+  // matching rounds the closed-set test above misses (e.g. Conference Call, 8
+  // conferences). A real question has a wh-word or a "?".
+  const WH = /\b(what|which|who|whom|whose|where|when|how|why|name|finish|complete|true or false)\b/i;
+  const bare = (s) => s.trim().split(/\s+/).length <= 5 && !s.includes("?") && !WH.test(s);
+  const bareN = qs.filter((q) => bare(q.text)).length;
+  if (bareN >= Math.ceil(qs.length / 2))
+    return { keep: false, reason: `matching/list round (${bareN}/${qs.length} bare-entity)` };
+
   return { keep: true, reason: `standard (${qs.length} Q:A)` };
 }
 

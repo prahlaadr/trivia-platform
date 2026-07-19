@@ -2,6 +2,47 @@
 
 ## 2026-07-19 — Snapshot
 **Snapshot:** `data/bank/snapshots/2026-07-19`
+**Total questions:** 19,289
+**Tag assignments:** 3,431 (11 distinct tags used)
+
+### By source
+| Source | Rows |
+|---|---:|
+| r-trivia | 13,194 |
+| opentdb | 5,193 |
+| dirty-south | 902 |
+
+### Catchall % per category (lower is better)
+| Category | % on catchall |
+|---|---:|
+| art-design | 91.1% |
+| film-tv | 57.0% |
+| food-drink | 72.4% |
+| games-toys | 100.0% |
+| geography | 60.0% |
+| history | 89.5% |
+| language-words | 34.3% |
+| literature | 64.6% |
+| music | 83.7% |
+| myth-religion | 76.2% |
+| politics-society | 78.2% |
+| pop-misc | 87.9% |
+| science-nature | 67.7% |
+| sport | 58.3% |
+| tech-internet | 51.9% |
+| video-games | 72.1% |
+
+### Files (rows / bytes / sha256 prefix)
+| Table | Rows | Bytes | sha256 |
+|---|---:|---:|---|
+| category | 16 | 1,252 | `2f28033910d261c6` |
+| subcategory | 55 | 2,988 | `69a4151503d075a2` |
+| tag | 28 | 1,376 | `7e5936e3150615ab` |
+| question | 19,289 | 3,185,708 | `902cb372e125c09c` |
+| question_tag | 3,431 | 57,216 | `db6261bca559ca11` |
+
+## 2026-07-19 — Snapshot
+**Snapshot:** `data/bank/snapshots/2026-07-19`
 **Total questions:** 19,334
 **Tag assignments:** 3,439 (11 distinct tags used)
 
