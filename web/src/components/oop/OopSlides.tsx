@@ -12,7 +12,22 @@
 
 /* eslint-disable @next/next/no-img-element */
 
+import { FitBox } from "./FitBox";
+
 const ASPECT = "aspect-[16/9] [container-type:size]";
+
+/**
+ * Content safe area inside template-question.png's white card.
+ *
+ * The pink frame, the black card border, and the decorative corner quote marks
+ * are all baked into the 1920×1080 PNG, so overlaid content must stay within the
+ * card's interior. Measured from the PNG: card interior spans x 7.6–92.4%,
+ * y 13.6–86.4%; the corner quotes intrude only to x≈10% (top-left, y 18–28%) and
+ * x≈90% (bottom-right, y 72–82%). This box clears the border and both quotes with
+ * margin — top is 15% so a top-anchored heading sits below the border line, not
+ * on it.
+ */
+const CARD_SAFE = "absolute inset-x-[12%] top-[15%] bottom-[15%]";
 
 // ── Cover ──────────────────────────────────────────────────────────
 
@@ -118,7 +133,7 @@ function shuffledDefs(pairs: MatchPair[]) {
 
 function MatchHeading({ number, text, points }: { number: number; text: string; points: number }) {
   return (
-    <p className="mb-[1.2cqh] shrink-0 text-center text-[2.1cqw] font-extrabold leading-snug text-black">
+    <p className="shrink-0 text-center text-[34px] font-extrabold leading-snug text-black">
       {number}. {text}{" "}
       <span className="font-bold text-black/60">({points} pt{points === 1 ? "" : "s"})</span>
     </p>
@@ -126,33 +141,36 @@ function MatchHeading({ number, text, points }: { number: number; text: string; 
 }
 
 // Question: both columns — numbered terms (left) + lettered, shuffled defs (right).
+// The two-column block is authored at a fixed design width (defs wrap within it)
+// and FitBox scales the whole group up to fill the card.
 function OopMatchQuestion({ number, text, points, pairs }: { number: number; text: string; points: number; pairs: MatchPair[] }) {
   const defs = shuffledDefs(pairs);
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
       <img src="/oop/template-question.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-x-[8%] top-[9%] bottom-[8%] flex flex-col overflow-hidden">
-        <MatchHeading number={number} text={text} points={points} />
-        {/* pl clears the decorative quote mark baked into the template's
-            top-left corner; defs stay full-height (they end well above the
-            bottom-right quote). */}
-        <div className="flex flex-1 gap-[3cqw] overflow-hidden pl-[6%]">
-          <ul className="w-[28%] shrink-0 space-y-[1cqh] text-[1.5cqw] font-extrabold leading-tight text-black">
-            {pairs.map((p, i) => (
-              <li key={i}>
-                <span className="text-[var(--oop-navy)]">{i + 1}.</span> {p.term}
-              </li>
-            ))}
-          </ul>
-          <ul className="flex-1 space-y-[0.9cqh] text-[1.2cqw] leading-tight text-black">
-            {defs.map((d, i) => (
-              <li key={i} className="flex gap-[0.6cqw]">
-                <span className="font-extrabold text-[var(--oop-navy)]">{String.fromCharCode(65 + i)}.</span>
-                <span>{d.definition}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className={CARD_SAFE}>
+        <FitBox align="top" designWidth={1240} refitKey={`mq-${number}-${text}`}>
+          <div className="flex w-full flex-col gap-[28px]">
+            <MatchHeading number={number} text={text} points={points} />
+            <div className="flex w-full gap-[48px]">
+              <ul className="w-[30%] shrink-0 space-y-[18px] text-[30px] font-extrabold leading-tight text-black">
+                {pairs.map((p, i) => (
+                  <li key={i}>
+                    <span className="text-[var(--oop-navy)]">{i + 1}.</span> {p.term}
+                  </li>
+                ))}
+              </ul>
+              <ul className="flex-1 space-y-[16px] text-[26px] leading-tight text-black">
+                {defs.map((d, i) => (
+                  <li key={i} className="flex gap-[10px]">
+                    <span className="font-extrabold text-[var(--oop-navy)]">{String.fromCharCode(65 + i)}.</span>
+                    <span>{d.definition}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </FitBox>
       </div>
     </div>
   );
@@ -163,20 +181,22 @@ function OopMatchReveal({ number, text, points, pairs }: { number: number; text:
   return (
     <div className={`relative ${ASPECT} w-full overflow-hidden bg-white`}>
       <img src="/oop/template-question.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-x-[8%] top-[9%] bottom-[8%] flex flex-col overflow-hidden">
-        <MatchHeading number={number} text={text} points={points} />
-        {/* pl clears the template's top-left quote; pr keeps the definition
-            text clear of the bottom-right quote on the lower rows. */}
-        <ul className="flex flex-1 flex-col justify-center space-y-[0.9cqh] pl-[6%] pr-[6%] text-[1.3cqw] leading-tight text-black">
-          {pairs.map((p, i) => (
-            <li key={i} className="flex gap-[0.8cqw]">
-              <span className="w-[24%] shrink-0 font-extrabold text-[var(--oop-navy)]">
-                {i + 1}. {p.term}
-              </span>
-              <span className="flex-1">{p.definition}</span>
-            </li>
-          ))}
-        </ul>
+      <div className={CARD_SAFE}>
+        <FitBox align="center" designWidth={1240} refitKey={`mr-${number}-${text}`}>
+          <div className="flex w-full flex-col gap-[26px]">
+            <MatchHeading number={number} text={text} points={points} />
+            <ul className="flex w-full flex-col space-y-[16px] text-[27px] leading-tight text-black">
+              {pairs.map((p, i) => (
+                <li key={i} className="flex gap-[16px]">
+                  <span className="w-[26%] shrink-0 font-extrabold text-[var(--oop-navy)]">
+                    {i + 1}. {p.term}
+                  </span>
+                  <span className="flex-1">{p.definition}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </FitBox>
       </div>
     </div>
   );
@@ -219,52 +239,62 @@ export function OopQuestionSlide({
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-x-[12%] top-[12%] bottom-[14%] flex flex-col items-center justify-center gap-[1.5cqh] overflow-hidden text-center">
-        <p className="text-[2.64cqw] font-extrabold leading-snug text-black">
-          {number}. {text}{" "}
-          <span className="font-bold text-black/60">
-            ({points} pt{points === 1 ? "" : "s"})
-          </span>
-        </p>
-        {codeBlock && (
-          <pre className="inline-block overflow-x-auto rounded border-2 border-black bg-[var(--oop-navy)] p-[1.4%] text-left font-mono text-[1.8cqw] leading-snug text-[var(--oop-cyan)]">
-            <code>{codeBlock}</code>
-          </pre>
-        )}
-        {bullets && bullets.length > 0 && (
-          <ul className="inline-block space-y-[0.8cqh] text-left text-[1.9cqw] font-bold text-black">
-            {bullets.map((b, i) => (
-              <li key={i} className="flex items-baseline gap-3">
-                <span aria-hidden className="text-[1cqw]">●</span>
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-        {(imageSrc || imageSrc2) && (
-          <div className="flex items-center justify-center gap-[2cqw]">
-            {imageSrc && (
-              <img src={imageSrc} alt="" className="max-h-[45cqh] w-auto max-w-[40cqw] object-contain" />
+      {/* Heading pinned to the top, body grown to fill — the whole group is
+          scaled by FitBox to use the full card (readable in large rooms). */}
+      <div className={CARD_SAFE}>
+        <FitBox align="top" designWidth={900} refitKey={`q-${number}-${text}`}>
+          <div className="flex flex-col items-center gap-[22px] text-center">
+            <p className="text-[40px] font-extrabold leading-snug text-black">
+              {number}. {text}{" "}
+              <span className="font-bold text-black/60">
+                ({points} pt{points === 1 ? "" : "s"})
+              </span>
+            </p>
+            {codeBlock && (
+              <pre className="inline-block whitespace-pre rounded border-2 border-black bg-[var(--oop-navy)] px-6 py-5 text-left font-mono text-[34px] leading-snug text-[var(--oop-cyan)]">
+                <code>{codeBlock}</code>
+              </pre>
             )}
-            {imageSrc2 && (
-              <img src={imageSrc2} alt="" className="max-h-[45cqh] w-auto max-w-[40cqw] object-contain" />
+            {bullets && bullets.length > 0 && (
+              <ul className="inline-block space-y-[12px] text-left text-[34px] font-bold text-black">
+                {bullets.map((b, i) => (
+                  <li key={i} className="flex items-baseline gap-3">
+                    <span aria-hidden className="text-[18px]">●</span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {(imageSrc || imageSrc2) && (
+              <div className="flex items-center justify-center gap-[32px]">
+                {imageSrc && (
+                  <img src={imageSrc} alt="" className="h-[340px] w-auto max-w-[440px] object-contain" />
+                )}
+                {imageSrc2 && (
+                  <img src={imageSrc2} alt="" className="h-[340px] w-auto max-w-[440px] object-contain" />
+                )}
+              </div>
+            )}
+            {caption && (
+              <p className="text-[18px] text-black/60">{caption}</p>
             )}
           </div>
-        )}
-        {caption && (
-          <p className="text-[1.2cqw] text-black/60">{caption}</p>
-        )}
-        {sourceUrl && (
-          <a
-            href={sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative z-20 text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
-          >
-            {sourceLabel ?? "source"} ↗
-          </a>
-        )}
+        </FitBox>
       </div>
+      {/* Source link lives outside FitBox: its scale transform creates a
+          stacking context that would trap the link's z-index below the
+          presenter's tap-zone overlay, breaking click-through. Anchored as
+          constant-size chrome so it stays clickable and legible. */}
+      {sourceUrl && (
+        <a
+          href={sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-[4%] right-[5%] z-20 text-[1.2cqw] text-[var(--oop-navy)] underline decoration-2 underline-offset-2 hover:text-black"
+        >
+          {sourceLabel ?? "source"} ↗
+        </a>
+      )}
     </div>
   );
 }
@@ -308,62 +338,71 @@ export function OopRevealSlide({
         alt=""
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-x-[12%] top-[12%] bottom-[14%] flex flex-col items-center justify-center gap-[1.2cqh] overflow-hidden text-center">
-        <p className="text-[2.05cqw] font-extrabold leading-snug text-black">
-          {number}. {text}{" "}
-          <span className="font-bold text-black/60">
-            ({points} pt{points === 1 ? "" : "s"})
-          </span>
-        </p>
-        {codeBlock && (
-          <pre className="inline-block overflow-x-auto rounded border-2 border-black bg-[var(--oop-navy)] p-[1.2%] text-left font-mono text-[1.5cqw] leading-snug text-[var(--oop-cyan)]">
-            <code>{codeBlock}</code>
-          </pre>
-        )}
-        {bullets && bullets.length > 0 && (
-          <ul className="inline-block space-y-[0.6cqh] text-left text-[1.6cqw] font-bold text-black">
-            {bullets.map((b, i) => (
-              <li key={i} className="flex items-baseline gap-3">
-                <span aria-hidden className="text-[1cqw]">●</span>
-                <span>
-                  {b.text}
-                  {b.correct && (
-                    <span className="ml-2 font-extrabold text-[var(--oop-cyan)]">
-                      real!
-                    </span>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-        {answer && (
-          <p className="text-[2.2cqw] font-extrabold text-black">{answer}</p>
-        )}
-        {(imageSrc || imageSrc2) && (
-          <div className="flex items-center justify-center gap-[2cqw]">
-            {imageSrc && (
-              <img src={imageSrc} alt="" className="max-h-[28cqh] w-auto max-w-[40cqw] object-contain" />
+      {/* Reveal holds more (question + answer + support), so the same FitBox
+          naturally settles a touch smaller than the question — parity without
+          separate tuning. */}
+      <div className={CARD_SAFE}>
+        <FitBox align="top" designWidth={900} refitKey={`r-${number}-${text}`}>
+          <div className="flex flex-col items-center gap-[18px] text-center">
+            <p className="text-[34px] font-extrabold leading-snug text-black">
+              {number}. {text}{" "}
+              <span className="font-bold text-black/60">
+                ({points} pt{points === 1 ? "" : "s"})
+              </span>
+            </p>
+            {codeBlock && (
+              <pre className="inline-block whitespace-pre rounded border-2 border-black bg-[var(--oop-navy)] px-6 py-5 text-left font-mono text-[30px] leading-snug text-[var(--oop-cyan)]">
+                <code>{codeBlock}</code>
+              </pre>
             )}
-            {imageSrc2 && (
-              <img src={imageSrc2} alt="" className="max-h-[28cqh] w-auto max-w-[40cqw] object-contain" />
+            {bullets && bullets.length > 0 && (
+              <ul className="inline-block space-y-[10px] text-left text-[30px] font-bold text-black">
+                {bullets.map((b, i) => (
+                  <li key={i} className="flex items-baseline gap-3">
+                    <span aria-hidden className="text-[18px]">●</span>
+                    <span>
+                      {b.text}
+                      {b.correct && (
+                        <span className="ml-2 font-extrabold text-[var(--oop-cyan)]">
+                          real!
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {answer && (
+              <p className="text-[42px] font-extrabold text-black">{answer}</p>
+            )}
+            {(imageSrc || imageSrc2) && (
+              <div className="flex items-center justify-center gap-[32px]">
+                {imageSrc && (
+                  <img src={imageSrc} alt="" className="h-[240px] w-auto max-w-[400px] object-contain" />
+                )}
+                {imageSrc2 && (
+                  <img src={imageSrc2} alt="" className="h-[240px] w-auto max-w-[400px] object-contain" />
+                )}
+              </div>
+            )}
+            {caption && (
+              <p className="text-[18px] text-black/60">{caption}</p>
             )}
           </div>
-        )}
-        {caption && (
-          <p className="text-[1.2cqw] text-black/60">{caption}</p>
-        )}
-        {sourceUrl && (
-          <a
-            href={sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative z-20 text-[1.2cqw] text-[var(--oop-cyan)] underline decoration-2 underline-offset-2 hover:text-black"
-          >
-            {sourceLabel ?? "source"} ↗
-          </a>
-        )}
+        </FitBox>
       </div>
+      {/* See OopQuestionSlide: source link sits outside FitBox to stay
+          clickable above the presenter's tap-zone overlay. */}
+      {sourceUrl && (
+        <a
+          href={sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-[4%] right-[5%] z-20 text-[1.2cqw] text-[var(--oop-navy)] underline decoration-2 underline-offset-2 hover:text-black"
+        >
+          {sourceLabel ?? "source"} ↗
+        </a>
+      )}
     </div>
   );
 }
