@@ -2,70 +2,82 @@
 spec_format_version: "0.1"
 title: "Pyaar Trivia Library + Round Builder"
 artifact_type: "prd"
-spec_revision: 1
+spec_revision: 2
 author: "Prahlaad"
 created_at: "2026-10-19T00:00:00Z"
 updated_at: "2026-10-19T00:00:00Z"
 linked_github_repo: "prahlaadr/trivia-platform"
 ---
 
-> Feature spec for turning the Pyaar Trivia Library into publishable rounds for
-> trivia.pyaarproject.org. The library INDEX is already built (see
-> `library/build_index.py`); this specs the round-builder on top of it. Part of
-> the `pando-trivia` stem.
+> Feature spec for growing the trivia-platform's EXISTING question bank with
+> Prahlaad's full corpora and adding a round-builder that emits publishable rounds
+> for trivia.pyaarproject.org. Part of the `pando-trivia` stem.
+>
+> rev 2 course-correction: build on the existing bank (`data/bank/trivia.duckdb`
+> + `scripts/ingest/`), NOT a separate index. The session's exploratory
+> `library/trivia_library.duckdb` + `build_index.py` are retired in favor of it.
 
 ## Problem
 
-Prahlaad hosts trivia (Atlanta pub quizzes, NYC Trivia League) and runs the live
-site `trivia.pyaarproject.org`, but every new quiz is built by hand: writing
-questions from scratch or digging through scattered docs. He now has a large
-indexed corpus on V3 (98,935 TriviaQA Unfiltered Q&A + 34 Atlanta rounds + 6 NYC
-League rounds, full-text searchable), but it is only searchable text, there is no
-way to turn it into a round in the site's format. So the corpus cannot actually
-produce quizzes, and music rounds still mean wrangling audio files.
+The trivia-platform already has a real question bank (`data/bank/trivia.duckdb`,
+exported to the committed `bank.json` that feeds the live site): **19,289
+questions** (r-trivia, opentdb, and dirty-south = the Atlanta pub quizzes), a
+**16-category / 28-tag taxonomy**, a Gemini topic classifier, dedup (`dedup_hash`),
+and quality scoring. But two gaps keep Prahlaad building every quiz by hand:
+
+1. **His larger corpora are not in the bank.** TriviaQA Unfiltered (~98,935 Q&A on
+   V3) and the NYC Trivia League packets are not ingested, so the bank is a
+   fraction of what he has.
+2. **Nothing turns the tagged bank into publishable rounds.** There is no builder
+   that assembles a themed round (by category/tag) or replicates a known round
+   into the site's quiz schema, so round creation stays manual.
 
 ## Hypothesis
 
-If the library has a round-builder that assembles or replicates rounds directly
-in the `trivia.pyaarproject.org` quiz schema (including music rounds as YouTube
-Music timestamp links), then Prahlaad will produce quizzes faster and reuse his
-corpus, because a themed or replicated round goes from library to published with
-no manual reformatting.
+If we ingest his full corpora into the existing bank (reusing its taxonomy +
+Gemini classifier) and add a round-builder that emits the site's quiz schema
+(assemble by tag/category, or replicate a stored round), then Prahlaad will build
+quizzes faster and actually reuse the corpus, because a themed or replicated round
+goes from the bank to published with no reformatting.
 
 ## Scope
 
 ```productspec-scope
 in:
-  - a round-builder whose output is the exact live-site quiz schema (round_type standard | progressive | video), so a round publishes with no translation
-  - ASSEMBLE mode: retrieve questions on a theme (FTS + tags) from the library and compose a round
-  - REPLICATE mode: materialize a stored full round (an Atlanta pub quiz, an NYC League packet, a past Pyaar round) into the schema, faithfully
-  - music / video rounds: round_type=video with each question carrying a YouTube Music URL at a timestamp (a media_url field), sourced from the artists Prahlaad collects; no audio files
-  - Gemini (gemini-q) tagging of the RETRIEVED SUBSET or the full rounds (category / theme / difficulty), not the whole corpus
-  - dedup: never emit a question already used in a published quiz
-  - publish through the EXISTING flow (data/quiz_<N>.json committed + Vercel Blob quiz_<N>.json)
+  - INGEST TriviaQA Unfiltered (V3 /triviaqa-unfiltered) + NYC Trivia League packets INTO the existing bank (data/bank/trivia.duckdb) via new scripts/ingest/ingest_*.py, following the established pattern (source tag, dedup_hash, quality_score)
+  - CLASSIFY the new questions with the EXISTING Gemini classifier into the existing 16-category / 28-tag taxonomy; add a tag only when a real subtopic needs one (no tag sprawl)
+  - a round-builder with two modes: ASSEMBLE (pick questions by category/tag/theme from the bank) and REPLICATE (materialize a stored full round), both emitting the live-site quiz schema (round_type standard | progressive | video)
+  - a CLI that emits quiz_<N>.json savable to the site, AND/OR feeds the site's existing game-gen with the bank corpus
+  - open-answer by default; keep multiple-choice ONLY when the source question already had options (options_json)
+  - NON-MUSIC rounds first (most song/artist questions are plain text, not play-the-song rounds)
+  - music rounds: round_type=video with a YouTube Music track LINK on the question (media_url); timestamp deferred
+  - dedup via the bank's existing dedup_hash, and never emit a question already used in a published quiz
 out:
-  - changing the live site's schema or player (the builder conforms to the site, never the reverse)
-  - the library index / re-indexing (already built; this sits on top)
-  - auto-publishing without human review (a person approves before it goes live)
-  - cloud hosting of the library (local-first on V3; the portable index enables it later)
+  - the session's separate library index (library/trivia_library.duckdb + build_index.py): RETIRED in favor of the existing bank
+  - changing the live site's schema or player (the builder conforms to the site)
+  - auto-publishing without human review
+  - full re-classification of the whole 19K+ bank upfront
 cut:
-  - generating brand-new questions from nothing (the library is the source; the LLM only selects / cleans / tags)
-  - full Gemini tagging of all 98,935 questions upfront
-  - mini_games generation (the schema has mini_games; out of this version)
+  - music timestamp selection (track link only for now; timestamp later)
+  - mini_games generation
+  - generating brand-new questions from nothing (the corpus is the source; the LLM selects / cleans / classifies)
 ```
 
 ## Acceptance Criteria
 
-- Given a theme, ASSEMBLE produces a round of N library questions that validates
-  against the quiz schema and publishes to the live site unchanged.
-- Given a stored full round (e.g. an NYC League packet), REPLICATE materializes it
-  into the schema faithfully (questions + answers intact, in order).
-- Given a music round request, each question has `round_type=video` context and a
-  working YouTube Music URL at a timestamp; no audio files are produced.
-- Given any round the builder emits, no question duplicates one already used in a
-  published `data/quiz_*.json` (normalized match).
-- Given a built `quiz_<N>.json`, it round-trips through the site's existing publish
-  flow (committed + Blob) and renders correctly, confirming schema compatibility.
+- Given TriviaQA + NYC League ingested, the bank's question count grows with
+  `source` tags for each, deduped against existing rows via `dedup_hash`, and the
+  new rows are classified into the existing 16-category / 28-tag taxonomy.
+- Given a category/tag/theme, ASSEMBLE produces a round of N bank questions that
+  validates against the quiz schema and publishes to the live site unchanged.
+- Given a stored full round, REPLICATE materializes it faithfully into the schema.
+- Given an assembled round, questions are open-answer unless the source carried
+  `options_json`, in which case multiple-choice is preserved.
+- Given a music round, each question has `round_type=video` and a valid YouTube
+  Music track link (`media_url`); no audio files; timestamp not required yet.
+- Given any built round, no question duplicates one already used in a published
+  `data/quiz_*.json`, and a built `quiz_<N>.json` round-trips the site's existing
+  publish flow (committed + Blob) unchanged.
 
 ```productspec-ai-evals
 - id: schema_conformance
@@ -74,25 +86,24 @@ cut:
   evaluator: automated_test
   pass_threshold: 1
   checks:
-    - every emitted quiz/round/question has the required keys and a valid round_type (standard|progressive|video)
-    - the output parses with the same loader the live site uses, with no extra translation
-- id: question_cleanup_quality
+    - every emitted quiz/round/question has required keys and a valid round_type
+    - output parses with the same loader the live site uses, no extra translation
+- id: classification_into_taxonomy
   type: rubric
-  input_set: evals/trivia-cleanup-golden.jsonl
+  input_set: evals/triviaqa-classification-golden.jsonl
   evaluator: llm_judge
   pass_threshold: 0.9
   checks:
-    - selected TriviaQA questions are unambiguous and correctly answered
-    - questions are pub-quiz appropriate (not noisy, dated, or near-duplicates)
-    - a themed round actually matches its theme
-- id: music_link_validity
-  type: deterministic
-  input_set: evals/music-questions-golden.jsonl
-  evaluator: automated_test
-  pass_threshold: 1
+    - each ingested question maps to a correct existing category + sensible tags
+    - new tags are introduced only for genuinely missing subtopics, not duplicates of existing ones
+- id: round_quality
+  type: rubric
+  input_set: evals/trivia-round-quality-golden.jsonl
+  evaluator: llm_judge
+  pass_threshold: 0.9
   checks:
-    - each music question's media_url resolves to a YouTube Music track at a timestamp
-    - the linked track matches the question's intended artist/song
+    - selected questions are unambiguous, correctly answered, on-theme
+    - noisy/dated/low-quality TriviaQA entries are filtered out
 - id: dedup_against_published
   type: deterministic
   input_set: evals/published-quizzes-snapshot.jsonl
@@ -105,29 +116,29 @@ cut:
 ## Success Metrics
 
 ```productspec-success-metrics
-- id: time_to_published_round
-  metric: median_minutes_theme_to_published_round
-  target: "< 10 min (vs a manual baseline to be measured)"
-  window: per round
-  segment: rounds built via the builder
-  source: build_log
+- id: bank_growth
+  metric: bank_question_count
+  target: ">= 60K classified questions (from ~19K)"
+  window: after ingest
+  segment: all sources
+  source: trivia_duckdb
 - id: library_sourced_share
-  metric: pct_published_quiz_questions_sourced_from_library
+  metric: pct_published_quiz_questions_sourced_from_bank
   target: ">= 50%"
   window: per published quiz
   segment: quizzes built with the builder
   source: quiz_provenance
+- id: time_to_published_round
+  metric: median_minutes_theme_to_published_round
+  target: "< 10 min"
+  window: per round
+  segment: rounds built via the builder
+  source: build_log
 - id: rounds_built_per_month
   metric: rounds_published_via_builder
   target: ">= 8 / month"
   window: monthly
   segment: all builder output
-  source: publish_log
-- id: music_rounds_published
-  metric: video_rounds_with_ytmusic_links_published
-  target: ">= 1 / month"
-  window: monthly
-  segment: round_type=video
   source: publish_log
 ```
 
@@ -135,42 +146,53 @@ cut:
 
 Intent-level approach (details belong in DESIGN / code):
 
-- **Builder reads the library, emits the site schema.** Retrieve from the DuckDB
-  index (FTS + tags) or pull a stored round, then compose a `quiz_<N>.json` that
-  matches the live schema exactly. The site is the fixed contract; the builder
-  conforms.
-- **Two modes.** ASSEMBLE (theme -> candidate questions -> select/clean -> round)
-  and REPLICATE (stored full round -> schema, faithfully).
-- **Music rounds as links, not files.** `round_type=video`; each question gets a
-  YouTube Music URL at a timestamp (`media_url`), drawn from the artists Prahlaad
-  collects (the shared music library / pando-radar rosters).
-- **Tagging is lazy.** FTS handles base retrieval; `gemini-q` adds
-  category/theme/difficulty tags to the retrieved subset or the full rounds, and
-  can do the light cleanup/selection pass. Never tag the whole corpus upfront.
-- **Dedup + provenance.** Track which questions have been published so the builder
-  never resurfaces one, and record each built question's library source.
+- **Grow the existing bank, do not fork it.** TriviaQA + NYC League become new
+  `scripts/ingest/ingest_*.py` sources (mirroring `ingest_opentdb` / the
+  `dirty-south` docx path), writing into `trivia.duckdb` with `source`,
+  `dedup_hash`, `quality_score`, then the existing Gemini classifier assigns
+  category + tags. The exploratory `library/` index is retired.
+- **Round-builder reads the bank, emits the site schema.** ASSEMBLE queries by
+  category/tag/theme; REPLICATE pulls a stored round. Output is a `quiz_<N>.json`
+  that matches the live schema exactly, published through the existing flow.
+- **CLI + game-gen.** A CLI emits the quiz JSON; where the site's game-gen already
+  produces quizzes, it should draw from this bank corpus rather than only fresh
+  generation.
+- **Music is secondary + link-only for now.** Non-music first. A music question is
+  `round_type=video` with a YouTube Music track link; the identifiable timestamp
+  comes later.
 
 ## risks
 
-- **TriviaQA quality.** The corpus is noisy, entity-answer style, 2017-era, and
-  US/web-skewed. Mitigation: it is a source to MINE; the selection + cleanup pass
-  (optionally Gemini) + the `question_cleanup_quality` eval guard what ships.
-- **YouTube Music link durability + timestamp accuracy.** Links can rot, and "the
-  moment the artist is identifiable" is a judgement call. See open questions.
-- **Schema drift.** If the site's schema changes, the builder breaks. Mitigation:
-  the `schema_conformance` eval runs against the live loader, so drift is caught.
+- **TriviaQA quality + volume.** ~99K noisy, entity-answer, 2017-era entries.
+  Mitigation: the bank's `quality_score` + `low_confidence` + the `round_quality`
+  eval gate what reaches a round; classification routes them so they are findable
+  but not blindly used.
+- **Classifying ~99K with Gemini is a large batch.** Mitigation: classify
+  incrementally / on the retrieved subset first; `gemini-q` free tier; the bank
+  already supports `low_confidence`.
+- **NYC League PDF parsing fidelity.** The Atlanta path pre-parsed .docx via
+  `parse_pub_quiz_docx.ts`; NYC packets are PDFs and need their own parse.
 
 ## open_questions
 
-- **Music timestamp selection.** How is the identifiable timestamp chosen per
-  question: manual pick, the track start, or a heuristic (chorus/drop)? And does
-  the host play it live or do players click through?
-- **Builder interface.** A CLI that emits `quiz_<N>.json`, or integrated into the
-  site's admin/edit UI? CLI-first is the likely default.
-- **Where tags live.** In the DuckDB index (a `tags` column on `questions`) vs a
-  sidecar. Index is the likely default so search + tags are one query.
-- **V3-connected dependency.** Building/replaying from the raw corpus needs V3
-  mounted; confirm the builder works off the portable index alone once tagged.
-- **Choices / multiple-choice.** TriviaQA is open-answer; the schema has a
-  `choices[]` array. Do assembled rounds stay open-answer, or should the builder
-  generate distractors for some round types?
+- **How does the current game-gen work:** does it already draw from the bank, or
+  generate fresh via LLM? This decides whether the round-builder extends game-gen
+  or is a sibling CLI.
+- **NYC League parsing:** reuse/extend the `parse_pub_quiz_docx` approach for PDFs,
+  or a new parser.
+- **Music timestamp** (deferred): how the identifiable moment is chosen per music
+  question, and whether the host plays it or players click the link.
+- **Retire mechanics:** delete `library/build_index.py` + `search.py` + the
+  gitignored `trivia_library.duckdb`, or keep the TriviaQA extraction logic as the
+  basis for `ingest_triviaqa.py` (likely the latter).
+
+## custom-changelog
+
+- **rev 2 (2026-10-19):** course-corrected to build on the EXISTING bank
+  (`trivia.duckdb` + `scripts/ingest/` + the 16/28 taxonomy + Gemini classifier),
+  after discovering the Atlanta pub quizzes are already ingested as `dirty-south`.
+  Folded in the user's decisions: non-music first, music link-only (timestamp
+  later), CLI emits quiz JSON / feed game-gen, open-answer unless the source had
+  options, tags reuse the existing taxonomy (add only when a subtopic needs it).
+  Retired the session's separate `library/` index.
+- **rev 1 (2026-10-19):** initial draft assuming a new standalone library index.
