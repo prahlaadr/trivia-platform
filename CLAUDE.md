@@ -53,7 +53,7 @@ trivia-platform/           # Repo root
 - **Presenter toolbar:** Uses `window.innerHeight` measurement (not CSS `100vh`) because Mac Dock/browser chrome can cover the bottom. Two-layer layout: outer `fixed inset-0` for background + inner flex column sized to measured height.
 - **Brand toggle:** `localStorage("trivia-brand")` → `"dirty-south"` or `"pyaar"`. Default is `"dirty-south"`. Server-side rendering uses the default.
 - **Admin PIN:** Set via `ADMIN_PIN` env var. Gates upload and delete operations. Client stores it in localStorage after first prompt.
-- **Game Gen:** Teams pick topics → topics ranked → round plan generated → prompt copied to Claude Code → `/game-gen` skill generates quiz JSON → saved to `public/data/`.
+- **Game Gen + Wildcard (both bank-backed):** teams/host pick topics → the shared `bank-generate.ts` engine pulls questions from the local bank via `/api/wildcard/topic` → Quiz JSON. No live LLM. The separate `/game-gen` Claude Code skill is the web-search path for brand-new questions. See `docs/generation-modes.md`.
 - **Responsive:** All pages use `sm:` breakpoint pattern. Presenter hides fullscreen button on mobile.
 
 ## Environment Variables
@@ -75,5 +75,6 @@ vercel --prod  # Deploy (run from repo root, not web/)
 ## Remaining Features (see PLAN.md)
 
 - Question swapping in Game Gen
-- Test bank pull (search existing quizzes by topic)
 - Google Drive integration for shared quiz access
+
+(Test bank pull is DONE: bank-backed generation is now the primary path. See `docs/generation-modes.md`.)

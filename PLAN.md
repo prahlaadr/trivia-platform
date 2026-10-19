@@ -30,14 +30,21 @@ The full platform running locally for dynamic game creation. Built as a separate
 |---------|--------|
 | Team registration (name + 3-5 topic picks) | ✅ Built |
 | Topic aggregation → round generation | ✅ Built |
-| AI question generation (Claude Code skill + web search) | ✅ Built |
+| Bank-backed round generation (shared `bank-generate.ts` engine, no LLM) | ✅ Built |
+| Test bank pull (questions by topic from the bank) | ✅ Built (now the primary flow) |
+| AI fresh-question generation (external `/game-gen` Claude Code skill, web search) | ✅ Built (separate manual tool) |
 | Question swapping | 🔲 Not started |
-| Test bank pull (reuse existing questions by topic) | 🔲 Not started |
+
+> **How generation actually works now (code was verified 2026-10-19):** both Game
+> Gen (team-driven) and Wildcard (host-driven) pull from the local question bank
+> via the shared `bank-generate.ts` engine (`/api/wildcard/topic`), no live LLM.
+> The web-search `/game-gen` skill is a separate manual path. Full detail:
+> [`docs/generation-modes.md`](docs/generation-modes.md).
 
 **Game Gen flow:**
 1. Teams walk in, each picks 3 topics
-2. Once 3–5 teams registered, generate rounds (6 questions each) from combined topic pool
-3. Pull from test bank first, AI-generate to fill gaps
+2. Once 3–5 teams registered, generate rounds (6 questions each) from the combined topic pool
+3. Pull questions from the bank by topic (via the shared engine)
 4. Present rounds via the Presenter, score as you go
 
 ---
@@ -62,11 +69,11 @@ Persistent quiz storage via Vercel Blob. Upload PDF/DOCX → parse → store JSO
 
 ### Module 5: Game Gen Mode (Local) ✅
 
-Dynamic game creation for live trivia nights. Teams pick 3-5 topics, topics are aggregated and ranked, a 6-round plan is generated, and a Claude Code skill (`/game-gen`) generates 36 questions + tie-breaker via web search. Output is a standard Quiz JSON that loads directly into the Presenter.
+Dynamic game creation for live trivia nights. Teams pick 3-5 topics, topics are aggregated and ranked, a 6-round plan is generated, and questions are pulled from the local bank via the shared `bank-generate.ts` engine (the same one Wildcard uses), producing a standard Quiz JSON that loads directly into the Presenter. The separate `/game-gen` Claude Code skill is the web-search path for brand-new questions. See [`docs/generation-modes.md`](docs/generation-modes.md).
 
 **Remaining sub-features:**
 - Question swapping (replace individual questions without regenerating)
-- Test bank pull (search existing quizzes by topic before generating new)
+- (Done) Test bank pull is now the primary generation path (bank-backed)
 
 ---
 
