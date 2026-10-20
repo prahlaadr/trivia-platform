@@ -123,8 +123,11 @@ def main() -> int:
     p.add_argument("--db", type=Path, default=DEFAULT_DB)
     p.add_argument("--source", default=None, help="limit to one source (default: all)")
     p.add_argument("--limit", type=int, default=0, help="cap questions (for a quick sample)")
+    p.add_argument("--batch", type=int, default=BATCH, help="questions per Gemini request")
+    p.add_argument("--sleep", type=float, default=0.4, help="seconds between requests (pace for 15 RPM free tier)")
     p.add_argument("--apply", action="store_true", help="write question_tag + export_json + snapshot")
     args = p.parse_args()
+    batch_size = args.batch
 
     key = gemini_key()
     con = duckdb.connect(str(args.db))
@@ -146,8 +149,8 @@ def main() -> int:
     samples: list[str] = []
     invalid = 0
 
-    for start in range(0, len(rows), BATCH):
-        chunk = rows[start:start + BATCH]
+    for start in range(0, len(rows), batch_size):
+        chunk = rows[start:start + batch_size]
         batch = [(i, r[1], r[2] or "") for i, r in enumerate(chunk)]
         try:
             gem = tag_batch(key, batch)
@@ -172,8 +175,8 @@ def main() -> int:
             if tags and len(samples) < 25:
                 samples.append(f"  {qtext[:60]:62s} -> {', '.join(tags)}"
                                + (f"  [era={det} det]" if det else ""))
-        print(f"  ...{min(start + BATCH, len(rows))}/{len(rows)}")
-        time.sleep(0.4)
+        print(f"  ...{min(start + batch_size, len(rows))}/{len(rows)}", flush=True)
+        time.sleep(args.sleep)
 
     tagged_qs = len({a[0] for a in assignments})
     print(f"\nProposed: {len(assignments)} tag assignments across {tagged_qs}/{len(rows)} questions "
