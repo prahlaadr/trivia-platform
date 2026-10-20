@@ -82,3 +82,47 @@ round-builder's ASSEMBLE mode largely reuses `bank-generate.ts` /
 (TriviaQA, NYC League) into the bank so there is more to pull, (2) REPLICATE a
 stored full round (the engine assembles by topic, it does not replay a known
 round), and (3) the music-link path. See `pyaar-trivia-library-SPEC.md`.
+
+## Round builder CLI (ASSEMBLE, implemented)
+
+`scripts/build_round.ts` turns the bank into a publishable `quiz_<N>.json`
+offline, without running the web server. It is accurate by construction: it
+imports the SAME `resolveTopic` + `pickQuestions` the live Wildcard/Game Gen
+use, and excludes `dirty-south` exactly like Wildcard (those pub-quiz rows are
+context-dependent and belong to REPLICATE, not themed assembly).
+
+```bash
+# multi-round quiz from a spec (one object per round: title, theme, count, difficulty)
+bun run scripts/build_round.ts --spec scripts/specs/example-round.json
+# quick single-theme round
+bun run scripts/build_round.ts --theme science-nature --count 8 --title "Science"
+# validate + preview, write nothing
+bun run scripts/build_round.ts --spec <file> --dry
+```
+
+What it guarantees, mapped to the SPEC acceptance criteria:
+- **Schema conformance:** a strict validator (required keys, `round_type` enum,
+  per-question shape) runs before writing; the output is consumed unchanged by
+  the site's own `buildSlides`, so it hosts at `/present/<N>` with no translation.
+- **Open-answer default:** `choices` only kept when the source question carried
+  options (>= 2); otherwise open-answer.
+- **No resurfaced questions:** builds a normalized-text ledger from every
+  published `data/quiz_*.json` + `web/public/data/quiz_*.json` and drops any
+  bank question already used.
+
+It writes `web/public/data/quiz_<N>.json` (served locally at `/present/<N>`) and
+`data/quiz_<N>.json`; both dirs are gitignored (quizzes are generated, not
+committed). Durable publishing is the existing `POST /api/quiz`, which stores the
+quiz in Vercel Blob for prod (printed at the end of each run). `quiz_1000.json`
+is the first corpus-built round.
+
+Known limitation: the dedup ledger and the auto-incremented quiz number are
+computed from LOCAL quiz files only. Quizzes published to prod Blob that aren't
+mirrored locally are invisible to the builder, so against those it could in
+principle resurface a question or pick a colliding quiz number. The fix is small
+(pull the Blob index via `list` from `@vercel/blob`, as the quiz route already
+does); until then, set `quiz_number` explicitly in the spec when in doubt.
+
+Still to come: REPLICATE mode (materialize a stored pub-quiz round; 5 Atlanta
+quizzes are already parsed + hostable, the rest need the docx re-parse) and
+music `round_type=video`.

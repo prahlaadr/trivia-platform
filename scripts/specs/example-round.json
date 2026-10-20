@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-19",
+  "rounds": [
+    { "title": "Science & Nature", "theme": "science-nature", "count": 8, "difficulty": "mixed" },
+    { "title": "Geography", "theme": "geography", "count": 8, "difficulty": "mixed" },
+    { "title": "Film & TV", "theme": "film-tv", "count": 8, "difficulty": "mixed" },
+    { "title": "History", "theme": "history", "count": 8, "difficulty": "mixed" },
+    { "title": "Music", "theme": "music", "count": 8, "difficulty": "mixed" }
+  ],
+  "tie_breaker": {
+    "question": "In what year was the first email sent over ARPANET?",
+    "answer": "1971"
+  }
+}
