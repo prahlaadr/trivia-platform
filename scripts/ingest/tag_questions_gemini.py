@@ -103,7 +103,8 @@ def tag_batch(key: str, batch: list[tuple]) -> dict[int, list[str]]:
         "Empty list if none clearly apply."
     )
     body = {"contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"responseMimeType": "application/json", "temperature": 0}}
+            "generationConfig": {"responseMimeType": "application/json", "temperature": 0,
+                                 "thinkingConfig": {"thinkingBudget": 0}}}
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
     for attempt in range(4):
         r = httpx.post(url, headers={"x-goog-api-key": key}, json=body, timeout=60)

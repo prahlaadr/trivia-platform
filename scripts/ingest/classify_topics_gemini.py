@@ -1,5 +1,5 @@
 """Reclassify questions into the taxonomy using Gemini (LLM), for rows the
-keyword rules can't place — chiefly the pop-misc/general-knowledge catchall.
+keyword rules can't place (chiefly the pop-misc/general-knowledge catchall).
 
 Unlike reclassify.py (regex keyword rules), this reads each question with an
 LLM and picks the best category + subcategory from the live taxonomy. Built
@@ -83,7 +83,8 @@ def classify_batch(key: str, listing: str, batch: list[tuple]) -> dict[int, tupl
     )
     body = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json", "temperature": 0},
+        "generationConfig": {"responseMimeType": "application/json", "temperature": 0,
+                             "thinkingConfig": {"thinkingBudget": 0}},
     }
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
     for attempt in range(4):
@@ -179,7 +180,7 @@ def main() -> int:
     print(f"\npop-misc catchall: {pop_before} -> {pop_after}")
 
     if not args.apply:
-        print("\npreview only — re-run with --apply to write, export_json, and snapshot.")
+        print("\npreview only. Re-run with --apply to write, export_json, and snapshot.")
         return 0
 
     # Apply via temp-table batch UPDATE (same pattern as reclassify.py).
