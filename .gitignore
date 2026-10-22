@@ -56,3 +56,6 @@ web/out-of-pocket-answers.*
 # ...but DO commit the example env file
 !web/.env.example
 !.env.example
+
+# run logs
+logs/

@@ -1,7 +1,7 @@
 """Export the trivia bank to date-stamped parquet snapshots + write a CHANGELOG entry.
 
 Parquets are small, columnar, git-friendly. They are the durable, auditable
-history of the bank — even when the .duckdb file is gitignored.
+history of the bank, even when the .duckdb file is gitignored.
 
 Usage:
     uv run python -m scripts.ingest.snapshot
@@ -75,7 +75,7 @@ def summary(con: duckdb.DuckDBPyConnection) -> dict:
 
 def write_changelog_entry(snap_date: date, snap_dir: Path, note: str, stats: dict, summ: dict) -> None:
     entry = [
-        f"\n## {snap_date.isoformat()} — Snapshot",
+        f"\n## {snap_date.isoformat()} Snapshot",
         f"\n_{note}_" if note else "",
         f"\n**Snapshot:** `{snap_dir.relative_to(REPO_ROOT)}`",
         f"\n**Total questions:** {summ['total_questions']:,}",

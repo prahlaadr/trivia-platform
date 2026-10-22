@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-22",
+  "rounds": [
+    { "title": "Film & TV", "theme": "film-tv", "count": 6 },
+    { "title": "Music", "theme": "music", "count": 6 },
+    { "title": "Sport", "theme": "sport", "count": 6 },
+    { "title": "Geography", "theme": "geography", "count": 6 },
+    { "title": "History", "theme": "history", "count": 6 },
+    { "title": "Science & Nature", "theme": "science-nature", "count": 6 },
+    { "title": "Food & Drink", "theme": "food-drink", "count": 6 },
+    { "title": "Literature", "theme": "literature", "count": 6 },
+    { "title": "Art & Design", "theme": "art-design", "count": 6 },
+    { "title": "Games & Toys", "theme": "games-toys", "count": 6 },
+    { "title": "Tech & Internet", "theme": "tech-internet", "count": 6 },
+    { "title": "Politics & Society", "theme": "politics-society", "count": 6 },
+    { "title": "Myth & Religion", "theme": "myth-religion", "count": 6 },
+    { "title": "Language & Words", "theme": "language-words", "count": 6 },
+    { "title": "Video Games", "theme": "video-games", "count": 6 },
+    { "title": "Pop & Misc", "theme": "pop-misc", "count": 6 }
+  ]
+}
