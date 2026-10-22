@@ -1,7 +1,7 @@
 """Build PATTERN / connection rounds (Dirty South / NYC League style) where the
 ANSWERS share a structural thread, not a category:
 
-  hidden   every answer hides the same string of letters ("...cat..." in Scatter,
+  string   every answer hides the same string of letters ("...cat..." in Scatter,
            Catalonia, Muscat)
   rhyme    every answer rhymes (CMU pronouncing dictionary)
   keyword  every answer (or question) contains the same whole word ("King")
@@ -11,9 +11,9 @@ round; BUILD materializes one into a publishable quiz_<N>.json with a
 theme_description stating the connection.
 
     uv run --with duckdb --with pronouncing python scripts/theme_round.py discover rhyme --min 10
-    uv run --with duckdb --with pronouncing python scripts/theme_round.py discover hidden --min 10
+    uv run --with duckdb --with pronouncing python scripts/theme_round.py discover string --min 10
     uv run --with duckdb --with pronouncing python scripts/theme_round.py discover keyword --min 5
-    uv run --with duckdb --with pronouncing python scripts/theme_round.py build hidden cat --count 8
+    uv run --with duckdb --with pronouncing python scripts/theme_round.py build string cat --count 8
     uv run --with duckdb --with pronouncing python scripts/theme_round.py build rhyme ain --count 8
     uv run --with duckdb --with pronouncing python scripts/theme_round.py build keyword king --count 8 --apply
 """
@@ -78,7 +78,7 @@ THEME_WORDS = {
 }
 
 
-def discover_hidden(qa, min_n):
+def discover_string(qa, min_n):
     # 1) curated theme words (the good stuff), where the word is hidden INSIDE a
     #    longer answer, not the whole answer.
     for theme, words in THEME_WORDS.items():
@@ -163,7 +163,7 @@ def match(qa, kind, value):
                 continue
             if _rhyme_part(a) == tgt:
                 picked.append((q, a)); seen.add(a.lower())
-    elif kind == "hidden":
+    elif kind == "string":
         for q, a in qa:
             la = letters(a)
             if v in la and la != v and a.lower() not in seen:
@@ -177,7 +177,7 @@ def match(qa, kind, value):
 
 
 def theme_desc(kind, value, n):
-    if kind == "hidden":
+    if kind == "string":
         return f"Hidden thread: every one of these {n} answers contains the string '{value.upper()}'."
     if kind == "rhyme":
         return f"Every one of these {n} answers rhymes."
@@ -236,13 +236,13 @@ def build(kind, value, count, title, apply):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    d = sub.add_parser("discover"); d.add_argument("kind", choices=["hidden", "rhyme", "keyword"]); d.add_argument("--min", type=int, default=8)
-    b = sub.add_parser("build"); b.add_argument("kind", choices=["hidden", "rhyme", "keyword"]); b.add_argument("value"); b.add_argument("--count", type=int, default=8); b.add_argument("--title", default=""); b.add_argument("--apply", action="store_true")
+    d = sub.add_parser("discover"); d.add_argument("kind", choices=["string", "rhyme", "keyword"]); d.add_argument("--min", type=int, default=8)
+    b = sub.add_parser("build"); b.add_argument("kind", choices=["string", "rhyme", "keyword"]); b.add_argument("value"); b.add_argument("--count", type=int, default=8); b.add_argument("--title", default=""); b.add_argument("--apply", action="store_true")
     a = ap.parse_args()
     if a.cmd == "discover":
         qa = load()
         print(f"scanning {len(qa)} clean answers for '{a.kind}' threads (min {a.min})...\n")
-        {"hidden": discover_hidden, "rhyme": discover_rhyme, "keyword": discover_keyword}[a.kind](qa, a.min)
+        {"string": discover_string, "rhyme": discover_rhyme, "keyword": discover_keyword}[a.kind](qa, a.min)
     else:
         return build(a.kind, a.value, a.count, a.title, a.apply)
 

@@ -14,17 +14,19 @@
  */
 
 import { NextResponse } from "next/server";
-import { pickQuestions, resolveTopic, salientTopic } from "@/lib/bank/queries";
-import type { DifficultyFilter } from "@/lib/bank/types";
+import { countPattern, pickQuestions, resolveTopic, salientTopic } from "@/lib/bank/queries";
+import type { DifficultyFilter, PatternSpec } from "@/lib/bank/types";
 
 export const runtime = "nodejs";
 
 interface TopicRequest {
-  topic: string;
+  topic?: string;
   count?: number;
   difficulty?: DifficultyFilter;
   excludeIds?: string[];
   allowTimeSensitive?: boolean;
+  /** Connection round: pull answers sharing a letter-string / keyword / rhyme. */
+  pattern?: PatternSpec;
 }
 
 export async function POST(req: Request) {
@@ -34,14 +36,44 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
+
+  const count = body.count ?? 8;
+
+  // PATTERN PATH: a connection round where the answers share a structural
+  // thread, not a category. Skips topic resolution entirely.
+  if (body.pattern && body.pattern.value) {
+    const spec: PatternSpec = { kind: body.pattern.kind, value: body.pattern.value };
+    const matchCount = await countPattern(spec);
+    const questions = await pickQuestions({
+      count,
+      difficulty: body.difficulty,
+      excludeIds: body.excludeIds,
+      excludeSources: ["dirty-south"],
+      allowTimeSensitive: body.allowTimeSensitive,
+      pattern: spec,
+    });
+    const warnings: string[] = [];
+    if (questions.length === 0) {
+      warnings.push(`No answers match the ${spec.kind} "${spec.value}". Try another value.`);
+    } else if (questions.length < count) {
+      warnings.push(`Only ${questions.length}/${count} answers match the ${spec.kind} "${spec.value}".`);
+    }
+    return NextResponse.json({
+      topic: body.topic || `${spec.kind}:${spec.value}`,
+      pattern: spec,
+      matchCount,
+      questions,
+      warnings,
+    });
+  }
+
   if (!body.topic || typeof body.topic !== "string") {
     return NextResponse.json({ error: "topic required" }, { status: 400 });
   }
-
-  const count = body.count ?? 8;
+  const topic = body.topic;
   // Match on the distinctive term ("Marvel movies" -> "marvel") so filler words
   // don't sink an otherwise-coverable topic. Original kept for warning copy.
-  const searchTopic = salientTopic(body.topic);
+  const searchTopic = salientTopic(topic);
   const resolved = await resolveTopic(searchTopic);
   const warnings: string[] = [];
   let fallbackUsed:
@@ -66,9 +98,9 @@ export async function POST(req: Request) {
   const topicMatchesSub =
     resolved.matched === "exact-slug" &&
     resolved.subcategorySlug !== null &&
-    (resolved.subcategorySlug.toLowerCase() === body.topic.trim().toLowerCase() ||
+    (resolved.subcategorySlug.toLowerCase() === topic.trim().toLowerCase() ||
       resolved.subcategorySlug.replace(/-/g, " ").toLowerCase() ===
-        body.topic.trim().toLowerCase());
+        topic.trim().toLowerCase());
 
   let questions: Awaited<ReturnType<typeof pickQuestions>> = [];
 

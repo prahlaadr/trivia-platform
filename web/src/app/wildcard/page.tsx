@@ -6,6 +6,8 @@ import { getBrand } from "@/lib/branding";
 import { gameGenToQuiz, saveGame, getSavedGames, deleteSavedGame } from "@/lib/game-gen";
 import type { GameGenSession, SavedGameGen } from "@/lib/types";
 import { buildRounds, type BankDifficulty, type RoundPick } from "@/lib/bank-generate";
+import type { PatternKind } from "@/lib/bank/types";
+import PatternRoundAdder from "@/components/PatternRoundAdder";
 
 interface ApiCategory {
   id: number;
@@ -25,9 +27,13 @@ export default function WildcardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Selected items can be either a category slug (from tile click) or a
-  // free-text topic the host typed (audience yelled it). Marked by `.kind`.
-  type Pick = { kind: "category"; slug: string; label: string } | { kind: "topic"; topic: string };
+  // Selected items are a category slug (tile click), a free-text topic the host
+  // typed (audience yelled it), or a connection pattern (shared letters / word /
+  // rhyme across answers). Marked by `.kind`.
+  type Pick =
+    | { kind: "category"; slug: string; label: string }
+    | { kind: "topic"; topic: string }
+    | { kind: "pattern"; patternKind: PatternKind; value: string; label: string; count: number };
   const [selected, setSelected] = useState<Pick[]>([]);
   const [topicInput, setTopicInput] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("mixed");
@@ -76,6 +82,15 @@ export default function WildcardPage() {
     setTopicInput("");
   }, [topicInput]);
 
+  const addPattern = useCallback(
+    (p: { patternKind: PatternKind; value: string; label: string; count: number }) => {
+      setSelected((prev) =>
+        prev.length >= DEFAULT_ROUNDS ? prev : [...prev, { kind: "pattern", ...p }]
+      );
+    },
+    []
+  );
+
   const removeSelected = useCallback((i: number) => {
     setSelected((prev) => prev.filter((_, idx) => idx !== i));
   }, []);
@@ -94,7 +109,9 @@ export default function WildcardPage() {
           ? selected.map((p) =>
               p.kind === "category"
                 ? { topic: p.slug, label: p.label }
-                : { topic: p.topic, label: p.topic }
+                : p.kind === "topic"
+                ? { topic: p.topic, label: p.topic }
+                : { topic: p.label, label: p.label, pattern: { kind: p.patternKind, value: p.value } }
             )
           : [...categories]
               .sort(() => Math.random() - 0.5)
@@ -233,6 +250,11 @@ export default function WildcardPage() {
               </div>
             </div>
 
+            {/* Connection / pattern round (NYC League style) */}
+            <div className="mb-4">
+              <PatternRoundAdder onAdd={addPattern} disabled={selected.length >= DEFAULT_ROUNDS} />
+            </div>
+
             {/* Selected chips (mix of category + topic picks) */}
             {selected.length > 0 && (
               <div className="mb-4 flex flex-wrap gap-2">
@@ -242,7 +264,10 @@ export default function WildcardPage() {
                     className="inline-flex items-center gap-2 rounded-full bg-[#8B3530] py-1 pl-3 pr-1 text-sm font-medium text-white"
                   >
                     {p.kind === "topic" && <span className="text-[10px] uppercase text-white/70">topic</span>}
-                    <span>{p.kind === "category" ? p.label : p.topic}</span>
+                    {p.kind === "pattern" && (
+                      <span className="text-[10px] uppercase text-white/70">{p.count}</span>
+                    )}
+                    <span>{p.kind === "category" ? p.label : p.kind === "topic" ? p.topic : p.label}</span>
                     <button
                       onClick={() => removeSelected(i)}
                       className="flex h-5 w-5 items-center justify-center rounded-full bg-white/15 text-xs text-white hover:bg-white/30"

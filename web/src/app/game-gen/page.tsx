@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { getBrand } from "@/lib/branding";
 import type { GameGenSession, SavedGameGen } from "@/lib/types";
-import { buildRounds, type BankDifficulty } from "@/lib/bank-generate";
+import { buildRounds, type BankDifficulty, type RoundPick } from "@/lib/bank-generate";
+import PatternRoundAdder, { type PatternPick } from "@/components/PatternRoundAdder";
 import {
   getGameGenSession,
   createGameGenSession,
@@ -71,6 +72,8 @@ export default function GameGenPage() {
   const [bankCategories, setBankCategories] = useState<ApiCategory[]>([]);
   const [difficulty, setDifficulty] = useState<Difficulty>("mixed");
   const [savedGames, setSavedGames] = useState<SavedGameGen[]>([]);
+  // Host-added connection rounds, appended after the team-topic rounds.
+  const [hostPatterns, setHostPatterns] = useState<PatternPick[]>([]);
 
   useEffect(() => {
     setSession(getGameGenSession());
@@ -174,7 +177,7 @@ export default function GameGenPage() {
         (c) => !used.has(c.name.toLowerCase()) && c.questionCount >= QUESTIONS_PER_ROUND
       );
       let fillerIdx = 0;
-      const picks = topics.map((t) => {
+      const picks: RoundPick[] = topics.map((t) => {
         if (t === "random" && fillers.length) {
           const c = fillers[fillerIdx % fillers.length];
           fillerIdx++;
@@ -182,6 +185,10 @@ export default function GameGenPage() {
         }
         return { topic: t, label: titleCase(t) };
       });
+      // Host-added connection rounds come after the team-topic rounds.
+      for (const p of hostPatterns) {
+        picks.push({ topic: p.label, label: p.label, pattern: { kind: p.patternKind, value: p.value } });
+      }
 
       const { rounds, tieBreaker } = await buildRounds(picks, {
         perRound: QUESTIONS_PER_ROUND,
@@ -212,7 +219,7 @@ export default function GameGenPage() {
     } finally {
       setGenerating(false);
     }
-  }, [session, bankCategories, difficulty]);
+  }, [session, bankCategories, difficulty, hostPatterns]);
 
   const handleSaveGame = useCallback(() => {
     if (!generated) return;
@@ -500,7 +507,7 @@ export default function GameGenPage() {
               </div>
             </div>
 
-            <div className="mb-6 space-y-2">
+            <div className="mb-4 space-y-2">
               {roundTopics.map((topic, i) => (
                 <div
                   key={i}
@@ -517,6 +524,30 @@ export default function GameGenPage() {
                   </span>
                 </div>
               ))}
+              {hostPatterns.map((p, i) => (
+                <div
+                  key={`p${i}`}
+                  className="flex items-center gap-3 rounded bg-[#8B3530]/8 px-4 py-3"
+                >
+                  <span className="text-sm font-bold text-[#8B3530]/60">R{roundTopics.length + i + 1}</span>
+                  <span className="font-medium text-[#3D3D3A]">{p.label}</span>
+                  <span className="text-xs text-[#3D3D3A]/45">{p.count} in bank</span>
+                  <button
+                    onClick={() => setHostPatterns((prev) => prev.filter((_, idx) => idx !== i))}
+                    className="ml-auto rounded px-2 py-0.5 text-xs text-[#C26B3E]/60 hover:bg-[#C26B3E]/10 hover:text-[#C26B3E]"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Add a connection round (shared with Wildcard) */}
+            <div className="mb-6">
+              <PatternRoundAdder
+                onAdd={(p) => setHostPatterns((prev) => [...prev, p])}
+                disabled={hostPatterns.length >= 4}
+              />
             </div>
 
             {/* Generate Section */}

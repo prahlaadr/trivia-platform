@@ -8,6 +8,7 @@
  * two pages can't drift apart.
  */
 import type { GeneratedQuestion, GeneratedRound } from "./types";
+import type { PatternSpec } from "./bank/types";
 
 export type BankDifficulty = "mixed" | "easy" | "medium" | "hard";
 
@@ -30,6 +31,15 @@ export interface RoundPick {
   topic: string;
   /** human-facing round title */
   label: string;
+  /** when set, this is a connection round (answers share a pattern), not a topic */
+  pattern?: PatternSpec;
+}
+
+/** Host-facing sentence stating the connection, stored as the round's theme. */
+export function patternDescription(p: PatternSpec): string {
+  if (p.kind === "string") return `Every answer contains the letters "${p.value.toUpperCase()}".`;
+  if (p.kind === "rhyme") return `Every answer rhymes with "${p.value}".`;
+  return `Every answer (or its question) involves "${p.value}".`;
 }
 
 /**
@@ -57,6 +67,24 @@ export async function pullTopic(
   return res.json() as Promise<TopicResponse>;
 }
 
+/** Fetch questions for one pick — a topic round or a pattern (connection) round. */
+async function pullPick(
+  pick: RoundPick,
+  count: number,
+  difficulty: BankDifficulty
+): Promise<TopicResponse> {
+  const body = pick.pattern
+    ? { pattern: pick.pattern, topic: pick.label, count, difficulty }
+    : { topic: pick.topic, count, difficulty };
+  const res = await fetch("/api/wildcard/topic", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Round "${pick.label}" failed (${res.status})`);
+  return res.json() as Promise<TopicResponse>;
+}
+
 /**
  * Pull questions for each pick and assemble rounds, plus an optional hard
  * tiebreaker drawn from the first pick's topic.
@@ -66,28 +94,36 @@ export async function buildRounds(
   opts: { perRound: number; difficulty: BankDifficulty; tiebreaker?: boolean }
 ): Promise<{ rounds: GeneratedRound[]; tieBreaker?: { question: string; answer: string } }> {
   const results = await Promise.all(
-    picks.map((p) => pullTopic(p.topic, opts.perRound, opts.difficulty))
+    picks.map((p) => pullPick(p, opts.perRound, opts.difficulty))
   );
 
-  const rounds: GeneratedRound[] = results.map((res, i) => ({
-    number: i + 1,
-    title: picks[i].label,
-    topic: picks[i].topic,
-    questions: (res.questions || []).map(
-      (q, j): GeneratedQuestion => ({
-        number: j + 1,
-        text: withTrueFalsePrefix(q),
-        answer: q.answer,
-        topic: picks[i].topic,
-        source: "bank",
-      })
-    ),
-  }));
+  const rounds: GeneratedRound[] = results.map((res, i) => {
+    // A pattern round carries the connection as its theme; a topic round keeps
+    // the topic. gameGenToQuiz surfaces round.topic as the theme_description.
+    const theme = picks[i].pattern ? patternDescription(picks[i].pattern!) : picks[i].topic;
+    return {
+      number: i + 1,
+      title: picks[i].label,
+      topic: theme,
+      questions: (res.questions || []).map(
+        (q, j): GeneratedQuestion => ({
+          number: j + 1,
+          text: withTrueFalsePrefix(q),
+          answer: q.answer,
+          topic: theme,
+          source: "bank",
+        })
+      ),
+    };
+  });
 
+  // Tiebreaker: a plain hard question from the first TOPIC pick (pattern picks
+  // have no topic to draw a fair numeric tiebreaker from).
+  const tbPick = picks.find((p) => !p.pattern);
   let tieBreaker: { question: string; answer: string } | undefined;
-  if (opts.tiebreaker !== false && picks.length) {
+  if (opts.tiebreaker !== false && tbPick) {
     try {
-      const tb = (await pullTopic(picks[0].topic, 1, "hard")).questions?.[0];
+      const tb = (await pullTopic(tbPick.topic, 1, "hard")).questions?.[0];
       if (tb) tieBreaker = { question: withTrueFalsePrefix(tb), answer: tb.answer };
     } catch {
       // tiebreaker is optional
