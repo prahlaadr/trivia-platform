@@ -24,12 +24,15 @@ for (const slug of targets) {
   const resolved = await resolveTopic(slug);
   const qs = await pickQuestions({
     categorySlug: resolved.categorySlug ?? slug,
+    subcategorySlug: resolved.subcategorySlug ?? undefined,
     count: per,
     difficulty: "mixed",
     excludeSources: ["dirty-south"],
   });
-  const offCat = qs.filter((q) => q.categorySlug !== slug).length;
-  console.log(`\n=== ${slug}  (resolved cat=${resolved.categorySlug}, matched=${resolved.matched})  ${qs.length} pulled, ${offCat} off-category ===`);
+  // off-target = not matching whichever level was resolved (subcat if present, else cat)
+  const targetKey = resolved.subcategorySlug ? "subcategorySlug" : "categorySlug";
+  const off = qs.filter((q) => (q as Record<string, unknown>)[targetKey] !== slug).length;
+  console.log(`\n=== ${slug}  (resolved ${resolved.categorySlug}/${resolved.subcategorySlug ?? "-"}, matched=${resolved.matched})  ${qs.length} pulled, ${off} off-target ===`);
   for (const q of qs) {
     console.log(`  [${q.source}] ${q.text.slice(0, 66)}  ->  ${String(q.answer).slice(0, 26)}`);
   }
