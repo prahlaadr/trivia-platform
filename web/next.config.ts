@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   // rhyme pattern is resolved; without it, rhyme silently returns 0 in prod.
   outputFileTracingIncludes: {
     "/api/bank/categories": ["./.bank/bank.json"],
+    "/api/bank/pattern-suggestions": ["./.bank/bank.json"],
     "/api/wildcard/topic": ["./.bank/bank.json", "./.bank/rhyme-seeds.json"],
     "/api/bank/pattern-count": ["./.bank/bank.json", "./.bank/rhyme-seeds.json"],
   },

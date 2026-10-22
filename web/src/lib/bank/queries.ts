@@ -4,6 +4,7 @@ import type {
   BankSubcategory,
   BankQuestion,
   DifficultyFilter,
+  PatternKind,
   PatternSpec,
 } from "./types";
 
@@ -124,6 +125,96 @@ function matchesPattern(q: BankQuestion, spec: PatternSpec, rhymeTarget: string 
   // rhyme: single-word answers only, matched on precomputed rhymeKey
   if (q.answer.includes(" ")) return false;
   return q.rhymeKey != null && rhymeTarget != null && q.rhymeKey === rhymeTarget;
+}
+
+// Curated "aha" substrings for string suggestions: a hidden animal / colour /
+// body part / element / common word reads far better than a random fragment.
+const STRING_CANDIDATES = (
+  "cat dog ant bee cow owl fox rat ape eel hen pig bat ram hare bear lion wolf " +
+  "deer seal crab mole newt toad goat mule boar lynx hawk swan dove crow moth " +
+  "slug worm clam puma kiwi " +
+  "red tan ash gold pink blue cyan rose ruby teal plum lime navy jade gray " +
+  "ear arm rib hip eye toe gum jaw lip shin heel nose chin lung brain spine " +
+  "thigh ankle wrist elbow " +
+  "tin iron gold lead zinc neon " +
+  "art age ice oak elm ink ale ace star moon king queen sea ski war pie tea oil " +
+  "map net key car bus van ram sun ear win"
+).split(/\s+/);
+
+// generic words that make dull keyword rounds
+const SUGGEST_STOP = new Set(
+  ("the and for with from this that what which name first known also called their " +
+   "other often most used name only into over than more some each both when where").split(/\s+/)
+);
+
+export interface PatternSuggestion { value: string; label: string; count: number }
+let _suggestions: Record<PatternKind, PatternSuggestion[]> | null = null;
+
+/** Top string / keyword / rhyme threads in the bank, for one-click round picks. */
+export function getPatternSuggestions(): Record<PatternKind, PatternSuggestion[]> {
+  if (_suggestions) return _suggestions;
+  const MIN = 8;
+  const qs = getBank().questions.filter(
+    (q) => q.source !== "dirty-south" && cleanPatternAnswer(q.answer)
+  );
+
+  // string: curated substrings hidden inside (not equal to) answers
+  const strHits = new Map<string, Set<string>>();
+  for (const q of qs) {
+    const la = lettersOnly(q.answer);
+    for (const c of STRING_CANDIDATES) {
+      if (la.includes(c) && la !== c) {
+        (strHits.get(c) ?? strHits.set(c, new Set()).get(c)!).add(q.answer.toLowerCase());
+      }
+    }
+  }
+  // Cap the count: a 3-letter fragment hidden in 200+ answers (ANT, ART) is
+  // everywhere and makes a dull round; the fun ones hide a word in ~10-50 (MAD).
+  const stringS = [...strHits.entries()]
+    .map(([v, s]) => ({ value: v, label: v.toUpperCase(), count: s.size }))
+    .filter((x) => x.count >= MIN && x.count <= 55)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 12);
+
+  // keyword: whole words shared across many answers
+  const kwHits = new Map<string, Set<string>>();
+  for (const q of qs) {
+    for (const w of new Set(q.answer.toLowerCase().match(/[a-z]{4,}/g) ?? [])) {
+      if (!SUGGEST_STOP.has(w)) {
+        (kwHits.get(w) ?? kwHits.set(w, new Set()).get(w)!).add(q.answer.toLowerCase());
+      }
+    }
+  }
+  const keywordS = [...kwHits.entries()]
+    .map(([v, s]) => ({ value: v, label: v, count: s.size }))
+    .filter((x) => x.count >= MIN)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 12);
+
+  // rhyme: groups of single-word answers that rhyme, named by an example word.
+  // Only real words (>=3 letters, has a vowel) so single-letter abbreviation
+  // answers (E, Z, K, Q) don't form junk rhyme groups.
+  const rhGroups = new Map<string, Set<string>>();
+  for (const q of qs) {
+    const a = q.answer;
+    const realWord = a.length >= 3 && /[aeiou]/i.test(a) && a !== a.toUpperCase(); // skip USA/NBA/ABC
+    if (q.rhymeKey && !a.includes(" ") && realWord) {
+      (rhGroups.get(q.rhymeKey) ?? rhGroups.set(q.rhymeKey, new Set()).get(q.rhymeKey)!).add(a);
+    }
+  }
+  const rhymeS = [...rhGroups.values()]
+    .filter((s) => s.size >= MIN)
+    .map((s) => {
+      // seed = most word-like member (closest to 5 letters), reads better than
+      // an abbreviation-y short one; examples are the rest.
+      const words = [...s].sort((a, b) => Math.abs(a.length - 5) - Math.abs(b.length - 5));
+      return { value: words[0], label: `${words[0]} (${words.slice(1, 4).join(", ")}…)`, count: s.size };
+    })
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 12);
+
+  _suggestions = { string: stringS, keyword: keywordS, rhyme: rhymeS };
+  return _suggestions;
 }
 
 /** Distinct-answer count for a pattern, so the UI can warn before an empty round. */

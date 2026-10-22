@@ -527,9 +527,12 @@ export default function GameGenPage() {
               {hostPatterns.map((p, i) => (
                 <div
                   key={`p${i}`}
-                  className="flex items-center gap-3 rounded bg-[#8B3530]/8 px-4 py-3"
+                  className="flex items-center gap-3 rounded border-l-4 border-[#8B3530] bg-[#8B3530]/10 px-4 py-3"
                 >
                   <span className="text-sm font-bold text-[#8B3530]/60">R{roundTopics.length + i + 1}</span>
+                  <span className="rounded-full bg-[#8B3530] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                    {p.patternKind}
+                  </span>
                   <span className="font-medium text-[#3D3D3A]">{p.label}</span>
                   <span className="text-xs text-[#3D3D3A]/45">{p.count} in bank</span>
                   <button
