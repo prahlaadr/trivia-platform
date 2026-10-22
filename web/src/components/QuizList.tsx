@@ -97,7 +97,7 @@ export function QuizList() {
       }
 
       if (res.status === 403) {
-        // Wrong PIN — clear it so they get prompted again
+        // Wrong PIN, clear it so they get prompted again
         setAdminPin("");
         setMessage("Invalid admin PIN");
         setMessageType("error");
@@ -351,6 +351,13 @@ export function QuizList() {
           </p>
         )}
       </div>
+      <footer className="mt-10 pb-6 text-center text-xs text-white/30">
+        Some questions from{" "}
+        <a href="https://the-trivia-api.com" target="_blank" rel="noreferrer" className="underline hover:text-white/50">The Trivia API</a>{" "}
+        (CC BY-NC) and{" "}
+        <a href="https://opentdb.com" target="_blank" rel="noreferrer" className="underline hover:text-white/50">OpenTDB</a>{" "}
+        (CC BY-SA).
+      </footer>
     </div>
   );
 }
