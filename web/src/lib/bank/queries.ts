@@ -119,9 +119,16 @@ export async function resolveTopic(topic: string): Promise<{
   const cats = getBank().categories;
   const subs = getBank().subcategories;
 
-  // Topic IS a category slug or name — return the whole category.
+  // Normalize away spaces, hyphens, and punctuation so a category's display
+  // name ("Science & Nature"), its salient form ("science nature"), and its
+  // slug ("science-nature") all match. Without this, display-name topics with
+  // an "&" resolve to nothing and the round comes back empty.
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const nt = norm(t);
+
+  // Topic IS a category slug or name: return the whole category.
   for (const c of cats) {
-    if (c.slug.toLowerCase() === t || c.name.toLowerCase() === t) {
+    if (norm(c.slug) === nt || norm(c.name) === nt) {
       return {
         categorySlug: c.slug,
         subcategorySlug: null,
@@ -133,7 +140,7 @@ export async function resolveTopic(topic: string): Promise<{
 
   // Exact subcategory slug or name match
   for (const s of subs) {
-    if (s.slug.toLowerCase() === t || s.name.toLowerCase() === t) {
+    if (norm(s.slug) === nt || norm(s.name) === nt) {
       return { categorySlug: s.categorySlug, subcategorySlug: s.slug, matched: "exact-slug" };
     }
   }
