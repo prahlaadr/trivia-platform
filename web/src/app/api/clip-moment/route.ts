@@ -13,6 +13,24 @@ export const maxDuration = 20;
 const norm = (s: string) =>
   s.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
 
+// Fetch transcript segments. On the deployed site (SUPADATA_API_KEY set) go
+// through Supadata, which reaches YouTube from an allowed IP; locally fall back
+// to the free youtube-transcript scrape (works from residential IPs). Both
+// return {text, offset(ms), duration(ms)}.
+async function getSegments(videoId: string): Promise<{ text: string; offset: number; duration: number }[]> {
+  const key = process.env.SUPADATA_API_KEY;
+  if (key) {
+    const res = await fetch(
+      `https://api.supadata.ai/v1/transcript?url=${encodeURIComponent("https://youtu.be/" + videoId)}`,
+      { headers: { "x-api-key": key } }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data?.content) ? data.content : [];
+  }
+  return YoutubeTranscript.fetchTranscript(videoId);
+}
+
 export async function GET(req: NextRequest) {
   const v = (req.nextUrl.searchParams.get("v") || "").trim();
   const q = norm(req.nextUrl.searchParams.get("q") || "");
@@ -20,7 +38,7 @@ export async function GET(req: NextRequest) {
 
   let raw: { text: string; offset: number; duration: number }[];
   try {
-    raw = await YoutubeTranscript.fetchTranscript(v);
+    raw = await getSegments(v);
   } catch {
     return NextResponse.json({ found: false, reason: "no-transcript" });
   }
