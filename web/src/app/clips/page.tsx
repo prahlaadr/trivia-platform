@@ -13,12 +13,18 @@ export default function ClipsPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<ClipResult | null>(null);
+  const [activeQuery, setActiveQuery] = useState("");
+  const [moment, setMoment] = useState<{ start: number; end: number; exact: boolean } | null>(null);
+  const [momentBusy, setMomentBusy] = useState(false);
 
   const search = useCallback(async (q: string) => {
     const trimmed = q.trim();
     if (!trimmed) return;
     setBusy(true);
     setError(null);
+    setActiveQuery(trimmed);
+    setSelected(null);
+    setMoment(null);
     try {
       const res = await fetch(`/api/clip-search?q=${encodeURIComponent(trimmed)}`);
       const data = await res.json();
@@ -28,6 +34,23 @@ export default function ClipsPage() {
       setError("Network error");
     } finally {
       setBusy(false);
+    }
+  }, []);
+
+  // Play a result: look up the exact moment the phrase is said (via transcript)
+  // and jump the embed there. Falls back to the full clip when there's no match.
+  const playClip = useCallback(async (c: ClipResult, phrase: string) => {
+    setSelected(c);
+    setMoment(null);
+    setMomentBusy(true);
+    try {
+      const res = await fetch(`/api/clip-moment?v=${c.videoId}&q=${encodeURIComponent(phrase)}`);
+      const data = await res.json();
+      if (data.found) setMoment({ start: data.start, end: data.end, exact: !!data.exact });
+    } catch {
+      // leave moment null -> plays the full clip
+    } finally {
+      setMomentBusy(false);
     }
   }, []);
 
@@ -80,7 +103,7 @@ export default function ClipsPage() {
           </div>
         )}
 
-        {/* Player */}
+        {/* Player — jumps to the exact moment when the transcript has a match */}
         {selected && (
           <div className="mt-6">
             <div className="mb-2 flex items-center justify-between gap-2">
@@ -88,22 +111,39 @@ export default function ClipsPage() {
                 {selected.title}
               </p>
               <button
-                onClick={() => setSelected(null)}
+                onClick={() => { setSelected(null); setMoment(null); }}
                 className="shrink-0 rounded px-2 py-1 text-xs font-bold text-[#8B3530]/60 hover:text-[#8B3530]"
               >
                 Close
               </button>
             </div>
-            <div className="overflow-hidden rounded-xl border border-[#3D3D3A]/20 shadow-lg">
-              <iframe
-                key={selected.videoId}
-                title="clip"
-                className="aspect-video w-full"
-                src={`https://www.youtube.com/embed/${selected.videoId}?autoplay=1&rel=0`}
-                allow="autoplay; encrypted-media; fullscreen"
-                allowFullScreen
-              />
-            </div>
+            {momentBusy ? (
+              <div className="flex aspect-video w-full items-center justify-center rounded-xl border border-[#3D3D3A]/20 bg-[#1C2E22] text-sm text-[#E8DFC8]/70">
+                Finding the exact moment…
+              </div>
+            ) : (
+              <>
+                <div className="overflow-hidden rounded-xl border border-[#3D3D3A]/20 shadow-lg">
+                  <iframe
+                    key={selected.videoId}
+                    title="clip"
+                    className="aspect-video w-full"
+                    src={`https://www.youtube.com/embed/${selected.videoId}?autoplay=1&rel=0${moment ? `&start=${moment.start}&end=${moment.end}` : ""}`}
+                    allow="autoplay; encrypted-media; fullscreen"
+                    allowFullScreen
+                  />
+                </div>
+                <p className="mt-2 text-xs">
+                  {moment ? (
+                    <span className="font-semibold text-[#8FAA73]">
+                      ▶ Jumped to the line at {moment.start}s{moment.exact ? "" : " · closest caption"} · stops at {moment.end}s
+                    </span>
+                  ) : (
+                    <span className="text-[#3D3D3A]/50">No transcript match — playing the full clip.</span>
+                  )}
+                </p>
+              </>
+            )}
           </div>
         )}
 
@@ -119,7 +159,7 @@ export default function ClipsPage() {
               }`}
             >
               <button
-                onClick={() => setSelected(c)}
+                onClick={() => playClip(c, activeQuery)}
                 className="flex min-w-0 flex-1 items-center gap-3 text-left"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
