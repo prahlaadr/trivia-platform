@@ -235,6 +235,12 @@ export function QuizList() {
             >
               Scorekeeper
             </Link>
+            <Link
+              href="/clips"
+              className="rounded bg-[#C26B3E]/20 px-4 py-2 text-sm font-bold text-[#C26B3E] transition-all hover:bg-[#C26B3E]/30"
+            >
+              Clips
+            </Link>
           </div>
         </div>
 

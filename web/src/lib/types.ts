@@ -35,6 +35,16 @@ export interface Quiz {
   tie_breaker_answer: string;
 }
 
+// A clip-search result (YouTube via InnerTube) shown in the presenter's live
+// clip lookup. Thumbnail is derived from the video id.
+export interface ClipResult {
+  videoId: string;
+  title: string;
+  channel: string;
+  duration: string;
+  thumbnail: string;
+}
+
 // A "slide" is a rendered view in the presenter
 export type SlideType =
   | "title"
