@@ -9,7 +9,9 @@ import type { ClipResult } from "@/lib/types";
 export const runtime = "nodejs";
 export const maxDuration = 15;
 
-const INNERTUBE_KEY = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
+// YouTube's public web-client InnerTube key (not a user credential). Read from
+// env so the literal isn't committed to source; see web/.env.example.
+const INNERTUBE_KEY = process.env.YT_INNERTUBE_KEY ?? "";
 const deEm = (s: string) => s.replace(/\s*—\s*/g, ", ").replace(/—/g, ", ");
 
 interface Run { text?: string }
@@ -24,6 +26,7 @@ interface VideoRenderer {
 export async function GET(req: NextRequest) {
   const q = (req.nextUrl.searchParams.get("q") || "").trim();
   if (!q) return NextResponse.json({ error: "q required" }, { status: 400 });
+  if (!INNERTUBE_KEY) return NextResponse.json({ error: "YT_INNERTUBE_KEY not set" }, { status: 500 });
 
   let res: Response;
   try {
